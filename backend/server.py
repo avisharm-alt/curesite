@@ -373,6 +373,29 @@ async def review_poster(poster_id: str, status: str, comments: Optional[str] = N
     updated_poster = await db.poster_submissions.find_one({"id": poster_id})
     return PosterSubmission(**parse_from_mongo(updated_poster))
 
+@api_router.get("/admin/posters/pending", response_model=List[PosterSubmission])
+async def get_pending_posters(current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    posters = await db.poster_submissions.find({"status": "pending"}).to_list(100)
+    return [PosterSubmission(**parse_from_mongo(poster)) for poster in posters]
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    stats = {
+        "total_users": await db.users.count_documents({}),
+        "total_posters": await db.poster_submissions.count_documents({}),
+        "pending_posters": await db.poster_submissions.count_documents({"status": "pending"}),
+        "approved_posters": await db.poster_submissions.count_documents({"status": "approved"}),
+        "total_network_profiles": await db.student_network.count_documents({}),
+        "total_volunteer_opportunities": await db.volunteer_opportunities.count_documents({})
+    }
+    return stats
+
 # EC Profile Routes
 @api_router.post("/ec-profiles", response_model=ECProfile)
 async def create_ec_profile(profile: ECProfileCreate, current_user: User = Depends(get_current_user)):
