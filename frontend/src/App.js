@@ -103,6 +103,7 @@ const Header = () => {
     { name: 'EC Profiles', href: '/profiles', icon: BarChart3 },
     { name: 'Volunteer Opportunities', href: '/volunteer', icon: Heart },
     ...(user ? [{ name: 'My Profile', href: '/profile', icon: User }] : []),
+    ...(user?.user_type === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Award }] : []),
   ];
 
   const handleGoogleLogin = () => {
