@@ -1671,7 +1671,7 @@ const AdminPanelPage = () => {
       const headers = { Authorization: `Bearer ${token}` };
 
       const [pendingResponse, statsResponse] = await Promise.all([
-        axios.get(`${API}/admin/posters/pending`, { headers }),
+        axios.get(`${API}/admin/posters/all`, { headers }),
         axios.get(`${API}/admin/stats`, { headers })
       ]);
 
