@@ -559,6 +559,13 @@ const PosterJournalPage = () => {
           </>
         )}
       </div>
+
+      {/* Poster Viewer Modal */}
+      <PosterViewerModal 
+        poster={viewingPoster} 
+        isOpen={!!viewingPoster}
+        onClose={() => setViewingPoster(null)}
+      />
     </div>
   );
 };
