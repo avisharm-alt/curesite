@@ -1892,7 +1892,8 @@ a:focus {
   color: var(--cure-white);
 }
 
-.pending-posters {
+.pending-posters,
+.admin-posters {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
