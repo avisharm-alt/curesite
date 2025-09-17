@@ -1769,6 +1769,360 @@ const SubmitPosterPage = () => {
   );
 };
 
+// Admin Tab Components
+const PosterManagementTab = ({ posters, onReview, onDelete }) => (
+  <div className="admin-section">
+    <h2>Poster Management</h2>
+    {posters.length > 0 ? (
+      <div className="admin-posters">
+        {posters.map((poster) => (
+          <div key={poster.id} className="admin-poster-card">
+            <div className="poster-header">
+              <h3>{poster.title}</h3>
+              <div className="poster-meta-header">
+                <span className={`status-badge status-${poster.status}`}>{poster.status}</span>
+                <span className="submitted-date">
+                  {new Date(poster.submitted_at).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+            
+            <div className="poster-details">
+              <div className="poster-authors">
+                <strong>Authors:</strong> {poster.authors.join(', ')}
+              </div>
+              <div className="poster-institution">
+                <strong>Institution:</strong> {poster.university} - {poster.program}
+              </div>
+              <div className="poster-abstract">
+                <strong>Abstract:</strong>
+                <p>{poster.abstract}</p>
+              </div>
+              <div className="poster-keywords">
+                <strong>Keywords:</strong>
+                <div className="keywords-list">
+                  {poster.keywords.map((keyword, index) => (
+                    <span key={index} className="keyword-tag">{keyword}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-actions">
+              {poster.poster_url && (
+                <>
+                  <button
+                    onClick={() => {
+                      const token = localStorage.getItem('token');
+                      const viewUrl = `${API}/admin/posters/${poster.id}/view`;
+                      window.open(viewUrl, '_blank');
+                    }}
+                    className="view-btn"
+                  >
+                    <Eye size={16} />
+                    View
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const token = localStorage.getItem('token');
+                      fetch(`${API}/admin/posters/${poster.id}/download`, {
+                        headers: { Authorization: `Bearer ${token}` }
+                      })
+                      .then(response => response.blob())
+                      .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${poster.title}.pdf`;
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        toast.success('Downloaded successfully');
+                      })
+                      .catch(() => toast.error('Download failed'));
+                    }}
+                    className="download-btn"
+                  >
+                    <Download size={16} />
+                    Download
+                  </button>
+                </>
+              )}
+              
+              {poster.status === 'pending' && (
+                <>
+                  <button
+                    onClick={() => onReview(poster.id, 'approved')}
+                    className="approve-btn"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => onReview(poster.id, 'rejected', 'Does not meet quality standards')}
+                    className="reject-btn"
+                  >
+                    Reject
+                  </button>
+                </>
+              )}
+              
+              <button
+                onClick={() => onDelete(poster.id)}
+                className="admin-delete-btn"
+              >
+                <Trash2 size={16} />
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="empty-state">
+        <FileText size={48} />
+        <h3>No posters found</h3>
+        <p>No poster submissions in the system yet.</p>
+      </div>
+    )}
+  </div>
+);
+
+const ProfessorManagementTab = ({ professors, onDelete, onAdd }) => (
+  <div className="admin-section">
+    <div className="section-header">
+      <h2>Professor Network Management</h2>
+      <button onClick={onAdd} className="add-new-btn">
+        <Plus size={16} />
+        Add Professor
+      </button>
+    </div>
+    
+    {professors.length > 0 ? (
+      <div className="admin-items-grid">
+        {professors.map((professor) => (
+          <div key={professor.id} className="admin-item-card">
+            <div className="item-header">
+              <h3>{professor.user_name}</h3>
+              <button onClick={() => onDelete(professor.id)} className="delete-item-btn">
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <p><strong>Department:</strong> {professor.department}</p>
+            <p><strong>Email:</strong> {professor.contact_email}</p>
+            <p><strong>Research Areas:</strong> {professor.research_areas.join(', ')}</p>
+            <p><strong>Accepting Students:</strong> {professor.accepting_students ? 'Yes' : 'No'}</p>
+            {professor.website && (
+              <p><strong>Website:</strong> <a href={professor.website} target="_blank" rel="noopener noreferrer">{professor.website}</a></p>
+            )}
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="empty-state">
+        <GraduationCap size={48} />
+        <h3>No professors found</h3>
+        <p>Add professors to the network.</p>
+      </div>
+    )}
+  </div>
+);
+
+const VolunteerManagementTab = ({ opportunities, onDelete, onAdd }) => (
+  <div className="admin-section">
+    <div className="section-header">
+      <h2>Volunteer Opportunities Management</h2>
+      <button onClick={onAdd} className="add-new-btn">
+        <Plus size={16} />
+        Add Opportunity
+      </button>
+    </div>
+    
+    {opportunities.length > 0 ? (
+      <div className="admin-items-grid">
+        {opportunities.map((opportunity) => (
+          <div key={opportunity.id} className="admin-item-card">
+            <div className="item-header">
+              <h3>{opportunity.title}</h3>
+              <button onClick={() => onDelete(opportunity.id)} className="delete-item-btn">
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <p><strong>Organization:</strong> {opportunity.organization}</p>
+            <p><strong>Location:</strong> {opportunity.location}</p>
+            <p><strong>Time Commitment:</strong> {opportunity.time_commitment}</p>
+            <p><strong>Contact:</strong> {opportunity.contact_email}</p>
+            <p className="item-description">{opportunity.description}</p>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="empty-state">
+        <Heart size={48} />
+        <h3>No volunteer opportunities found</h3>
+        <p>Add volunteer opportunities for students.</p>
+      </div>
+    )}
+  </div>
+);
+
+const ECProfileManagementTab = ({ profiles, onDelete, onAdd }) => (
+  <div className="admin-section">
+    <div className="section-header">
+      <h2>EC Profiles Management</h2>
+      <button onClick={onAdd} className="add-new-btn">
+        <Plus size={16} />
+        Add EC Profile
+      </button>
+    </div>
+    
+    {profiles.length > 0 ? (
+      <div className="admin-items-grid">
+        {profiles.map((profile) => (
+          <div key={profile.id} className="admin-item-card">
+            <div className="item-header">
+              <h3>{profile.medical_school}</h3>
+              <button onClick={() => onDelete(profile.id)} className="delete-item-btn">
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <p><strong>Admission Year:</strong> {profile.admission_year}</p>
+            <p><strong>Undergraduate GPA:</strong> {profile.undergraduate_gpa}</p>
+            {profile.mcat_score && <p><strong>MCAT Score:</strong> {profile.mcat_score}</p>}
+            <p><strong>Research Hours:</strong> {profile.research_hours || 'N/A'}</p>
+            <p><strong>Volunteer Hours:</strong> {profile.volunteer_hours || 'N/A'}</p>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <div className="empty-state">
+        <BarChart3 size={48} />
+        <h3>No EC profiles found</h3>
+        <p>Add EC profiles to help students understand admission statistics.</p>
+      </div>
+    )}
+  </div>
+);
+
+// Modal Components for Adding New Items
+const AddProfessorModal = ({ onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    contact_email: '',
+    department: '',
+    research_areas: '',
+    lab_description: '',
+    accepting_students: true,
+    website: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      const submitData = {
+        ...formData,
+        research_areas: formData.research_areas.split(',').map(area => area.trim())
+      };
+      
+      await axios.post(`${API}/admin/professor-network`, submitData, { headers });
+      toast.success('Professor added successfully');
+      onSuccess();
+    } catch (error) {
+      toast.error('Error adding professor');
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>Add Professor</h3>
+          <button onClick={onClose} className="close-modal-btn">
+            <X size={20} />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-grid">
+            <div className="form-field">
+              <label>Email *</label>
+              <input
+                type="email"
+                value={formData.contact_email}
+                onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Department *</label>
+              <input
+                type="text"
+                value={formData.department}
+                onChange={(e) => setFormData({...formData, department: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Research Areas *</label>
+              <input
+                type="text"
+                value={formData.research_areas}
+                onChange={(e) => setFormData({...formData, research_areas: e.target.value})}
+                className="form-input"
+                placeholder="Separate with commas"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Website</label>
+              <input
+                type="url"
+                value={formData.website}
+                onChange={(e) => setFormData({...formData, website: e.target.value})}
+                className="form-input"
+              />
+            </div>
+          </div>
+          
+          <div className="form-field">
+            <label>Lab Description *</label>
+            <textarea
+              value={formData.lab_description}
+              onChange={(e) => setFormData({...formData, lab_description: e.target.value})}
+              className="form-textarea"
+              required
+            />
+          </div>
+          
+          <div className="form-field">
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={formData.accepting_students}
+                onChange={(e) => setFormData({...formData, accepting_students: e.target.checked})}
+              />
+              Currently accepting students
+            </label>
+          </div>
+          
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} className="cancel-btn">Cancel</button>
+            <button type="submit" className="submit-btn">Add Professor</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // Admin Panel Page
 const AdminPanelPage = () => {
   const { user } = useAuth();
