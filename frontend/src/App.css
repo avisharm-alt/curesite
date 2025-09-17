@@ -224,12 +224,19 @@ body {
 }
 
 .mobile-nav-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   color: var(--cure-white);
   text-decoration: none;
   padding: var(--spacing-md) 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.mobile-nav-link:hover {
+  color: var(--cure-green);
 }
 
 /* PAGE LAYOUT */
