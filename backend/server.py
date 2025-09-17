@@ -439,6 +439,24 @@ async def get_student_network(research_interest: Optional[str] = None):
     
     return result
 
+@api_router.get("/student-network/my", response_model=StudentNetwork)
+async def get_my_student_network_profile(current_user: User = Depends(get_current_user)):
+    profile = await db.student_network.find_one({"user_id": current_user.id})
+    if not profile:
+        raise HTTPException(status_code=404, detail="Network profile not found")
+    return StudentNetwork(**parse_from_mongo(profile))
+
+@api_router.put("/student-network/my", response_model=StudentNetwork)
+async def update_my_student_network_profile(profile_update: StudentNetworkCreate, current_user: User = Depends(get_current_user)):
+    existing_profile = await db.student_network.find_one({"user_id": current_user.id})
+    if not existing_profile:
+        raise HTTPException(status_code=404, detail="Network profile not found")
+    
+    update_data = prepare_for_mongo(profile_update.dict())
+    await db.student_network.update_one({"user_id": current_user.id}, {"$set": update_data})
+    updated_profile = await db.student_network.find_one({"user_id": current_user.id})
+    return StudentNetwork(**parse_from_mongo(updated_profile))
+
 # Professor Network Routes
 @api_router.post("/professor-network", response_model=ProfessorNetwork)
 async def create_professor_network_profile(profile: ProfessorNetworkCreate, current_user: User = Depends(get_current_user)):
