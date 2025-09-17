@@ -1852,6 +1852,13 @@ const AdminPanelPage = () => {
                     >
                       Reject
                     </button>
+                    <button
+                      onClick={() => handleDeleteAdminPoster(poster.id)}
+                      className="admin-delete-btn"
+                    >
+                      <Trash2 size={16} />
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
