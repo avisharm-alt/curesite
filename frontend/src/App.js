@@ -1476,6 +1476,7 @@ const App = () => {
               <Route path="/professors" element={<ProfessorNetworkPage />} />
               <Route path="/profiles" element={<ECProfilesPage />} />
               <Route path="/volunteer" element={<VolunteerOpportunitiesPage />} />
+              <Route path="/profile" element={<MyProfilePage />} />
             </Routes>
           </main>
           <Footer />
