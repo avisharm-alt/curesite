@@ -898,6 +898,20 @@ const MyProfilePage = () => {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+
+      await axios.delete(`${API}/users/account`, { headers });
+      toast.success('Account deleted successfully');
+      logout();
+      navigate('/');
+    } catch (error) {
+      toast.error('Error deleting account');
+    }
+  };
+
   if (!user) {
     return (
       <div className="page">
