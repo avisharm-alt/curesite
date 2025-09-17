@@ -1772,9 +1772,18 @@ const SubmitPosterPage = () => {
 // Admin Panel Page
 const AdminPanelPage = () => {
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState('posters');
   const [pendingPosters, setPendingPosters] = useState([]);
+  const [professors, setProfessors] = useState([]);
+  const [volunteerOpportunities, setVolunteerOpportunities] = useState([]);
+  const [ecProfiles, setEcProfiles] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
+  
+  // Form states
+  const [showAddProfessor, setShowAddProfessor] = useState(false);
+  const [showAddVolunteer, setShowAddVolunteer] = useState(false);
+  const [showAddECProfile, setShowAddECProfile] = useState(false);
 
   useEffect(() => {
     if (user?.user_type === 'admin') {
