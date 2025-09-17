@@ -485,6 +485,45 @@ async def download_approved_poster(poster_id: str):
         media_type='application/octet-stream'
     )
 
+@api_router.get("/posters/{poster_id}/view")
+async def view_approved_poster(poster_id: str):
+    """View approved poster inline (public access)"""
+    poster = await db.poster_submissions.find_one({"id": poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    if poster.get("status") != "approved":
+        raise HTTPException(status_code=403, detail="Poster not approved for public viewing")
+    
+    if not poster.get("poster_url"):
+        raise HTTPException(status_code=404, detail="No file attached to this poster")
+    
+    file_path = Path(poster["poster_url"])
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Poster file not found")
+    
+    # Determine media type based on file extension
+    file_extension = file_path.suffix.lower()
+    if file_extension == '.pdf':
+        media_type = 'application/pdf'
+    elif file_extension in ['.png']:
+        media_type = 'image/png'
+    elif file_extension in ['.jpg', '.jpeg']:
+        media_type = 'image/jpeg'
+    elif file_extension == '.gif':
+        media_type = 'image/gif'
+    else:
+        media_type = 'application/octet-stream'
+    
+    return FileResponse(
+        path=file_path,
+        media_type=media_type,
+        headers={
+            "Content-Disposition": "inline",
+            "Cache-Control": "public, max-age=3600"
+        }
+    )
+
 @api_router.delete("/posters/{poster_id}")
 async def delete_poster(poster_id: str, current_user: User = Depends(get_current_user)):
     """Delete poster (user can delete their own, admin can delete any)"""
