@@ -347,14 +347,6 @@ const PosterJournalPage = () => {
         </div>
       </div>
 
-      <div className="page-image">
-        <img 
-          src="https://images.unsplash.com/photo-1579165466949-3180a3d056d5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
-          alt="Medical Research"
-          className="section-img"
-        />
-      </div>
-
       <div className="page-content">
         <div className="poster-controls">
           <div className="poster-filters">
