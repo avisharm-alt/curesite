@@ -9,6 +9,7 @@ from authlib.integrations.starlette_client import OAuth
 import os
 import logging
 from pathlib import Path
+import shutil
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional, Dict, Any
 import uuid
