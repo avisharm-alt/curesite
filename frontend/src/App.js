@@ -963,6 +963,23 @@ const MyProfilePage = () => {
     }
   };
 
+  const handleDeleteMyPoster = async (posterId) => {
+    if (!window.confirm('Are you sure you want to delete this poster?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.delete(`${API}/posters/${posterId}`, { headers });
+      toast.success('Poster deleted successfully');
+      fetchMyData(); // Refresh the data
+    } catch (error) {
+      toast.error('Error deleting poster');
+    }
+  };
+
   if (!user) {
     return (
       <div className="page">
