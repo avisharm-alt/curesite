@@ -1492,6 +1492,25 @@ const SubmitPosterPage = () => {
               />
               <small>Separate keywords with commas</small>
             </div>
+
+            <div className="form-field">
+              <label htmlFor="poster-file">Poster File *</label>
+              <input
+                type="file"
+                id="poster-file"
+                accept=".pdf,.png,.jpg,.jpeg"
+                onChange={handleFileChange}
+                className="file-input"
+                required
+              />
+              <small>Upload your poster as PDF or image (PNG, JPG, JPEG). Max size: 10MB</small>
+              {selectedFile && (
+                <div className="file-selected">
+                  <span className="file-name">Selected: {selectedFile.name}</span>
+                  <span className="file-size">({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="form-section">
