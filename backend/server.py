@@ -240,8 +240,8 @@ def parse_from_mongo(item):
 # Authentication Routes
 @api_router.get("/auth/google")
 async def google_auth(request: Request):
-    # Create proper redirect URI
-    redirect_uri = f"{request.url.scheme}://{request.url.netloc}/api/auth/google/callback"
+    # Use exact redirect URI that matches Google Console configuration
+    redirect_uri = "https://academiccure.preview.emergentagent.com/api/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 @api_router.get("/auth/google/callback")
