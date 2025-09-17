@@ -307,6 +307,24 @@ async def update_profile(user_update: UserCreate, current_user: User = Depends(g
     updated_user = await db.users.find_one({"id": current_user.id})
     return User(**parse_from_mongo(updated_user))
 
+@api_router.delete("/users/account")
+async def delete_account(current_user: User = Depends(get_current_user)):
+    """Delete user account and all associated data"""
+    try:
+        # Delete all user's associated data
+        await db.poster_submissions.delete_many({"submitted_by": current_user.id})
+        await db.student_network.delete_many({"user_id": current_user.id})
+        await db.professor_network.delete_many({"user_id": current_user.id})
+        await db.ec_profiles.delete_many({"submitted_by": current_user.id})
+        await db.volunteer_opportunities.delete_many({"posted_by": current_user.id})
+        
+        # Delete the user account
+        await db.users.delete_one({"id": current_user.id})
+        
+        return {"message": "Account successfully deleted"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Error deleting account")
+
 # Poster Routes
 @api_router.post("/posters", response_model=PosterSubmission)
 async def submit_poster(poster: PosterSubmissionCreate, current_user: User = Depends(get_current_user)):
