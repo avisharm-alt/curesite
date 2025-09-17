@@ -1,6 +1,6 @@
 from fastapi import FastAPI, APIRouter, HTTPException, Depends, File, UploadFile, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
@@ -16,6 +16,7 @@ from datetime import datetime, timezone, timedelta
 import jwt
 from passlib.context import CryptContext
 import secrets
+from urllib.parse import quote
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -239,7 +240,8 @@ def parse_from_mongo(item):
 # Authentication Routes
 @api_router.get("/auth/google")
 async def google_auth(request: Request):
-    redirect_uri = f"{request.url.scheme}://{request.url.netloc}/auth/google/callback"
+    # Create proper redirect URI
+    redirect_uri = f"{request.url.scheme}://{request.url.netloc}/api/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 @api_router.get("/auth/google/callback")
@@ -272,10 +274,19 @@ async def google_callback(request: Request):
             data={"sub": user.id}, expires_delta=access_token_expires
         )
         
-        return {"access_token": access_token, "token_type": "bearer", "user": user}
+        # Redirect to frontend with token and user data
+        frontend_url = request.url.scheme + "://" + request.url.netloc
+        user_data_encoded = quote(user.json())
+        redirect_url = f"{frontend_url}/?token={access_token}&user={user_data_encoded}"
+        
+        return RedirectResponse(url=redirect_url)
         
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Authentication failed: {str(e)}")
+        # Redirect to frontend with error
+        frontend_url = request.url.scheme + "://" + request.url.netloc
+        error_message = quote(str(e))
+        redirect_url = f"{frontend_url}/?error={error_message}"
+        return RedirectResponse(url=redirect_url)
 
 @api_router.post("/auth/logout")
 async def logout():

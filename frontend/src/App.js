@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import './App.css';
@@ -10,12 +9,11 @@ import {
   BookOpen, Users, GraduationCap, Heart, FileText, 
   User, LogOut, Menu, X, Search, Filter, Plus,
   Star, MapPin, Clock, Mail, Phone, ExternalLink,
-  Award, BarChart3, TrendingUp, Calendar
+  Award, BarChart3, TrendingUp, Calendar, Home
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
-const GOOGLE_CLIENT_ID = "492483192809-ltp2f8jtudscriesriob5a6jn34snbtc.apps.googleusercontent.com";
 
 // Auth Context
 const AuthContext = React.createContext();
@@ -51,6 +49,25 @@ const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
+
+    // Check for auth callback in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const token_param = urlParams.get('token');
+    const user_param = urlParams.get('user');
+    
+    if (token_param && user_param) {
+      try {
+        const userData = JSON.parse(decodeURIComponent(user_param));
+        localStorage.setItem('token', token_param);
+        setUser(userData);
+        toast.success(`Welcome, ${userData.name}!`);
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+      } catch (error) {
+        console.error('Error parsing auth callback:', error);
+        toast.error('Authentication failed. Please try again.');
+      }
+    }
   }, []);
 
   const login = (userData, token) => {
@@ -72,36 +89,49 @@ const AuthProvider = ({ children }) => {
   );
 };
 
-// Components
+// Header Component
 const Header = () => {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
 
   const navigation = [
-    { name: 'Poster Journal', href: '#posters' },
-    { name: 'Student Network', href: '#students' },
-    { name: 'Professor Network', href: '#professors' },
-    { name: 'EC Profiles', href: '#profiles' },
-    { name: 'Volunteer Opportunities', href: '#volunteer' },
+    { name: 'Home', href: '/', icon: Home },
+    { name: 'Poster Journal', href: '/posters', icon: FileText },
+    { name: 'Student Network', href: '/students', icon: Users },
+    { name: 'Professor Network', href: '/professors', icon: GraduationCap },
+    { name: 'EC Profiles', href: '/profiles', icon: BarChart3 },
+    { name: 'Volunteer Opportunities', href: '/volunteer', icon: Heart },
   ];
+
+  const handleGoogleLogin = () => {
+    // Redirect to backend Google OAuth endpoint
+    window.location.href = `${API}/auth/google`;
+  };
 
   return (
     <header className="header">
       <nav className="nav-container">
         <div className="nav-brand">
-          <img 
-            src="https://customer-assets.emergentagent.com/job_137e70c1-f0f7-4e3d-8748-ad4447b6d332/artifacts/l3ze9cjg_Logo%20maker%20project%20%284%29.png" 
-            alt="CURE Logo" 
-            className="logo"
-          />
+          <Link to="/">
+            <img 
+              src="https://customer-assets.emergentagent.com/job_137e70c1-f0f7-4e3d-8748-ad4447b6d332/artifacts/l3ze9cjg_Logo%20maker%20project%20%284%29.png" 
+              alt="CURE Logo" 
+              className="logo"
+            />
+          </Link>
         </div>
 
         {/* Desktop Navigation */}
         <div className="nav-links">
           {navigation.map((item) => (
-            <a key={item.name} href={item.href} className="nav-link">
+            <Link 
+              key={item.name} 
+              to={item.href} 
+              className={`nav-link ${location.pathname === item.href ? 'active' : ''}`}
+            >
               {item.name}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -118,7 +148,14 @@ const Header = () => {
               </button>
             </div>
           ) : (
-            <GoogleLoginButton />
+            <button onClick={handleGoogleLogin} className="google-login-btn">
+              <img 
+                src="https://developers.google.com/identity/images/g-logo.png" 
+                alt="Google" 
+                className="google-icon"
+              />
+              Sign in with Google
+            </button>
           )}
         </div>
 
@@ -134,9 +171,15 @@ const Header = () => {
       {mobileMenuOpen && (
         <div className="mobile-menu">
           {navigation.map((item) => (
-            <a key={item.name} href={item.href} className="mobile-nav-link">
+            <Link 
+              key={item.name} 
+              to={item.href} 
+              className="mobile-nav-link"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <item.icon size={18} />
               {item.name}
-            </a>
+            </Link>
           ))}
         </div>
       )}
@@ -144,105 +187,105 @@ const Header = () => {
   );
 };
 
-const GoogleLoginButton = () => {
-  const { login } = useAuth();
-
-  const handleGoogleLogin = () => {
-    window.location.href = `${API}/auth/google`;
-  };
-
-  // Listen for auth callback
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    const userStr = urlParams.get('user');
-    
-    if (token && userStr) {
-      try {
-        const userData = JSON.parse(decodeURIComponent(userStr));
-        login(userData, token);
-        // Clean up URL
-        window.history.replaceState({}, document.title, window.location.pathname);
-      } catch (error) {
-        console.error('Error parsing auth callback:', error);
-      }
-    }
-  }, [login]);
+// Home Page Component
+const HomePage = () => {
+  const navigate = useNavigate();
 
   return (
-    <button onClick={handleGoogleLogin} className="google-login-btn">
-      <img 
-        src="https://developers.google.com/identity/images/g-logo.png" 
-        alt="Google" 
-        className="google-icon"
-      />
-      Sign in with Google
-    </button>
+    <div className="page">
+      {/* Hero Section */}
+      <section className="hero">
+        <div className="hero-content">
+          <div className="hero-text">
+            <h1 className="hero-title">
+              Canadian Undergraduate
+              <span className="accent-text"> Research Exchange</span>
+            </h1>
+            <p className="hero-description">
+              The premier platform connecting Canadian undergraduate students with research opportunities, 
+              medical school preparation resources, and a thriving community of future healthcare professionals.
+            </p>
+            <div className="hero-buttons">
+              <button 
+                className="cta-primary"
+                onClick={() => navigate('/students')}
+              >
+                Join the Network
+              </button>
+              <button 
+                className="cta-secondary"
+                onClick={() => navigate('/posters')}
+              >
+                Explore Resources
+              </button>
+            </div>
+          </div>
+          <div className="hero-image">
+            <img 
+              src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
+              alt="Medical Research"
+              className="hero-img"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Features Overview */}
+      <section className="features-overview">
+        <div className="container">
+          <h2 className="section-title">Explore Our Platform</h2>
+          <div className="features-grid">
+            <div className="feature-card" onClick={() => navigate('/posters')}>
+              <div className="feature-icon">
+                <FileText size={32} />
+              </div>
+              <h3>Poster Journal</h3>
+              <p>Showcase your research and discover groundbreaking work from students across Canada.</p>
+            </div>
+            
+            <div className="feature-card" onClick={() => navigate('/students')}>
+              <div className="feature-icon">
+                <Users size={32} />
+              </div>
+              <h3>Student Network</h3>
+              <p>Connect with like-minded undergraduate students passionate about research.</p>
+            </div>
+            
+            <div className="feature-card" onClick={() => navigate('/professors')}>
+              <div className="feature-icon">
+                <GraduationCap size={32} />
+              </div>
+              <h3>Professor Network</h3>
+              <p>Find faculty mentors for research opportunities and career guidance.</p>
+            </div>
+            
+            <div className="feature-card" onClick={() => navigate('/profiles')}>
+              <div className="feature-icon">
+                <BarChart3 size={32} />
+              </div>
+              <h3>EC Profiles</h3>
+              <p>Anonymous profiles and statistics from accepted Canadian medical students.</p>
+            </div>
+            
+            <div className="feature-card" onClick={() => navigate('/volunteer')}>
+              <div className="feature-icon">
+                <Heart size={32} />
+              </div>
+              <h3>Volunteer Opportunities</h3>
+              <p>Discover medical-related volunteer opportunities to build your experience.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
   );
 };
 
-const Hero = () => {
-  return (
-    <section className="hero">
-      <div className="hero-content">
-        <div className="hero-text">
-          <h1 className="hero-title">
-            Canadian Undergraduate
-            <span className="accent-text"> Research Exchange</span>
-          </h1>
-          <p className="hero-description">
-            The premier platform connecting Canadian undergraduate students with research opportunities, 
-            medical school preparation resources, and a thriving community of future healthcare professionals.
-          </p>
-          <div className="hero-buttons">
-            <button className="cta-primary">Join the Network</button>
-            <button className="cta-secondary">Explore Resources</button>
-          </div>
-        </div>
-        <div className="hero-image">
-          <img 
-            src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
-            alt="Medical Research"
-            className="hero-img"
-          />
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const FeatureSection = ({ id, title, description, icon: Icon, children, image }) => {
-  return (
-    <section id={id} className="feature-section">
-      <div className="feature-container">
-        <div className="feature-header">
-          <div className="feature-icon">
-            <Icon size={32} />
-          </div>
-          <div className="feature-title-container">
-            <h2 className="feature-title">{title}</h2>
-            <p className="feature-description">{description}</p>
-          </div>
-        </div>
-        
-        {image && (
-          <div className="feature-image">
-            <img src={image} alt={title} className="section-img" />
-          </div>
-        )}
-        
-        <div className="feature-content">
-          {children}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const PosterJournal = () => {
+// Poster Journal Page
+const PosterJournalPage = () => {
   const { user } = useAuth();
   const [posters, setPosters] = useState([]);
-  const [showSubmitForm, setShowSubmitForm] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ status: 'approved', university: '' });
 
   useEffect(() => {
@@ -251,6 +294,7 @@ const PosterJournal = () => {
 
   const fetchPosters = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (filters.status) params.append('status', filters.status);
       if (filters.university) params.append('university', filters.university);
@@ -259,6 +303,8 @@ const PosterJournal = () => {
       setPosters(response.data);
     } catch (error) {
       toast.error('Error fetching posters');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -287,64 +333,85 @@ const PosterJournal = () => {
   );
 
   return (
-    <FeatureSection
-      id="posters"
-      title="Poster Journal"
-      description="Showcase your research and discover groundbreaking work from undergraduate students across Canada."
-      icon={FileText}
-      image="https://images.unsplash.com/photo-1579165466949-3180a3d056d5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
-    >
-      <div className="poster-controls">
-        <div className="poster-filters">
-          <select 
-            value={filters.status} 
-            onChange={(e) => setFilters({...filters, status: e.target.value})}
-            className="filter-select"
-          >
-            <option value="approved">Approved</option>
-            <option value="pending">Pending Review</option>
-            <option value="">All Status</option>
-          </select>
-          
-          <input
-            type="text"
-            placeholder="Filter by university..."
-            value={filters.university}
-            onChange={(e) => setFilters({...filters, university: e.target.value})}
-            className="filter-input"
-          />
+    <div className="page">
+      <div className="page-header">
+        <div className="page-icon">
+          <FileText size={32} />
         </div>
-        
-        {user && (
-          <button 
-            onClick={() => setShowSubmitForm(true)}
-            className="submit-poster-btn"
-          >
-            <Plus size={18} />
-            Submit Poster
-          </button>
+        <div>
+          <h1 className="page-title">Poster Journal</h1>
+          <p className="page-description">
+            Showcase your research and discover groundbreaking work from undergraduate students across Canada.
+          </p>
+        </div>
+      </div>
+
+      <div className="page-image">
+        <img 
+          src="https://images.unsplash.com/photo-1579165466949-3180a3d056d5?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwyfHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
+          alt="Medical Research"
+          className="section-img"
+        />
+      </div>
+
+      <div className="page-content">
+        <div className="poster-controls">
+          <div className="poster-filters">
+            <select 
+              value={filters.status} 
+              onChange={(e) => setFilters({...filters, status: e.target.value})}
+              className="filter-select"
+            >
+              <option value="approved">Approved</option>
+              <option value="pending">Pending Review</option>
+              <option value="">All Status</option>
+            </select>
+            
+            <input
+              type="text"
+              placeholder="Filter by university..."
+              value={filters.university}
+              onChange={(e) => setFilters({...filters, university: e.target.value})}
+              className="filter-input"
+            />
+          </div>
+          
+          {user && (
+            <button className="submit-poster-btn">
+              <Plus size={18} />
+              Submit Poster
+            </button>
+          )}
+        </div>
+
+        {loading ? (
+          <div className="loading">Loading posters...</div>
+        ) : (
+          <>
+            <div className="posters-grid">
+              {posters.map((poster) => (
+                <PosterCard key={poster.id} poster={poster} />
+              ))}
+            </div>
+
+            {posters.length === 0 && (
+              <div className="empty-state">
+                <FileText size={48} />
+                <h3>No posters found</h3>
+                <p>Be the first to submit a poster to the journal!</p>
+              </div>
+            )}
+          </>
         )}
       </div>
-
-      <div className="posters-grid">
-        {posters.map((poster) => (
-          <PosterCard key={poster.id} poster={poster} />
-        ))}
-      </div>
-
-      {posters.length === 0 && (
-        <div className="empty-state">
-          <FileText size={48} />
-          <h3>No posters found</h3>
-          <p>Be the first to submit a poster to the journal!</p>
-        </div>
-      )}
-    </FeatureSection>
+    </div>
   );
 };
 
-const StudentNetwork = () => {
+// Student Network Page
+const StudentNetworkPage = () => {
   const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -353,6 +420,7 @@ const StudentNetwork = () => {
 
   const fetchStudents = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (searchTerm) params.append('research_interest', searchTerm);
       
@@ -360,6 +428,8 @@ const StudentNetwork = () => {
       setStudents(response.data);
     } catch (error) {
       toast.error('Error fetching student network');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -398,45 +468,69 @@ const StudentNetwork = () => {
   );
 
   return (
-    <FeatureSection
-      id="students"
-      title="Student Network"
-      description="Connect with like-minded undergraduate students passionate about research and medical careers."
-      icon={Users}
-      image="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwzfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHN8ZW58MHx8fHwxNzU4MDczNDYxfDA&ixlib=rb-4.1.0&q=85"
-    >
-      <div className="network-search">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search by research interest..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+    <div className="page">
+      <div className="page-header">
+        <div className="page-icon">
+          <Users size={32} />
+        </div>
+        <div>
+          <h1 className="page-title">Student Network</h1>
+          <p className="page-description">
+            Connect with like-minded undergraduate students passionate about research and medical careers.
+          </p>
         </div>
       </div>
 
-      <div className="students-grid">
-        {students.map((student) => (
-          <StudentCard key={student.id} student={student} />
-        ))}
+      <div className="page-image">
+        <img 
+          src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwzfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHN8ZW58MHx8fHwxNzU4MDczNDYxfDA&ixlib=rb-4.1.0&q=85"
+          alt="Student Collaboration"
+          className="section-img"
+        />
       </div>
 
-      {students.length === 0 && (
-        <div className="empty-state">
-          <Users size={48} />
-          <h3>No students found</h3>
-          <p>Join the network to connect with other students!</p>
+      <div className="page-content">
+        <div className="network-search">
+          <div className="search-box">
+            <Search size={20} />
+            <input
+              type="text"
+              placeholder="Search by research interest..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
         </div>
-      )}
-    </FeatureSection>
+
+        {loading ? (
+          <div className="loading">Loading students...</div>
+        ) : (
+          <>
+            <div className="students-grid">
+              {students.map((student) => (
+                <StudentCard key={student.id} student={student} />
+              ))}
+            </div>
+
+            {students.length === 0 && (
+              <div className="empty-state">
+                <Users size={48} />
+                <h3>No students found</h3>
+                <p>Join the network to connect with other students!</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
-const ProfessorNetwork = () => {
+// Professor Network Page
+const ProfessorNetworkPage = () => {
   const [professors, setProfessors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAvailableOnly, setShowAvailableOnly] = useState(true);
 
@@ -446,6 +540,7 @@ const ProfessorNetwork = () => {
 
   const fetchProfessors = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (searchTerm) params.append('research_area', searchTerm);
       if (showAvailableOnly) params.append('accepting_students', 'true');
@@ -454,16 +549,20 @@ const ProfessorNetwork = () => {
       setProfessors(response.data);
     } catch (error) {
       toast.error('Error fetching professor network');
+    } finally {
+      setLoading(false);
     }
   };
 
   const ProfessorCard = ({ professor }) => (
     <div className="professor-card">
       <div className="professor-header">
-        <h3 className="professor-name">{professor.user_name}</h3>
-        <div className="professor-meta">
-          <span className="professor-university">{professor.user_university}</span>
-          <span className="professor-department">{professor.department}</span>
+        <div>
+          <h3 className="professor-name">{professor.user_name}</h3>
+          <div className="professor-meta">
+            <span className="professor-university">{professor.user_university}</span>
+            <span className="professor-department">{professor.department}</span>
+          </div>
         </div>
         {professor.accepting_students && (
           <span className="accepting-badge">Accepting Students</span>
@@ -497,55 +596,79 @@ const ProfessorNetwork = () => {
   );
 
   return (
-    <FeatureSection
-      id="professors"
-      title="Professor Network"
-      description="Connect with faculty members for research opportunities, mentorship, and career guidance."
-      icon={GraduationCap}
-      image="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwyfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHN8ZW58MHx8fHwxNzU4MDczNDYxfDA&ixlib=rb-4.1.0&q=85"
-    >
-      <div className="professor-controls">
-        <div className="search-box">
-          <Search size={20} />
-          <input
-            type="text"
-            placeholder="Search by research area..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+    <div className="page">
+      <div className="page-header">
+        <div className="page-icon">
+          <GraduationCap size={32} />
         </div>
-        
-        <label className="checkbox-label">
-          <input
-            type="checkbox"
-            checked={showAvailableOnly}
-            onChange={(e) => setShowAvailableOnly(e.target.checked)}
-          />
-          Only show professors accepting students
-        </label>
+        <div>
+          <h1 className="page-title">Professor Network</h1>
+          <p className="page-description">
+            Connect with faculty members for research opportunities, mentorship, and career guidance.
+          </p>
+        </div>
       </div>
 
-      <div className="professors-grid">
-        {professors.map((professor) => (
-          <ProfessorCard key={professor.id} professor={professor} />
-        ))}
+      <div className="page-image">
+        <img 
+          src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwyfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHN8ZW58MHx8fHwxNzU4MDczNDYxfDA&ixlib=rb-4.1.0&q=85"
+          alt="Academic Excellence"
+          className="section-img"
+        />
       </div>
 
-      {professors.length === 0 && (
-        <div className="empty-state">
-          <GraduationCap size={48} />
-          <h3>No professors found</h3>
-          <p>Check back later for new research opportunities!</p>
+      <div className="page-content">
+        <div className="professor-controls">
+          <div className="search-box">
+            <Search size={20} />
+            <input
+              type="text"
+              placeholder="Search by research area..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={showAvailableOnly}
+              onChange={(e) => setShowAvailableOnly(e.target.checked)}
+            />
+            Only show professors accepting students
+          </label>
         </div>
-      )}
-    </FeatureSection>
+
+        {loading ? (
+          <div className="loading">Loading professors...</div>
+        ) : (
+          <>
+            <div className="professors-grid">
+              {professors.map((professor) => (
+                <ProfessorCard key={professor.id} professor={professor} />
+              ))}
+            </div>
+
+            {professors.length === 0 && (
+              <div className="empty-state">
+                <GraduationCap size={48} />
+                <h3>No professors found</h3>
+                <p>Check back later for new research opportunities!</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
-const ECProfiles = () => {
+// EC Profiles Page
+const ECProfilesPage = () => {
   const [profiles, setProfiles] = useState([]);
   const [stats, setStats] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ medical_school: '', admission_year: '' });
 
   useEffect(() => {
@@ -555,6 +678,7 @@ const ECProfiles = () => {
 
   const fetchProfiles = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (filters.medical_school) params.append('medical_school', filters.medical_school);
       if (filters.admission_year) params.append('admission_year', filters.admission_year);
@@ -563,6 +687,8 @@ const ECProfiles = () => {
       setProfiles(response.data);
     } catch (error) {
       toast.error('Error fetching EC profiles');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -606,7 +732,7 @@ const ECProfiles = () => {
         </div>
       </div>
       
-      {profile.leadership_activities.length > 0 && (
+      {profile.leadership_activities && profile.leadership_activities.length > 0 && (
         <div className="profile-activities">
           <h4>Leadership Activities</h4>
           <div className="activity-tags">
@@ -617,7 +743,7 @@ const ECProfiles = () => {
         </div>
       )}
       
-      {profile.awards_scholarships.length > 0 && (
+      {profile.awards_scholarships && profile.awards_scholarships.length > 0 && (
         <div className="profile-awards">
           <h4>Awards & Scholarships</h4>
           <div className="award-tags">
@@ -631,84 +757,108 @@ const ECProfiles = () => {
   );
 
   return (
-    <FeatureSection
-      id="profiles"
-      title="EC Profiles & Stats"
-      description="Anonymous profiles and statistics from accepted Canadian medical school students."
-      icon={BarChart3}
-      image="https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHw0fHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
-    >
-      <div className="profile-controls">
-        <select
-          value={filters.medical_school}
-          onChange={(e) => setFilters({...filters, medical_school: e.target.value})}
-          className="filter-select"
-        >
-          <option value="">All Medical Schools</option>
-          <option value="University of Toronto">University of Toronto</option>
-          <option value="University of Western Ontario">University of Western Ontario</option>
-          <option value="McMaster University">McMaster University</option>
-          <option value="Queen's University">Queen's University</option>
-          <option value="University of Ottawa">University of Ottawa</option>
-        </select>
-        
-        <input
-          type="number"
-          placeholder="Admission year..."
-          value={filters.admission_year}
-          onChange={(e) => setFilters({...filters, admission_year: e.target.value})}
-          className="filter-input"
-          min="2020"
-          max="2030"
+    <div className="page">
+      <div className="page-header">
+        <div className="page-icon">
+          <BarChart3 size={32} />
+        </div>
+        <div>
+          <h1 className="page-title">EC Profiles & Stats</h1>
+          <p className="page-description">
+            Anonymous profiles and statistics from accepted Canadian medical school students.
+          </p>
+        </div>
+      </div>
+
+      <div className="page-image">
+        <img 
+          src="https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHw0fHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
+          alt="Medical Research Data"
+          className="section-img"
         />
       </div>
 
-      {stats.length > 0 && (
-        <div className="stats-overview">
-          <h3>Average Statistics by School</h3>
-          <div className="stats-grid">
-            {stats.map((stat, index) => (
-              <div key={index} className="stat-card">
-                <h4>{stat._id}</h4>
-                <div className="stat-details">
-                  <div className="stat-detail">
-                    <span>Avg GPA</span>
-                    <span>{stat.avg_gpa?.toFixed(2) || 'N/A'}</span>
-                  </div>
-                  <div className="stat-detail">
-                    <span>Avg MCAT</span>
-                    <span>{stat.avg_mcat?.toFixed(0) || 'N/A'}</span>
-                  </div>
-                  <div className="stat-detail">
-                    <span>Profiles</span>
-                    <span>{stat.count}</span>
+      <div className="page-content">
+        <div className="profile-controls">
+          <select
+            value={filters.medical_school}
+            onChange={(e) => setFilters({...filters, medical_school: e.target.value})}
+            className="filter-select"
+          >
+            <option value="">All Medical Schools</option>
+            <option value="University of Toronto">University of Toronto</option>
+            <option value="University of Western Ontario">University of Western Ontario</option>
+            <option value="McMaster University">McMaster University</option>
+            <option value="Queen's University">Queen's University</option>
+            <option value="University of Ottawa">University of Ottawa</option>
+          </select>
+          
+          <input
+            type="number"
+            placeholder="Admission year..."
+            value={filters.admission_year}
+            onChange={(e) => setFilters({...filters, admission_year: e.target.value})}
+            className="filter-input"
+            min="2020"
+            max="2030"
+          />
+        </div>
+
+        {stats.length > 0 && (
+          <div className="stats-overview">
+            <h3>Average Statistics by School</h3>
+            <div className="stats-grid">
+              {stats.map((stat, index) => (
+                <div key={index} className="stat-card">
+                  <h4>{stat._id}</h4>
+                  <div className="stat-details">
+                    <div className="stat-detail">
+                      <span>Avg GPA</span>
+                      <span>{stat.avg_gpa?.toFixed(2) || 'N/A'}</span>
+                    </div>
+                    <div className="stat-detail">
+                      <span>Avg MCAT</span>
+                      <span>{stat.avg_mcat?.toFixed(0) || 'N/A'}</span>
+                    </div>
+                    <div className="stat-detail">
+                      <span>Profiles</span>
+                      <span>{stat.count}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="profiles-grid">
-        {profiles.map((profile) => (
-          <ProfileCard key={profile.id} profile={profile} />
-        ))}
+        {loading ? (
+          <div className="loading">Loading profiles...</div>
+        ) : (
+          <>
+            <div className="profiles-grid">
+              {profiles.map((profile) => (
+                <ProfileCard key={profile.id} profile={profile} />
+              ))}
+            </div>
+
+            {profiles.length === 0 && (
+              <div className="empty-state">
+                <BarChart3 size={48} />
+                <h3>No profiles found</h3>
+                <p>Submit your profile to help future students!</p>
+              </div>
+            )}
+          </>
+        )}
       </div>
-
-      {profiles.length === 0 && (
-        <div className="empty-state">
-          <BarChart3 size={48} />
-          <h3>No profiles found</h3>
-          <p>Submit your profile to help future students!</p>
-        </div>
-      )}
-    </FeatureSection>
+    </div>
   );
 };
 
-const VolunteerOpportunities = () => {
+// Volunteer Opportunities Page
+const VolunteerOpportunitiesPage = () => {
   const [opportunities, setOpportunities] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchLocation, setSearchLocation] = useState('');
 
   useEffect(() => {
@@ -717,6 +867,7 @@ const VolunteerOpportunities = () => {
 
   const fetchOpportunities = async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams();
       if (searchLocation) params.append('location', searchLocation);
       
@@ -724,6 +875,8 @@ const VolunteerOpportunities = () => {
       setOpportunities(response.data);
     } catch (error) {
       toast.error('Error fetching volunteer opportunities');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -747,7 +900,7 @@ const VolunteerOpportunities = () => {
       
       <p className="opportunity-description">{opportunity.description}</p>
       
-      {opportunity.requirements.length > 0 && (
+      {opportunity.requirements && opportunity.requirements.length > 0 && (
         <div className="opportunity-requirements">
           <h4>Requirements</h4>
           <ul>
@@ -774,43 +927,66 @@ const VolunteerOpportunities = () => {
   );
 
   return (
-    <FeatureSection
-      id="volunteer"
-      title="Volunteer Opportunities"
-      description="Discover medical-related volunteer opportunities to build your experience and give back to the community."
-      icon={Heart}
-      image="https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg"
-    >
-      <div className="opportunity-search">
-        <div className="search-box">
-          <MapPin size={20} />
-          <input
-            type="text"
-            placeholder="Search by location..."
-            value={searchLocation}
-            onChange={(e) => setSearchLocation(e.target.value)}
-            className="search-input"
-          />
+    <div className="page">
+      <div className="page-header">
+        <div className="page-icon">
+          <Heart size={32} />
+        </div>
+        <div>
+          <h1 className="page-title">Volunteer Opportunities</h1>
+          <p className="page-description">
+            Discover medical-related volunteer opportunities to build your experience and give back to the community.
+          </p>
         </div>
       </div>
 
-      <div className="opportunities-grid">
-        {opportunities.map((opportunity) => (
-          <OpportunityCard key={opportunity.id} opportunity={opportunity} />
-        ))}
+      <div className="page-image">
+        <img 
+          src="https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg"
+          alt="Volunteer Work"
+          className="section-img"
+        />
       </div>
 
-      {opportunities.length === 0 && (
-        <div className="empty-state">
-          <Heart size={48} />
-          <h3>No opportunities found</h3>
-          <p>Check back later for new volunteer opportunities!</p>
+      <div className="page-content">
+        <div className="opportunity-search">
+          <div className="search-box">
+            <MapPin size={20} />
+            <input
+              type="text"
+              placeholder="Search by location..."
+              value={searchLocation}
+              onChange={(e) => setSearchLocation(e.target.value)}
+              className="search-input"
+            />
+          </div>
         </div>
-      )}
-    </FeatureSection>
+
+        {loading ? (
+          <div className="loading">Loading opportunities...</div>
+        ) : (
+          <>
+            <div className="opportunities-grid">
+              {opportunities.map((opportunity) => (
+                <OpportunityCard key={opportunity.id} opportunity={opportunity} />
+              ))}
+            </div>
+
+            {opportunities.length === 0 && (
+              <div className="empty-state">
+                <Heart size={48} />
+                <h3>No opportunities found</h3>
+                <p>Check back later for new volunteer opportunities!</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
   );
 };
 
+// Footer Component
 const Footer = () => {
   return (
     <footer className="footer">
@@ -829,17 +1005,17 @@ const Footer = () => {
         <div className="footer-section">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="#posters">Poster Journal</a></li>
-            <li><a href="#students">Student Network</a></li>
-            <li><a href="#professors">Professor Network</a></li>
-            <li><a href="#profiles">EC Profiles</a></li>
+            <li><Link to="/posters">Poster Journal</Link></li>
+            <li><Link to="/students">Student Network</Link></li>
+            <li><Link to="/professors">Professor Network</Link></li>
+            <li><Link to="/profiles">EC Profiles</Link></li>
           </ul>
         </div>
         
         <div className="footer-section">
           <h4>Resources</h4>
           <ul>
-            <li><a href="#volunteer">Volunteer Opportunities</a></li>
+            <li><Link to="/volunteer">Volunteer Opportunities</Link></li>
             <li><a href="#mcat">MCAT Prep (Coming Soon)</a></li>
             <li><a href="#courses">Course Resources (Coming Soon)</a></li>
           </ul>
@@ -863,27 +1039,28 @@ const Footer = () => {
   );
 };
 
+// Main App Component
 const App = () => {
   return (
-    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
-      <AuthProvider>
-        <BrowserRouter>
-          <div className="App">
-            <Header />
-            <main>
-              <Hero />
-              <PosterJournal />
-              <StudentNetwork />
-              <ProfessorNetwork />
-              <ECProfiles />
-              <VolunteerOpportunities />
-            </main>
-            <Footer />
-            <Toaster position="top-right" />
-          </div>
-        </BrowserRouter>
-      </AuthProvider>
-    </GoogleOAuthProvider>
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="App">
+          <Header />
+          <main>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/posters" element={<PosterJournalPage />} />
+              <Route path="/students" element={<StudentNetworkPage />} />
+              <Route path="/professors" element={<ProfessorNetworkPage />} />
+              <Route path="/profiles" element={<ECProfilesPage />} />
+              <Route path="/volunteer" element={<VolunteerOpportunitiesPage />} />
+            </Routes>
+          </main>
+          <Footer />
+          <Toaster position="top-right" />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 };
 
