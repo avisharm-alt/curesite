@@ -1797,12 +1797,18 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
-      const [pendingResponse, statsResponse] = await Promise.all([
+      const [postersResponse, professorsResponse, volunteerResponse, ecProfilesResponse, statsResponse] = await Promise.all([
         axios.get(`${API}/admin/posters/all`, { headers }),
+        axios.get(`${API}/admin/professor-network`, { headers }),
+        axios.get(`${API}/admin/volunteer-opportunities`, { headers }),
+        axios.get(`${API}/admin/ec-profiles`, { headers }),
         axios.get(`${API}/admin/stats`, { headers })
       ]);
 
-      setPendingPosters(pendingResponse.data);
+      setPendingPosters(postersResponse.data);
+      setProfessors(professorsResponse.data);
+      setVolunteerOpportunities(volunteerResponse.data);
+      setEcProfiles(ecProfilesResponse.data);
       setStats(statsResponse.data);
     } catch (error) {
       toast.error('Error fetching admin data');
