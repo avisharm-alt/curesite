@@ -1986,6 +1986,26 @@ a:focus {
   color: white;
 }
 
+.view-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--cure-green);
+  color: var(--cure-black);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+}
+
+.view-btn:hover {
+  background: var(--cure-green-dark);
+  transform: translateY(-1px);
+}
+
 .admin-delete-btn {
   display: flex;
   align-items: center;
