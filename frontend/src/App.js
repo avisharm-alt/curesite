@@ -310,6 +310,33 @@ const PosterJournalPage = () => {
     }
   };
 
+  const handleDeletePoster = async (posterId) => {
+    if (!window.confirm('Are you sure you want to delete this poster?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.delete(`${API}/posters/${posterId}`, { headers });
+      toast.success('Poster deleted successfully');
+      fetchPosters(); // Refresh the list
+    } catch (error) {
+      toast.error('Error deleting poster');
+    }
+  };
+
+  const handleDownloadPoster = (posterId, title) => {
+    const url = `${API}/posters/${posterId}/download`;
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${title}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   const PosterCard = ({ poster }) => (
     <div className="poster-card">
       <div className="poster-header">
@@ -330,6 +357,29 @@ const PosterJournalPage = () => {
         {poster.keywords.map((keyword, index) => (
           <span key={index} className="keyword-tag">{keyword}</span>
         ))}
+      </div>
+      
+      {/* Poster Actions */}
+      <div className="poster-actions">
+        {poster.status === 'approved' && poster.poster_url && (
+          <button
+            onClick={() => handleDownloadPoster(poster.id, poster.title)}
+            className="view-poster-btn"
+          >
+            <ExternalLink size={16} />
+            View Poster
+          </button>
+        )}
+        
+        {user && (user.user_type === 'admin' || poster.submitted_by === user.id) && (
+          <button
+            onClick={() => handleDeletePoster(poster.id)}
+            className="delete-poster-btn"
+          >
+            <Trash2 size={16} />
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );
