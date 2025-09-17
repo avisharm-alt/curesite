@@ -1989,127 +1989,69 @@ const AdminPanelPage = () => {
           </button>
         </div>
 
-        {/* All Posters */}
-        <div className="admin-section">
-          <h2>Poster Management</h2>
-          
-          {pendingPosters.length > 0 ? (
-            <div className="admin-posters">
-              {pendingPosters.map((poster) => (
-                <div key={poster.id} className="admin-poster-card">
-                  <div className="poster-header">
-                    <h3>{poster.title}</h3>
-                    <span className="submitted-date">
-                      Submitted: {new Date(poster.submitted_at).toLocaleDateString()}
-                    </span>
-                  </div>
-                  
-                  <div className="poster-details">
-                    <div className="poster-authors">
-                      <strong>Authors:</strong> {poster.authors.join(', ')}
-                    </div>
-                    <div className="poster-institution">
-                      <strong>Institution:</strong> {poster.university} - {poster.program}
-                    </div>
-                    <div className="poster-abstract">
-                      <strong>Abstract:</strong>
-                      <p>{poster.abstract}</p>
-                    </div>
-                    <div className="poster-keywords">
-                      <strong>Keywords:</strong>
-                      <div className="keywords-list">
-                        {poster.keywords.map((keyword, index) => (
-                          <span key={index} className="keyword-tag">{keyword}</span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+        {/* Tab Content */}
+        {activeTab === 'posters' && (
+          <PosterManagementTab 
+            posters={pendingPosters}
+            onReview={handleReviewPoster}
+            onDelete={handleDeleteAdminPoster}
+          />
+        )}
 
-                  <div className="admin-actions">
-                    {poster.poster_url && (
-                      <>
-                        <button
-                          onClick={() => {
-                            const token = localStorage.getItem('token');
-                            const viewUrl = `${API}/admin/posters/${poster.id}/view`;
-                            window.open(viewUrl, '_blank');
-                          }}
-                          className="view-btn"
-                        >
-                          <Eye size={16} />
-                          View Poster
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.preventDefault();
-                            const token = localStorage.getItem('token');
-                            fetch(`${API}/admin/posters/${poster.id}/download`, {
-                              headers: { Authorization: `Bearer ${token}` }
-                            })
-                            .then(response => {
-                              if (!response.ok) throw new Error('Download failed');
-                              return response.blob();
-                            })
-                            .then(blob => {
-                              const url = window.URL.createObjectURL(blob);
-                              const a = document.createElement('a');
-                              a.href = url;
-                              a.download = `${poster.title}.pdf`;
-                              document.body.appendChild(a);
-                              a.click();
-                              window.URL.revokeObjectURL(url);
-                              document.body.removeChild(a);
-                              toast.success('Poster downloaded successfully');
-                            })
-                            .catch(error => {
-                              console.error('Download error:', error);
-                              toast.error('Error downloading poster');
-                            });
-                          }}
-                          className="download-btn"
-                        >
-                          <Download size={16} />
-                          Download Poster
-                        </button>
-                      </>
-                    )}
-                    
-                    {poster.status === 'pending' && (
-                      <>
-                        <button
-                          onClick={() => handleReviewPoster(poster.id, 'approved')}
-                          className="approve-btn"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleReviewPoster(poster.id, 'rejected', 'Does not meet quality standards')}
-                          className="reject-btn"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    
-                    <button
-                      onClick={() => handleDeleteAdminPoster(poster.id)}
-                      className="admin-delete-btn"
-                    >
-                      <Trash2 size={16} />
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="empty-state">
-              <FileText size={48} />
-              <h3>No posters found</h3>
-              <p>No poster submissions in the system yet.</p>
-            </div>
-          )}
-        </div>
+        {activeTab === 'professors' && (
+          <ProfessorManagementTab 
+            professors={professors}
+            onDelete={handleDeleteProfessor}
+            onAdd={() => setShowAddProfessor(true)}
+          />
+        )}
+
+        {activeTab === 'volunteer' && (
+          <VolunteerManagementTab 
+            opportunities={volunteerOpportunities}
+            onDelete={handleDeleteVolunteerOpportunity}
+            onAdd={() => setShowAddVolunteer(true)}
+          />
+        )}
+
+        {activeTab === 'ecprofiles' && (
+          <ECProfileManagementTab 
+            profiles={ecProfiles}
+            onDelete={handleDeleteECProfile}
+            onAdd={() => setShowAddECProfile(true)}
+          />
+        )}
+
+        {/* Add Forms */}
+        {showAddProfessor && (
+          <AddProfessorModal 
+            onClose={() => setShowAddProfessor(false)}
+            onSuccess={() => {
+              setShowAddProfessor(false);
+              fetchAdminData();
+            }}
+          />
+        )}
+
+        {showAddVolunteer && (
+          <AddVolunteerModal 
+            onClose={() => setShowAddVolunteer(false)}
+            onSuccess={() => {
+              setShowAddVolunteer(false);
+              fetchAdminData();
+            }}
+          />
+        )}
+
+        {showAddECProfile && (
+          <AddECProfileModal 
+            onClose={() => setShowAddECProfile(false)}
+            onSuccess={() => {
+              setShowAddECProfile(false);
+              fetchAdminData();
+            }}
+          />
+        )}
       </div>
     </div>
   );
