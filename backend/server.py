@@ -99,6 +99,7 @@ class PosterSubmissionCreate(BaseModel):
     keywords: List[str]
     university: str
     program: str
+    poster_url: Optional[str] = None
 
 class ECProfile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
