@@ -1811,18 +1811,17 @@ const AdminPanelPage = () => {
 
                   <div className="admin-actions">
                     {poster.poster_url && (
-                      <a
-                        href={`${API}/admin/posters/${poster.id}/download`}
-                        download
-                        className="download-btn"
+                      <button
                         onClick={(e) => {
-                          // Add authorization header for download
                           e.preventDefault();
                           const token = localStorage.getItem('token');
                           fetch(`${API}/admin/posters/${poster.id}/download`, {
                             headers: { Authorization: `Bearer ${token}` }
                           })
-                          .then(response => response.blob())
+                          .then(response => {
+                            if (!response.ok) throw new Error('Download failed');
+                            return response.blob();
+                          })
                           .then(blob => {
                             const url = window.URL.createObjectURL(blob);
                             const a = document.createElement('a');
@@ -1832,26 +1831,37 @@ const AdminPanelPage = () => {
                             a.click();
                             window.URL.revokeObjectURL(url);
                             document.body.removeChild(a);
+                            toast.success('Poster downloaded successfully');
                           })
-                          .catch(error => toast.error('Error downloading poster'));
+                          .catch(error => {
+                            console.error('Download error:', error);
+                            toast.error('Error downloading poster');
+                          });
                         }}
+                        className="download-btn"
                       >
                         <ExternalLink size={16} />
-                        View/Download Poster
-                      </a>
+                        Download Poster
+                      </button>
                     )}
-                    <button
-                      onClick={() => handleReviewPoster(poster.id, 'approved')}
-                      className="approve-btn"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleReviewPoster(poster.id, 'rejected', 'Does not meet quality standards')}
-                      className="reject-btn"
-                    >
-                      Reject
-                    </button>
+                    
+                    {poster.status === 'pending' && (
+                      <>
+                        <button
+                          onClick={() => handleReviewPoster(poster.id, 'approved')}
+                          className="approve-btn"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleReviewPoster(poster.id, 'rejected', 'Does not meet quality standards')}
+                          className="reject-btn"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    
                     <button
                       onClick={() => handleDeleteAdminPoster(poster.id)}
                       className="admin-delete-btn"
