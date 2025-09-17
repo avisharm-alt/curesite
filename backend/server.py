@@ -418,6 +418,28 @@ async def get_admin_stats(current_user: User = Depends(get_current_user)):
     }
     return stats
 
+@api_router.get("/admin/posters/{poster_id}/download")
+async def download_poster(poster_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    poster = await db.poster_submissions.find_one({"id": poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    if not poster.get("poster_url"):
+        raise HTTPException(status_code=404, detail="No file attached to this poster")
+    
+    file_path = Path(poster["poster_url"])
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Poster file not found")
+    
+    return FileResponse(
+        path=file_path,
+        filename=f"{poster['title']}.{file_path.suffix[1:]}",
+        media_type='application/octet-stream'
+    )
+
 # EC Profile Routes
 @api_router.post("/ec-profiles", response_model=ECProfile)
 async def create_ec_profile(profile: ECProfileCreate, current_user: User = Depends(get_current_user)):
