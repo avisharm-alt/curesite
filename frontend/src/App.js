@@ -1866,8 +1866,8 @@ const AdminPanelPage = () => {
           ) : (
             <div className="empty-state">
               <FileText size={48} />
-              <h3>No pending reviews</h3>
-              <p>All poster submissions have been reviewed.</p>
+              <h3>No posters found</h3>
+              <p>No poster submissions in the system yet.</p>
             </div>
           )}
         </div>
