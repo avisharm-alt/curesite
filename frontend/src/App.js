@@ -2123,6 +2123,321 @@ const AddProfessorModal = ({ onClose, onSuccess }) => {
   );
 };
 
+const AddVolunteerModal = ({ onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    title: '',
+    organization: '',
+    description: '',
+    location: '',
+    contact_email: '',
+    contact_phone: '',
+    requirements: '',
+    time_commitment: '',
+    expires_at: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      const submitData = {
+        ...formData,
+        requirements: formData.requirements ? formData.requirements.split(',').map(req => req.trim()) : [],
+        expires_at: formData.expires_at ? new Date(formData.expires_at).toISOString() : null
+      };
+      
+      await axios.post(`${API}/admin/volunteer-opportunities`, submitData, { headers });
+      toast.success('Volunteer opportunity added successfully');
+      onSuccess();
+    } catch (error) {
+      toast.error('Error adding volunteer opportunity');
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>Add Volunteer Opportunity</h3>
+          <button onClick={onClose} className="close-modal-btn">
+            <X size={20} />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-grid">
+            <div className="form-field">
+              <label>Title *</label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Organization *</label>
+              <input
+                type="text"
+                value={formData.organization}
+                onChange={(e) => setFormData({...formData, organization: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Location *</label>
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Time Commitment *</label>
+              <input
+                type="text"
+                value={formData.time_commitment}
+                onChange={(e) => setFormData({...formData, time_commitment: e.target.value})}
+                className="form-input"
+                placeholder="e.g., 4 hours/week"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Contact Email *</label>
+              <input
+                type="email"
+                value={formData.contact_email}
+                onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Contact Phone</label>
+              <input
+                type="tel"
+                value={formData.contact_phone}
+                onChange={(e) => setFormData({...formData, contact_phone: e.target.value})}
+                className="form-input"
+              />
+            </div>
+          </div>
+          
+          <div className="form-field">
+            <label>Description *</label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({...formData, description: e.target.value})}
+              className="form-textarea"
+              required
+            />
+          </div>
+          
+          <div className="form-field">
+            <label>Requirements</label>
+            <input
+              type="text"
+              value={formData.requirements}
+              onChange={(e) => setFormData({...formData, requirements: e.target.value})}
+              className="form-input"
+              placeholder="Separate with commas"
+            />
+          </div>
+          
+          <div className="form-field">
+            <label>Expires At</label>
+            <input
+              type="date"
+              value={formData.expires_at}
+              onChange={(e) => setFormData({...formData, expires_at: e.target.value})}
+              className="form-input"
+            />
+          </div>
+          
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} className="cancel-btn">Cancel</button>
+            <button type="submit" className="submit-btn">Add Opportunity</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
+const AddECProfileModal = ({ onClose, onSuccess }) => {
+  const [formData, setFormData] = useState({
+    medical_school: '',
+    admission_year: new Date().getFullYear(),
+    undergraduate_gpa: '',
+    mcat_score: '',
+    research_hours: '',
+    volunteer_hours: '',
+    clinical_hours: '',
+    leadership_activities: '',
+    awards_scholarships: '',
+    publications: ''
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      const submitData = {
+        ...formData,
+        admission_year: parseInt(formData.admission_year),
+        undergraduate_gpa: parseFloat(formData.undergraduate_gpa),
+        mcat_score: formData.mcat_score ? parseInt(formData.mcat_score) : null,
+        research_hours: formData.research_hours ? parseInt(formData.research_hours) : null,
+        volunteer_hours: formData.volunteer_hours ? parseInt(formData.volunteer_hours) : null,
+        clinical_hours: formData.clinical_hours ? parseInt(formData.clinical_hours) : null,
+        publications: formData.publications ? parseInt(formData.publications) : null,
+        leadership_activities: formData.leadership_activities ? formData.leadership_activities.split(',').map(item => item.trim()) : [],
+        awards_scholarships: formData.awards_scholarships ? formData.awards_scholarships.split(',').map(item => item.trim()) : []
+      };
+      
+      await axios.post(`${API}/admin/ec-profiles`, submitData, { headers });
+      toast.success('EC profile added successfully');
+      onSuccess();
+    } catch (error) {
+      toast.error('Error adding EC profile');
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content large-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-header">
+          <h3>Add EC Profile</h3>
+          <button onClick={onClose} className="close-modal-btn">
+            <X size={20} />
+          </button>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="modal-form">
+          <div className="form-grid">
+            <div className="form-field">
+              <label>Medical School *</label>
+              <select
+                value={formData.medical_school}
+                onChange={(e) => setFormData({...formData, medical_school: e.target.value})}
+                className="form-input"
+                required
+              >
+                <option value="">Select Medical School</option>
+                <option value="University of Toronto">University of Toronto</option>
+                <option value="University of Western Ontario">University of Western Ontario</option>
+                <option value="McMaster University">McMaster University</option>
+                <option value="Queen's University">Queen's University</option>
+                <option value="University of Ottawa">University of Ottawa</option>
+              </select>
+            </div>
+            
+            <div className="form-field">
+              <label>Admission Year *</label>
+              <input
+                type="number"
+                value={formData.admission_year}
+                onChange={(e) => setFormData({...formData, admission_year: e.target.value})}
+                className="form-input"
+                min="2020"
+                max="2030"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Undergraduate GPA *</label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="4.0"
+                value={formData.undergraduate_gpa}
+                onChange={(e) => setFormData({...formData, undergraduate_gpa: e.target.value})}
+                className="form-input"
+                required
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>MCAT Score</label>
+              <input
+                type="number"
+                min="472"
+                max="528"
+                value={formData.mcat_score}
+                onChange={(e) => setFormData({...formData, mcat_score: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Research Hours</label>
+              <input
+                type="number"
+                value={formData.research_hours}
+                onChange={(e) => setFormData({...formData, research_hours: e.target.value})}
+                className="form-input"
+              />
+            </div>
+            
+            <div className="form-field">
+              <label>Volunteer Hours</label>
+              <input
+                type="number"
+                value={formData.volunteer_hours}
+                onChange={(e) => setFormData({...formData, volunteer_hours: e.target.value})}
+                className="form-input"
+              />
+            </div>
+          </div>
+          
+          <div className="form-field">
+            <label>Leadership Activities</label>
+            <input
+              type="text"
+              value={formData.leadership_activities}
+              onChange={(e) => setFormData({...formData, leadership_activities: e.target.value})}
+              className="form-input"
+              placeholder="Separate with commas"
+            />
+          </div>
+          
+          <div className="form-field">
+            <label>Awards & Scholarships</label>
+            <input
+              type="text"
+              value={formData.awards_scholarships}
+              onChange={(e) => setFormData({...formData, awards_scholarships: e.target.value})}
+              className="form-input"
+              placeholder="Separate with commas"
+            />
+          </div>
+          
+          <div className="modal-actions">
+            <button type="button" onClick={onClose} className="cancel-btn">Cancel</button>
+            <button type="submit" className="submit-btn">Add EC Profile</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 // Admin Panel Page
 const AdminPanelPage = () => {
   const { user } = useAuth();
