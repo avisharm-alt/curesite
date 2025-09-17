@@ -1957,6 +1957,38 @@ const AdminPanelPage = () => {
           </div>
         </div>
 
+        {/* Admin Tabs */}
+        <div className="admin-tabs">
+          <button 
+            className={`admin-tab ${activeTab === 'posters' ? 'active' : ''}`}
+            onClick={() => setActiveTab('posters')}
+          >
+            <FileText size={16} />
+            Poster Management
+          </button>
+          <button 
+            className={`admin-tab ${activeTab === 'professors' ? 'active' : ''}`}
+            onClick={() => setActiveTab('professors')}
+          >
+            <GraduationCap size={16} />
+            Professor Network
+          </button>
+          <button 
+            className={`admin-tab ${activeTab === 'volunteer' ? 'active' : ''}`}
+            onClick={() => setActiveTab('volunteer')}
+          >
+            <Heart size={16} />
+            Volunteer Opportunities
+          </button>
+          <button 
+            className={`admin-tab ${activeTab === 'ecprofiles' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ecprofiles')}
+          >
+            <BarChart3 size={16} />
+            EC Profiles
+          </button>
+        </div>
+
         {/* All Posters */}
         <div className="admin-section">
           <h2>Poster Management</h2>
