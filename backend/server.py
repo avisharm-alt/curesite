@@ -462,6 +462,45 @@ async def download_poster(poster_id: str, current_user: User = Depends(get_curre
         media_type='application/octet-stream'
     )
 
+@api_router.get("/admin/posters/{poster_id}/view")
+async def view_poster_admin(poster_id: str, current_user: User = Depends(get_current_user)):
+    """View poster inline (admin access)"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    poster = await db.poster_submissions.find_one({"id": poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    if not poster.get("poster_url"):
+        raise HTTPException(status_code=404, detail="No file attached to this poster")
+    
+    file_path = Path(poster["poster_url"])
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Poster file not found")
+    
+    # Determine media type based on file extension
+    file_extension = file_path.suffix.lower()
+    if file_extension == '.pdf':
+        media_type = 'application/pdf'
+    elif file_extension in ['.png']:
+        media_type = 'image/png'
+    elif file_extension in ['.jpg', '.jpeg']:
+        media_type = 'image/jpeg'
+    elif file_extension == '.gif':
+        media_type = 'image/gif'
+    else:
+        media_type = 'application/octet-stream'
+    
+    return FileResponse(
+        path=file_path,
+        media_type=media_type,
+        headers={
+            "Content-Disposition": "inline",
+            "Cache-Control": "public, max-age=3600"
+        }
+    )
+
 @api_router.get("/posters/{poster_id}/download")
 async def download_approved_poster(poster_id: str):
     """Download approved poster (public access)"""
