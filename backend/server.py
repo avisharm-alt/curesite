@@ -267,7 +267,14 @@ async def google_callback(request: Request):
                 email=user_info['email'],
                 name=user_info['name']
             )
-            user = User(**user_data.dict(), profile_picture=user_info.get('picture'))
+            
+            # Set admin role for curejournal@gmail.com
+            user_type = "admin" if user_info['email'] == "curejournal@gmail.com" else "student"
+            
+            user = User(**user_data.dict(), 
+                       profile_picture=user_info.get('picture'),
+                       user_type=user_type,
+                       verified=True if user_type == "admin" else False)
             user_dict = prepare_for_mongo(user.dict())
             await db.users.insert_one(user_dict)
         
