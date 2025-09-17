@@ -453,6 +453,51 @@ async def download_poster(poster_id: str, current_user: User = Depends(get_curre
         media_type='application/octet-stream'
     )
 
+@api_router.get("/posters/{poster_id}/download")
+async def download_approved_poster(poster_id: str):
+    """Download approved poster (public access)"""
+    poster = await db.poster_submissions.find_one({"id": poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    if poster.get("status") != "approved":
+        raise HTTPException(status_code=403, detail="Poster not approved for public viewing")
+    
+    if not poster.get("poster_url"):
+        raise HTTPException(status_code=404, detail="No file attached to this poster")
+    
+    file_path = Path(poster["poster_url"])
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Poster file not found")
+    
+    return FileResponse(
+        path=file_path,
+        filename=f"{poster['title']}.{file_path.suffix[1:]}",
+        media_type='application/octet-stream'
+    )
+
+@api_router.delete("/posters/{poster_id}")
+async def delete_poster(poster_id: str, current_user: User = Depends(get_current_user)):
+    """Delete poster (user can delete their own, admin can delete any)"""
+    poster = await db.poster_submissions.find_one({"id": poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    # Check permissions
+    if current_user.user_type != "admin" and poster["submitted_by"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized to delete this poster")
+    
+    # Delete the file if it exists
+    if poster.get("poster_url"):
+        file_path = Path(poster["poster_url"])
+        if file_path.exists():
+            file_path.unlink()
+    
+    # Delete from database
+    await db.poster_submissions.delete_one({"id": poster_id})
+    
+    return {"message": "Poster deleted successfully"}
+
 # EC Profile Routes
 @api_router.post("/ec-profiles", response_model=ECProfile)
 async def create_ec_profile(profile: ECProfileCreate, current_user: User = Depends(get_current_user)):
