@@ -309,7 +309,7 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
   };
 
   const fileType = getFileType(poster.poster_url);
-  const viewerUrl = `${API}/posters/${poster.id}/download`;
+  const viewerUrl = `${API}/posters/${poster.id}/view`;
 
   return (
     <div className="poster-modal-overlay" onClick={onClose}>
