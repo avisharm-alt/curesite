@@ -1347,24 +1347,62 @@ const SubmitPosterPage = () => {
       return;
     }
 
+    if (!selectedFile) {
+      toast.error('Please select a poster file to upload');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
+      // First, upload the file
+      const fileFormData = new FormData();
+      fileFormData.append('file', selectedFile);
+
+      const uploadResponse = await axios.post(`${API}/posters/upload`, fileFormData, {
+        headers: {
+          ...headers,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // Then, submit the poster data with file reference
       const posterData = {
         ...formData,
         authors: formData.authors.split(',').map(author => author.trim()).filter(author => author),
-        keywords: formData.keywords.split(',').map(keyword => keyword.trim()).filter(keyword => keyword)
+        keywords: formData.keywords.split(',').map(keyword => keyword.trim()).filter(keyword => keyword),
+        poster_url: uploadResponse.data.file_path
       };
 
       await axios.post(`${API}/posters`, posterData, { headers });
       toast.success('Poster submitted successfully! It will be reviewed by our team.');
       navigate('/posters');
     } catch (error) {
-      toast.error('Error submitting poster');
+      toast.error('Error submitting poster: ' + (error.response?.data?.detail || error.message));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file type
+      const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
+      if (!allowedTypes.includes(file.type)) {
+        toast.error('Please select a PDF or image file (PNG, JPG, JPEG)');
+        return;
+      }
+      
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      
+      setSelectedFile(file);
     }
   };
 
