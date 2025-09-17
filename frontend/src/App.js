@@ -9,7 +9,7 @@ import {
   BookOpen, Users, GraduationCap, Heart, FileText, 
   User, LogOut, Menu, X, Search, Filter, Plus,
   Star, MapPin, Clock, Mail, Phone, ExternalLink,
-  Award, BarChart3, TrendingUp, Calendar, Home, Edit3, Save, Trash2, AlertTriangle, Download
+  Award, BarChart3, TrendingUp, Calendar, Home, Edit3, Save, Trash2, AlertTriangle, Download, Eye, ZoomIn
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
