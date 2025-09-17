@@ -227,6 +227,9 @@ def prepare_for_mongo(data):
 
 def parse_from_mongo(item):
     if isinstance(item, dict):
+        # Remove MongoDB's _id field to avoid ObjectId serialization issues
+        item.pop('_id', None)
+        
         if 'created_at' in item and isinstance(item['created_at'], str):
             item['created_at'] = datetime.fromisoformat(item['created_at'])
         if 'submitted_at' in item and isinstance(item['submitted_at'], str):
