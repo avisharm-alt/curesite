@@ -1697,6 +1697,23 @@ const AdminPanelPage = () => {
     }
   };
 
+  const handleDeleteAdminPoster = async (posterId) => {
+    if (!window.confirm('Are you sure you want to permanently delete this poster?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.delete(`${API}/posters/${posterId}`, { headers });
+      toast.success('Poster deleted successfully');
+      fetchAdminData(); // Refresh data
+    } catch (error) {
+      toast.error('Error deleting poster');
+    }
+  };
+
   if (!user || user.user_type !== 'admin') {
     return (
       <div className="page">
