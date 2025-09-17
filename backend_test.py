@@ -74,9 +74,50 @@ class CUREAPITester:
         # Test with filters
         if success:
             self.run_test("Get Posters (Approved)", "GET", "posters?status=approved", 200)
+            self.run_test("Get Posters (Pending)", "GET", "posters?status=pending", 200)
+            self.run_test("Get Posters (All Status)", "GET", "posters", 200)
             self.run_test("Get Posters (By University)", "GET", "posters?university=University%20of%20Toronto", 200)
         
         return success, response
+
+    def test_specific_poster(self):
+        """Test specific poster mentioned in review request"""
+        poster_id = "c67e8d86-c92a-4488-b362-f33c60d488c1"
+        print(f"\n🔍 Testing specific poster ID: {poster_id}")
+        
+        # First get all posters to see if this specific one exists
+        success, all_posters = self.run_test("Get All Posters for Specific Check", "GET", "posters", 200)
+        
+        if success and isinstance(all_posters, list):
+            found_poster = None
+            for poster in all_posters:
+                if poster.get('id') == poster_id:
+                    found_poster = poster
+                    break
+            
+            if found_poster:
+                print(f"✅ Found specific poster: {found_poster.get('title', 'No title')}")
+                print(f"   Status: {found_poster.get('status', 'No status')}")
+                print(f"   University: {found_poster.get('university', 'No university')}")
+                if found_poster.get('status') == 'pending':
+                    print(f"✅ Poster has correct 'pending' status")
+                    self.tests_passed += 1
+                else:
+                    print(f"❌ Poster status is '{found_poster.get('status')}', expected 'pending'")
+                self.tests_run += 1
+            else:
+                print(f"❌ Specific poster with ID {poster_id} not found")
+                self.tests_run += 1
+        
+        return success, all_posters
+
+    def test_admin_endpoints(self):
+        """Test admin endpoints (without authentication)"""
+        # These should fail without proper admin token
+        self.run_test("Admin Pending Posters (No Auth)", "GET", "admin/posters/pending", 401)
+        self.run_test("Admin Stats (No Auth)", "GET", "admin/stats", 401)
+        
+        return True, {}
 
     def test_student_network_endpoint(self):
         """Test student network endpoint"""
