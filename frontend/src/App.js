@@ -464,13 +464,22 @@ const PosterJournalPage = () => {
       {/* Poster Actions */}
       <div className="poster-actions">
         {poster.status === 'approved' && poster.poster_url && (
-          <button
-            onClick={() => handleDownloadPoster(poster.id, poster.title)}
-            className="view-poster-btn"
-          >
-            <ExternalLink size={16} />
-            View Poster
-          </button>
+          <>
+            <button
+              onClick={() => handleViewPoster(poster)}
+              className="view-poster-btn"
+            >
+              <Eye size={16} />
+              View Poster
+            </button>
+            <button
+              onClick={() => handleDownloadPoster(poster.id, poster.title)}
+              className="download-poster-btn"
+            >
+              <Download size={16} />
+              Download
+            </button>
+          </>
         )}
         
         {user && (user.user_type === 'admin' || poster.submitted_by === user.id) && (
