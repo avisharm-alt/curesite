@@ -585,6 +585,120 @@ async def delete_poster(poster_id: str, current_user: User = Depends(get_current
     
     return {"message": "Poster deleted successfully"}
 
+# Admin Network Management Routes
+
+@api_router.post("/admin/professor-network", response_model=ProfessorNetwork)
+async def admin_create_professor(profile: ProfessorNetworkCreate, current_user: User = Depends(get_current_user)):
+    """Admin creates professor network profile"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Create a dummy user for the professor or use existing
+    prof_user = User(
+        email=profile.dict().get("contact_email", "unknown@university.edu"),
+        name="Professor (Admin Created)",
+        user_type="professor"
+    )
+    
+    profile_data = profile.dict()
+    profile_obj = ProfessorNetwork(**profile_data, user_id=str(uuid.uuid4()), contact_email=profile_data.get("contact_email", ""))
+    profile_dict = prepare_for_mongo(profile_obj.dict())
+    await db.professor_network.insert_one(profile_dict)
+    return profile_obj
+
+@api_router.delete("/admin/professor-network/{profile_id}")
+async def admin_delete_professor(profile_id: str, current_user: User = Depends(get_current_user)):
+    """Admin deletes professor network profile"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.professor_network.delete_one({"id": profile_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Professor profile not found")
+    
+    return {"message": "Professor profile deleted successfully"}
+
+@api_router.post("/admin/volunteer-opportunities", response_model=VolunteerOpportunity)
+async def admin_create_volunteer_opportunity(opportunity: VolunteerOpportunityCreate, current_user: User = Depends(get_current_user)):
+    """Admin creates volunteer opportunity"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    opportunity_data = opportunity.dict()
+    opportunity_obj = VolunteerOpportunity(**opportunity_data, posted_by=current_user.id)
+    opportunity_dict = prepare_for_mongo(opportunity_obj.dict())
+    await db.volunteer_opportunities.insert_one(opportunity_dict)
+    return opportunity_obj
+
+@api_router.delete("/admin/volunteer-opportunities/{opportunity_id}")
+async def admin_delete_volunteer_opportunity(opportunity_id: str, current_user: User = Depends(get_current_user)):
+    """Admin deletes volunteer opportunity"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.volunteer_opportunities.delete_one({"id": opportunity_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Volunteer opportunity not found")
+    
+    return {"message": "Volunteer opportunity deleted successfully"}
+
+@api_router.post("/admin/ec-profiles", response_model=ECProfile)
+async def admin_create_ec_profile(profile: ECProfileCreate, current_user: User = Depends(get_current_user)):
+    """Admin creates EC profile"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    profile_data = profile.dict()
+    profile_obj = ECProfile(**profile_data, submitted_by=current_user.id)
+    profile_dict = prepare_for_mongo(profile_obj.dict())
+    await db.ec_profiles.insert_one(profile_dict)
+    return profile_obj
+
+@api_router.delete("/admin/ec-profiles/{profile_id}")
+async def admin_delete_ec_profile(profile_id: str, current_user: User = Depends(get_current_user)):
+    """Admin deletes EC profile"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.ec_profiles.delete_one({"id": profile_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="EC profile not found")
+    
+    return {"message": "EC profile deleted successfully"}
+
+@api_router.get("/admin/professor-network", response_model=List[Dict[str, Any]])
+async def admin_get_all_professors(current_user: User = Depends(get_current_user)):
+    """Admin gets all professor profiles"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    profiles = await db.professor_network.find({}).to_list(100)
+    result = []
+    for profile in profiles:
+        result.append({
+            **parse_from_mongo(profile),
+            "user_name": "Professor (Admin Created)"
+        })
+    return result
+
+@api_router.get("/admin/volunteer-opportunities", response_model=List[VolunteerOpportunity]])
+async def admin_get_all_volunteer_opportunities(current_user: User = Depends(get_current_user)):
+    """Admin gets all volunteer opportunities"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    opportunities = await db.volunteer_opportunities.find({}).to_list(100)
+    return [VolunteerOpportunity(**parse_from_mongo(opportunity)) for opportunity in opportunities]
+
+@api_router.get("/admin/ec-profiles", response_model=List[ECProfile]])
+async def admin_get_all_ec_profiles(current_user: User = Depends(get_current_user)):
+    """Admin gets all EC profiles"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    profiles = await db.ec_profiles.find({}).to_list(100)
+    return [ECProfile(**parse_from_mongo(profile)) for profile in profiles]
+
 # EC Profile Routes
 @api_router.post("/ec-profiles", response_model=ECProfile)
 async def create_ec_profile(profile: ECProfileCreate, current_user: User = Depends(get_current_user)):
