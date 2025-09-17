@@ -205,11 +205,16 @@ def main():
     # Test main feature endpoints
     print("\n📚 Testing Feature Endpoints...")
     tester.test_posters_endpoint()
+    tester.test_specific_poster()
     tester.test_student_network_endpoint()
     tester.test_professor_network_endpoint()
     tester.test_ec_profiles_endpoint()
     tester.test_ec_stats_endpoint()
     tester.test_volunteer_opportunities_endpoint()
+    
+    # Test admin endpoints
+    print("\n👑 Testing Admin Endpoints...")
+    tester.test_admin_endpoints()
     
     # Test authentication
     print("\n🔐 Testing Authentication...")
