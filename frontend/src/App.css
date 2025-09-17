@@ -1745,6 +1745,55 @@ a:focus {
   background: rgba(255, 255, 255, 0.15);
 }
 
+.file-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--cure-white);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.file-input:focus {
+  outline: none;
+  border-color: var(--cure-green);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.file-input::file-selector-button {
+  background: var(--cure-green);
+  color: var(--cure-black);
+  border: none;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  margin-right: var(--spacing-sm);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.file-selected {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--cure-green);
+  border-radius: var(--radius-sm);
+}
+
+.file-name {
+  color: var(--cure-green);
+  font-weight: 500;
+}
+
+.file-size {
+  color: var(--gray-400);
+  font-size: 0.9rem;
+}
+
 .form-actions {
   display: flex;
   gap: var(--spacing-md);
