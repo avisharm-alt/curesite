@@ -1773,9 +1773,9 @@ const AdminPanelPage = () => {
           </div>
         </div>
 
-        {/* Pending Posters */}
+        {/* All Posters */}
         <div className="admin-section">
-          <h2>Pending Poster Reviews</h2>
+          <h2>Poster Management</h2>
           
           {pendingPosters.length > 0 ? (
             <div className="pending-posters">
