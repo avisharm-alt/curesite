@@ -1154,8 +1154,17 @@ const MyProfilePage = () => {
                         <span className="keyword-tag small">+{poster.keywords.length - 3} more</span>
                       )}
                     </div>
-                    <div className="poster-date">
-                      <small>{new Date(poster.submitted_at).toLocaleDateString()}</small>
+                    <div className="poster-profile-actions">
+                      <div className="poster-date">
+                        <small>{new Date(poster.submitted_at).toLocaleDateString()}</small>
+                      </div>
+                      <button
+                        onClick={() => handleDeleteMyPoster(poster.id)}
+                        className="delete-my-poster-btn"
+                        title="Delete this poster"
+                      >
+                        <Trash2 size={14} />
+                      </button>
                     </div>
                   </div>
                 </div>
