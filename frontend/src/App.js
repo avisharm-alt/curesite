@@ -1337,6 +1337,7 @@ const SubmitPosterPage = () => {
     university: user?.university || '',
     program: user?.program || ''
   });
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e) => {
