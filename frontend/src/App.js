@@ -1880,6 +1880,8 @@ const App = () => {
               <Route path="/profiles" element={<ECProfilesPage />} />
               <Route path="/volunteer" element={<VolunteerOpportunitiesPage />} />
               <Route path="/profile" element={<MyProfilePage />} />
+              <Route path="/submit-poster" element={<SubmitPosterPage />} />
+              <Route path="/admin" element={<AdminPanelPage />} />
             </Routes>
           </main>
           <Footer />
