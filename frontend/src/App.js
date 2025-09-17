@@ -102,6 +102,7 @@ const Header = () => {
     { name: 'Professor Network', href: '/professors', icon: GraduationCap },
     { name: 'EC Profiles', href: '/profiles', icon: BarChart3 },
     { name: 'Volunteer Opportunities', href: '/volunteer', icon: Heart },
+    ...(user ? [{ name: 'My Profile', href: '/profile', icon: User }] : []),
   ];
 
   const handleGoogleLogin = () => {
