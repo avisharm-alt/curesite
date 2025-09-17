@@ -1330,14 +1330,6 @@ const VolunteerOpportunitiesPage = () => {
         </div>
       </div>
 
-      <div className="page-image">
-        <img 
-          src="https://images.pexels.com/photos/356040/pexels-photo-356040.jpeg"
-          alt="Volunteer Work"
-          className="section-img"
-        />
-      </div>
-
       <div className="page-content">
         <div className="opportunity-search">
           <div className="search-box">
