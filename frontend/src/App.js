@@ -1847,6 +1847,57 @@ const AdminPanelPage = () => {
     }
   };
 
+  const handleDeleteProfessor = async (professorId) => {
+    if (!window.confirm('Are you sure you want to delete this professor profile?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.delete(`${API}/admin/professor-network/${professorId}`, { headers });
+      toast.success('Professor profile deleted successfully');
+      fetchAdminData();
+    } catch (error) {
+      toast.error('Error deleting professor profile');
+    }
+  };
+
+  const handleDeleteVolunteerOpportunity = async (opportunityId) => {
+    if (!window.confirm('Are you sure you want to delete this volunteer opportunity?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.delete(`${API}/admin/volunteer-opportunities/${opportunityId}`, { headers });
+      toast.success('Volunteer opportunity deleted successfully');
+      fetchAdminData();
+    } catch (error) {
+      toast.error('Error deleting volunteer opportunity');
+    }
+  };
+
+  const handleDeleteECProfile = async (profileId) => {
+    if (!window.confirm('Are you sure you want to delete this EC profile?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.delete(`${API}/admin/ec-profiles/${profileId}`, { headers });
+      toast.success('EC profile deleted successfully');
+      fetchAdminData();
+    } catch (error) {
+      toast.error('Error deleting EC profile');
+    }
+  };
+
   if (!user || user.user_type !== 'admin') {
     return (
       <div className="page">
