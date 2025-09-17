@@ -1717,6 +1717,36 @@ const AdminPanelPage = () => {
                   </div>
 
                   <div className="admin-actions">
+                    {poster.poster_url && (
+                      <a
+                        href={`${API}/admin/posters/${poster.id}/download`}
+                        download
+                        className="download-btn"
+                        onClick={(e) => {
+                          // Add authorization header for download
+                          e.preventDefault();
+                          const token = localStorage.getItem('token');
+                          fetch(`${API}/admin/posters/${poster.id}/download`, {
+                            headers: { Authorization: `Bearer ${token}` }
+                          })
+                          .then(response => response.blob())
+                          .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.href = url;
+                            a.download = `${poster.title}.pdf`;
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url);
+                            document.body.removeChild(a);
+                          })
+                          .catch(error => toast.error('Error downloading poster'));
+                        }}
+                      >
+                        <ExternalLink size={16} />
+                        View/Download Poster
+                      </a>
+                    )}
                     <button
                       onClick={() => handleReviewPoster(poster.id, 'approved')}
                       className="approve-btn"
