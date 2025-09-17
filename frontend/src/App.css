@@ -1704,6 +1704,267 @@ a:focus {
   background: #dc2626;
 }
 
+/* POSTER SUBMISSION FORM */
+.poster-form {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.form-section {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-2xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.form-section h3 {
+  color: var(--cure-green);
+  font-size: 1.25rem;
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+}
+
+.form-textarea {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--cure-white);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
+  font-size: 0.95rem;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 120px;
+  transition: all 0.3s ease;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--cure-green);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+  margin-top: var(--spacing-2xl);
+}
+
+.submit-btn {
+  background: var(--cure-green);
+  color: var(--cure-black);
+  border: none;
+  padding: var(--spacing-md) var(--spacing-2xl);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: var(--cure-green-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-lg);
+}
+
+.submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.submit-poster-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: var(--cure-green);
+  color: var(--cure-black);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.submit-poster-btn:hover {
+  background: var(--cure-green-dark);
+  transform: translateY(-1px);
+  color: var(--cure-black);
+}
+
+/* ADMIN PANEL */
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.admin-stats .stat-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  text-align: center;
+}
+
+.admin-stats .stat-card h3 {
+  font-size: 0.9rem;
+  color: var(--gray-400);
+  margin-bottom: var(--spacing-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--cure-white);
+}
+
+.stat-number.pending {
+  color: #f59e0b;
+}
+
+.stat-number.approved {
+  color: var(--cure-green);
+}
+
+.admin-section {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.admin-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-lg);
+  color: var(--cure-white);
+}
+
+.pending-posters {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.admin-poster-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+}
+
+.admin-poster-card .poster-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-lg);
+}
+
+.admin-poster-card h3 {
+  font-size: 1.25rem;
+  color: var(--cure-white);
+  margin-bottom: var(--spacing-sm);
+}
+
+.submitted-date {
+  color: var(--gray-400);
+  font-size: 0.9rem;
+}
+
+.poster-details {
+  margin-bottom: var(--spacing-xl);
+}
+
+.poster-details > div {
+  margin-bottom: var(--spacing-md);
+}
+
+.poster-details strong {
+  color: var(--cure-green);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.poster-authors,
+.poster-institution {
+  color: var(--gray-300);
+}
+
+.poster-abstract p {
+  color: var(--gray-300);
+  line-height: 1.6;
+  margin-top: var(--spacing-sm);
+}
+
+.keywords-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
+.admin-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}
+
+.approve-btn {
+  background: var(--cure-green);
+  color: var(--cure-black);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.approve-btn:hover {
+  background: var(--cure-green-dark);
+  transform: translateY(-1px);
+}
+
+.reject-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reject-btn:hover {
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+/* RESPONSIVE FORMS */
+@media (max-width: 768px) {
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .submit-btn,
+  .cancel-btn {
+    width: 100%;
+  }
+  
+  .admin-actions {
+    flex-direction: column;
+  }
+  
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* RESPONSIVE PROFILE PAGE */
 @media (max-width: 768px) {
   .form-grid {
