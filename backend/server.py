@@ -366,10 +366,11 @@ async def get_ec_profiles(medical_school: Optional[str] = None, admission_year: 
         query["admission_year"] = admission_year
     
     profiles = await db.ec_profiles.find(query).to_list(100)
-    # Remove submitted_by for anonymity
+    # Remove submitted_by for anonymity and clean up MongoDB fields
     for profile in profiles:
         profile.pop('submitted_by', None)
-    return [ECProfile(**parse_from_mongo(profile)) for profile in profiles]
+        profile = parse_from_mongo(profile)
+    return [ECProfile(**profile) for profile in profiles]
 
 @api_router.get("/ec-profiles/stats")
 async def get_ec_stats():
