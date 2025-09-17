@@ -1778,7 +1778,7 @@ const AdminPanelPage = () => {
           <h2>Poster Management</h2>
           
           {pendingPosters.length > 0 ? (
-            <div className="pending-posters">
+            <div className="admin-posters">
               {pendingPosters.map((poster) => (
                 <div key={poster.id} className="admin-poster-card">
                   <div className="poster-header">
