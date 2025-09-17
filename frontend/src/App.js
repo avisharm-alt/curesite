@@ -371,10 +371,10 @@ const PosterJournalPage = () => {
           </div>
           
           {user && (
-            <button className="submit-poster-btn">
+            <Link to="/submit-poster" className="submit-poster-btn">
               <Plus size={18} />
               Submit Poster
-            </button>
+            </Link>
           )}
         </div>
 
