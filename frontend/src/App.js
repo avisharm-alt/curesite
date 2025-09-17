@@ -425,6 +425,10 @@ const PosterJournalPage = () => {
     }
   };
 
+  const handleViewPoster = (poster) => {
+    setViewingPoster(poster);
+  };
+
   const handleDownloadPoster = (posterId, title) => {
     const url = `${API}/posters/${posterId}/download`;
     const a = document.createElement('a');
