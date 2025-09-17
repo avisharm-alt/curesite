@@ -1929,38 +1929,51 @@ const AdminPanelPage = () => {
 
                   <div className="admin-actions">
                     {poster.poster_url && (
-                      <button
-                        onClick={(e) => {
-                          e.preventDefault();
-                          const token = localStorage.getItem('token');
-                          fetch(`${API}/admin/posters/${poster.id}/download`, {
-                            headers: { Authorization: `Bearer ${token}` }
-                          })
-                          .then(response => {
-                            if (!response.ok) throw new Error('Download failed');
-                            return response.blob();
-                          })
-                          .then(blob => {
-                            const url = window.URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = `${poster.title}.pdf`;
-                            document.body.appendChild(a);
-                            a.click();
-                            window.URL.revokeObjectURL(url);
-                            document.body.removeChild(a);
-                            toast.success('Poster downloaded successfully');
-                          })
-                          .catch(error => {
-                            console.error('Download error:', error);
-                            toast.error('Error downloading poster');
-                          });
-                        }}
-                        className="download-btn"
-                      >
-                        <ExternalLink size={16} />
-                        Download Poster
-                      </button>
+                      <>
+                        <button
+                          onClick={() => {
+                            const token = localStorage.getItem('token');
+                            const viewUrl = `${API}/admin/posters/${poster.id}/view`;
+                            window.open(viewUrl, '_blank');
+                          }}
+                          className="view-btn"
+                        >
+                          <Eye size={16} />
+                          View Poster
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            const token = localStorage.getItem('token');
+                            fetch(`${API}/admin/posters/${poster.id}/download`, {
+                              headers: { Authorization: `Bearer ${token}` }
+                            })
+                            .then(response => {
+                              if (!response.ok) throw new Error('Download failed');
+                              return response.blob();
+                            })
+                            .then(blob => {
+                              const url = window.URL.createObjectURL(blob);
+                              const a = document.createElement('a');
+                              a.href = url;
+                              a.download = `${poster.title}.pdf`;
+                              document.body.appendChild(a);
+                              a.click();
+                              window.URL.revokeObjectURL(url);
+                              document.body.removeChild(a);
+                              toast.success('Poster downloaded successfully');
+                            })
+                            .catch(error => {
+                              console.error('Download error:', error);
+                              toast.error('Error downloading poster');
+                            });
+                          }}
+                          className="download-btn"
+                        >
+                          <Download size={16} />
+                          Download Poster
+                        </button>
+                      </>
                     )}
                     
                     {poster.status === 'pending' && (
