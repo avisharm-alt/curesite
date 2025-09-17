@@ -278,6 +278,19 @@ async def google_callback(request: Request):
                        verified=True if user_type == "admin" else False)
             user_dict = prepare_for_mongo(user.dict())
             await db.users.insert_one(user_dict)
+            
+            # Auto-create student network profile for new students
+            if user_type == "student":
+                student_profile = StudentNetwork(
+                    user_id=user.id,
+                    research_interests=["General Research"],
+                    skills=["Research Skills"],
+                    looking_for=["Research Opportunities"],
+                    contact_preferences="Email",
+                    public_profile=True
+                )
+                profile_dict = prepare_for_mongo(student_profile.dict())
+                await db.student_network.insert_one(profile_dict)
         
         # Create JWT token
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
