@@ -594,14 +594,6 @@ const ProfessorNetworkPage = () => {
         </div>
       </div>
 
-      <div className="page-image">
-        <img 
-          src="https://images.unsplash.com/photo-1571260899304-425eee4c7efc?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzd8MHwxfHNlYXJjaHwyfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHN8ZW58MHx8fHwxNzU4MDczNDYxfDA&ixlib=rb-4.1.0&q=85"
-          alt="Academic Excellence"
-          className="section-img"
-        />
-      </div>
-
       <div className="page-content">
         <div className="professor-controls">
           <div className="search-box">
