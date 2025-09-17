@@ -826,12 +826,14 @@ const ECProfilesPage = () => {
 
 // My Profile Page
 const MyProfilePage = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(user || {});
   const [myPosters, setMyPosters] = useState([]);
   const [myNetworkProfile, setMyNetworkProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   useEffect(() => {
     if (user) {
