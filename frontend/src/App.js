@@ -1070,52 +1070,115 @@ const MyProfilePage = () => {
         <div className="profile-section">
           <div className="section-header">
             <h2>My Poster Submissions</h2>
-            <span className="section-count">{myPosters.length} submissions</span>
+            <div className="section-actions">
+              <span className="section-count">{myPosters.length} submissions</span>
+              <Link to="/posters" className="add-btn">
+                <Plus size={16} />
+                Submit New Poster
+              </Link>
+            </div>
           </div>
 
           {myPosters.length > 0 ? (
             <div className="posters-grid">
               {myPosters.map((poster) => (
-                <div key={poster.id} className="poster-card">
+                <div key={poster.id} className="poster-card compact">
                   <div className="poster-header">
                     <h3 className="poster-title">{poster.title}</h3>
                     <span className={`status-badge status-${poster.status}`}>
                       {poster.status}
                     </span>
                   </div>
-                  <div className="poster-authors">
-                    By: {poster.authors.join(', ')}
-                  </div>
                   <div className="poster-meta">
                     <span className="poster-university">{poster.university}</span>
                     <span className="poster-program">{poster.program}</span>
                   </div>
-                  <p className="poster-abstract">{poster.abstract}</p>
-                  <div className="poster-keywords">
-                    {poster.keywords.map((keyword, index) => (
-                      <span key={index} className="keyword-tag">{keyword}</span>
-                    ))}
-                  </div>
-                  <div className="poster-dates">
-                    <small>Submitted: {new Date(poster.submitted_at).toLocaleDateString()}</small>
-                    {poster.reviewed_at && (
-                      <small>Reviewed: {new Date(poster.reviewed_at).toLocaleDateString()}</small>
-                    )}
+                  <p className="poster-abstract">{poster.abstract.length > 150 ? poster.abstract.substring(0, 150) + '...' : poster.abstract}</p>
+                  <div className="poster-footer">
+                    <div className="poster-keywords">
+                      {poster.keywords.slice(0, 3).map((keyword, index) => (
+                        <span key={index} className="keyword-tag small">{keyword}</span>
+                      ))}
+                      {poster.keywords.length > 3 && (
+                        <span className="keyword-tag small">+{poster.keywords.length - 3} more</span>
+                      )}
+                    </div>
+                    <div className="poster-date">
+                      <small>{new Date(poster.submitted_at).toLocaleDateString()}</small>
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="empty-state">
-              <FileText size={48} />
+            <div className="empty-state compact">
+              <FileText size={32} />
               <h3>No poster submissions yet</h3>
-              <p>Submit your first research poster to get started!</p>
-              <Link to="/posters" className="cta-primary">
-                Go to Poster Journal
-              </Link>
+              <p>Submit your first research poster to showcase your work!</p>
             </div>
           )}
         </div>
+
+        {/* Account Settings */}
+        <div className="profile-section danger-section">
+          <div className="section-header">
+            <h2>Account Settings</h2>
+          </div>
+          
+          <div className="danger-zone">
+            <div className="danger-content">
+              <div className="danger-info">
+                <h3>Delete Account</h3>
+                <p>Permanently delete your account and all associated data. This action cannot be undone.</p>
+              </div>
+              <button 
+                onClick={() => setShowDeleteConfirm(true)}
+                className="delete-account-btn"
+              >
+                <Trash2 size={18} />
+                Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <div className="modal-header">
+                <AlertTriangle size={24} className="warning-icon" />
+                <h3>Delete Account</h3>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to delete your account? This will permanently remove:</p>
+                <ul>
+                  <li>Your profile information</li>
+                  <li>All poster submissions</li>
+                  <li>Network profile and connections</li>
+                  <li>EC profile data</li>
+                  <li>All posted volunteer opportunities</li>
+                </ul>
+                <p><strong>This action cannot be undone.</strong></p>
+              </div>
+              <div className="modal-actions">
+                <button 
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="cancel-btn"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleDeleteAccount}
+                  className="confirm-delete-btn"
+                >
+                  <Trash2 size={16} />
+                  Delete My Account
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
