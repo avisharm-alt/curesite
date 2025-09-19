@@ -4,6 +4,20 @@ import toast, { Toaster } from 'react-hot-toast';
 import axios from 'axios';
 import './App.css';
 
+// Import pages
+import HomePage from './pages/HomePage';
+import PosterJournalPage from './pages/PosterJournalPage';
+import StudentNetworkPage from './pages/StudentNetworkPage';
+import ProfessorNetworkPage from './pages/ProfessorNetworkPage';
+import ECProfilesPage from './pages/ECProfilesPage';
+import VolunteerOpportunitiesPage from './pages/VolunteerOpportunitiesPage';
+import ProfilePage from './pages/ProfilePage';
+import SubmitPosterPage from './pages/SubmitPosterPage';
+import AdminPanelPage from './pages/AdminPanelPage';
+
+// Import hooks and components
+import { AuthProvider } from './hooks/useAuth';
+
 // Import Lucide React icons
 import { 
   BookOpen, Users, GraduationCap, Heart, FileText, 
