@@ -681,7 +681,7 @@ async def admin_get_all_professors(current_user: User = Depends(get_current_user
         })
     return result
 
-@api_router.get("/admin/volunteer-opportunities", response_model=List[VolunteerOpportunity]])
+@api_router.get("/admin/volunteer-opportunities", response_model=List[VolunteerOpportunity])
 async def admin_get_all_volunteer_opportunities(current_user: User = Depends(get_current_user)):
     """Admin gets all volunteer opportunities"""
     if current_user.user_type != "admin":
