@@ -21,7 +21,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 // Import Lucide React icons
 import { 
   BookOpen, Users, GraduationCap, Heart, FileText, 
-  User, LogOut, Menu, X, Home, Award
+  User, LogOut, Menu, X, Home, Award, BarChart3
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
