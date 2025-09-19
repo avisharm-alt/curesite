@@ -246,7 +246,7 @@ def parse_from_mongo(item):
 @api_router.get("/auth/google")
 async def google_auth(request: Request):
     # Use exact redirect URI that matches Google Console configuration
-    redirect_uri = "https://academiccure.preview.emergentagent.com/api/auth/google/callback"
+    redirect_uri = "https://uniresearch-cure.preview.emergentagent.com/api/auth/google/callback"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 @api_router.get("/auth/google/callback")

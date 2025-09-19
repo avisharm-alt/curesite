@@ -1,0 +1,114 @@
+<analysis>
+The AI engineer successfully took the CURE project from 0 to 1, iteratively building a full-stack React-FastAPI-MongoDB application. Initial development focused on an MVP with a single-page layout for Poster Journal, Student/Professor Networks, EC Profiles, and Volunteer Opportunities, incorporating Google OAuth for authentication and a Kraken.com-inspired design. Subsequent iterations addressed user feedback, refactoring into separate pages, implementing My Profile with editing, and fixing numerous bugs related to MongoDB ObjectId serialization, file upload ( not saving), and view/download functionality via distinct backend endpoints. The latest work expanded admin capabilities for managing network content. Google OAuth issues were a recurring challenge, primarily due to console configuration.
+</analysis>
+
+<product_requirements>
+The user requested a modern, elegant website for the CURE Project, a Canadian Undergraduate Research Exchange platform. The initial MVP included:
+- **Poster Journal/Collection:** For students to submit and view research posters.
+- **Network of Undergraduate Students:** To connect students interested in research.
+- **Professor Network:** For outreach and connections.
+- **Collection of EC profile/stats:** For students accepted to Canadian Med Schools.
+- **Database for med related volunteer opportunities.**
+Design was to be based on the provided CURE logo, prominently displayed, and inspired by kraken.com's aesthetic, matching CURE's black, white, and green colors.
+
+Key enhancements and fixes requested and implemented include:
+- Refactoring from a single-page layout to separate pages for each feature.
+- Implementing a My Profile section for users to view their poster submissions, connections, and edit their research interests, email, program, and institution (post-login).
+- Removing images from feature pages (Poster Journal, Student Network, etc.) for a cleaner design, keeping the hero image on the homepage.
+- Adding a Delete Account option on the profile page.
+- Developing a poster submission page with file upload (PDF/image support).
+- Creating an admin control system () to review, approve/reject, and delete posters.
+- Implementing a View Poster modal popup instead of direct download.
+- Adding admin capabilities to add/remove professors, volunteer opportunities, and EC profiles.
+</product_requirements>
+
+<key_technical_concepts>
+- **FastAPI:** Python web framework for backend APIs.
+- **React:** JavaScript library for building the frontend UI.
+- **MongoDB:** NoSQL database for data storage, accessed via  (async client).
+- **Google OAuth:** User authentication via Google for university logins.
+- **Shadcn UI & Tailwind CSS:** Frontend component library and utility-first CSS framework for styling.
+- **Pydantic:** Data validation and serialization for FastAPI models.
+- **UUIDs:** Used for IDs instead of MongoDB's ObjectIDs for JSON serialization.
+- **File Upload/Serving:** Backend handles file storage (), frontend handles submission and displays.
+</key_technical_concepts>
+
+<code_architecture>
+The application follows a standard full-stack architecture with a React frontend, FastAPI backend, and MongoDB database.
+
+
+
+- ****:
+    - **Importance**: This is the core of the backend, containing all FastAPI routes, MongoDB interactions, Google OAuth logic, user and role management, poster submission/review/file serving, and network management.
+    - **Changes**:
+        - Initial implementation of all MVP features (users, posters, networks, EC profiles, volunteer opportunities).
+        - Google OAuth authentication endpoints (, ).
+        - Fixed  serialization issues by ensuring  usage and proper Pydantic model handling.
+        - Added  and  endpoints for profile management.
+        - Added  endpoint for account deletion.
+        - Implemented  for file uploads.
+        - Created separate  endpoint to serve files inline for modal viewing.
+        - Modified  Pydantic model to include .
+        - Expanded admin endpoints for managing , ,  (CRUD operations).
+        - Ensured  has admin privileges.
+
+- ****:
+    - **Importance**: Stores environment variables like  and Google OAuth , .
+    - **Changes**: Updated to include Google OAuth credentials after user provided them.
+
+- ****:
+    - **Importance**: The main React component, responsible for overall application structure, routing, navigation, state management, and API calls.
+    - **Changes**:
+        - Initial monolithic structure with all sections.
+        - Refactored to implement  for separate pages.
+        - Integrated Google OAuth sign-in and logout functionality.
+        - Added navigation links for all main sections and My Profile.
+        - Incorporated  for inline poster viewing.
+        - Contains logic for fetching and displaying data for various pages (Posters, Students, Professors, EC Profiles, Volunteer Opps).
+
+- ****:
+    - **Importance**: Global CSS styles for the application, including Tailwind CSS imports and custom styles.
+    - **Changes**:
+        - Initial styling inspired by Kraken.com with CURE branding.
+        - Updated to support the new page-based layout and removed image-specific styles for feature pages.
+        - Added styles for profile page, admin panel, poster submission form, and the poster viewer modal.
+
+- ** (and potentially new components like , , , )**:
+    - **Importance**: Contains reusable UI components, with Shadcn UI components as the base.
+    - **Changes**:
+        - : Created for displaying and editing user profiles.
+        - : Created for admin to manage posters, professors, students, EC profiles, and volunteer opportunities.
+        - : Created to display PDF/image posters in a popup.
+        - : Created for the poster submission form.
+        - Other existing Shadcn components were utilized and styled as needed.
+
+- ****:
+    - **Importance**: A new directory created to securely store uploaded poster files.
+    - **Changes**: Created this directory to handle file persistence.
+
+- ** and **:
+    - **Importance**: Utility scripts for debugging and manually setting up admin access when Google OAuth was problematic.
+    - **Changes**: New scripts created for one-off tasks.
+
+- ****:
+    - **Importance**: A utility script created to resolve data inconsistency where uploaded files were not linked to poster records in MongoDB.
+    - **Changes**: New script created to update  for existing posters.
+</code_architecture>
+
+<pending_tasks>
+- **Google OAuth Integration:** The Google OAuth setup still requires the user to properly configure their Google Cloud Console for the  and . The AI engineer has provided detailed instructions multiple times, but the user reported it's still not fully working.
+</pending_tasks>
+
+<current_work>
+Immediately prior to this summary request, the AI engineer was tasked with implementing comprehensive admin management for the Prof Network, Volunteer Opportunities, and EC Profiles sections. This involved:
+
+1.  **Backend Enhancements**: Expanding  to include CRUD endpoints for managing these entities (professors, volunteer opportunities, EC profiles).
+2.  **Frontend Admin Panel Updates**: Modifying  and potentially creating new components to introduce a tabbed interface within the  (e.g., , , ). These tabs contain forms and lists for adding, editing, and removing entries.
+3.  **UI/UX**: Adding necessary modal components, handler functions, and CSS styles () to support these new admin operations, ensuring a consistent design.
+
+The services were restarted after these changes. The last user interaction was asking how to deploy using Hostinger, to which the AI deferred to Emergent's deployment feature. Following this, the user explicitly requested to boot up the cure project website and have it fully working with the google login and everything right now. This indicates that, despite previous efforts, the Google OAuth is still not fully functional from the user's perspective, and the AI engineer is about to re-investigate and fix this critical issue.
+</current_work>
+
+<optional_next_step>
+Investigate and resolve the outstanding Google OAuth login issues to ensure the website is fully operational.
+</optional_next_step>
