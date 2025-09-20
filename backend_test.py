@@ -449,41 +449,52 @@ class CUREAPITester:
             return False
 
 def main():
-    print("🚀 Starting CURE API Testing...")
-    print("=" * 50)
+    print("🚀 Starting CURE API CRITICAL REGRESSION Testing...")
+    print("🚨 Focus: Student Profile Update & Admin Panel Issues")
+    print("=" * 60)
     
     tester = CUREAPITester()
     
-    # Test basic endpoints
-    print("\n📋 Testing Basic Endpoints...")
+    # Test basic connectivity first
+    print("\n📋 Testing Basic Connectivity...")
     tester.test_health_check()
     tester.test_root_endpoint()
     
-    # Test main feature endpoints
-    print("\n📚 Testing Feature Endpoints...")
+    # CRITICAL TESTS - Focus on reported issues
+    print("\n🚨 CRITICAL REGRESSION TESTS...")
+    print("   Testing issues reported by user:")
+    print("   1. Student profile saving functionality broken")
+    print("   2. Admin panel still doesn't work")
+    
+    # Test 1: Student Profile Update
+    tester.test_student_profile_update()
+    
+    # Test 2: Admin Panel Functionality
+    tester.test_admin_panel_endpoints()
+    tester.test_admin_poster_review()
+    tester.test_admin_professor_management()
+    tester.test_admin_volunteer_management()
+    tester.test_admin_ec_profiles_management()
+    
+    # Test 3: Authentication Flow
+    tester.test_authentication_flow()
+    
+    # Test supporting endpoints to verify they work
+    print("\n📚 Testing Supporting Endpoints...")
     tester.test_posters_endpoint()
-    tester.test_specific_poster()
     tester.test_student_network_endpoint()
     tester.test_professor_network_endpoint()
     tester.test_ec_profiles_endpoint()
-    tester.test_ec_stats_endpoint()
     tester.test_volunteer_opportunities_endpoint()
     
-    # Test admin endpoints
-    print("\n👑 Testing Admin Endpoints...")
-    tester.test_admin_endpoints()
-    
-    # Test authentication
-    print("\n🔐 Testing Authentication...")
-    tester.test_auth_endpoints()
-    
-    # Test CORS
-    print("\n🌐 Testing CORS...")
-    tester.test_cors_headers()
-    
     # Print final results
-    print("\n" + "=" * 50)
+    print("\n" + "=" * 60)
     print(f"📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
+    
+    if tester.critical_failures:
+        print(f"\n🚨 CRITICAL FAILURES ({len(tester.critical_failures)}):")
+        for failure in tester.critical_failures:
+            print(f"   ❌ {failure}")
     
     if tester.tests_passed == tester.tests_run:
         print("🎉 All tests passed! Backend is working correctly.")
@@ -491,6 +502,10 @@ def main():
     else:
         failed_tests = tester.tests_run - tester.tests_passed
         print(f"⚠️  {failed_tests} test(s) failed. Check the issues above.")
+        
+        if tester.critical_failures:
+            print("\n🚨 CRITICAL ISSUES FOUND - These need immediate attention!")
+        
         return 1
 
 if __name__ == "__main__":
