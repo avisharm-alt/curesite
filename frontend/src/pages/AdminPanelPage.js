@@ -220,7 +220,8 @@ const AdminPanelPage = () => {
       toast.success('Professor added successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error adding professor');
+      console.error('Add professor error:', error.response?.data || error.message);
+      toast.error('Error adding professor: ' + (error.response?.data?.detail || error.message));
     }
   }
 
@@ -233,7 +234,8 @@ const AdminPanelPage = () => {
       toast.success('Professor updated successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error updating professor');
+      console.error('Edit professor error:', error.response?.data || error.message);
+      toast.error('Error updating professor: ' + (error.response?.data?.detail || error.message));
     }
   }
 
@@ -248,7 +250,8 @@ const AdminPanelPage = () => {
       toast.success('Professor deleted successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error deleting professor');
+      console.error('Delete professor error:', error.response?.data || error.message);
+      toast.error('Error deleting professor: ' + (error.response?.data?.detail || error.message));
     }
   }
 
