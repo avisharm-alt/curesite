@@ -29,4 +29,4 @@ RUN mkdir -p ../uploads
 # Railway will set PORT dynamically
 
 # Start the server with enhanced logging
-CMD ["sh", "-c", "echo 'Starting CURE Backend on port ${PORT:-8000}' && python -m uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000} --log-level info"]
+CMD ["sh", "-c", "echo 'Starting CURE Backend on port ${PORT:-8000}' && python -m uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}"]
