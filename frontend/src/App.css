@@ -2318,10 +2318,32 @@ a:focus {
 
 /* Small Modal Styles */
 .small-modal {
-  max-width: 600px;
-  max-height: 85vh;
-  width: 90vw;
-  overflow-y: auto;
+  max-width: 500px !important;
+  max-height: 70vh !important;
+  width: 80vw !important;
+  overflow-y: auto !important;
+}
+
+.small-modal .form-field {
+  margin-bottom: 5px !important;
+}
+
+.small-modal .form-grid {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 8px !important;
+  margin-bottom: 8px !important;
+}
+
+.small-modal .compact-input {
+  height: 28px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+}
+
+.small-modal .compact-textarea {
+  min-height: 40px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
 }
 
 /* Compact Form Styles */
