@@ -2316,6 +2316,46 @@ a:focus {
   background: rgba(0, 255, 136, 0.1);
 }
 
+/* Compact Form Styles */
+.compact-form {
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.compact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.compact-input {
+  padding: 8px 12px;
+  font-size: 14px;
+  height: 36px;
+}
+
+.compact-textarea {
+  padding: 8px 12px;
+  font-size: 14px;
+  min-height: 60px;
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+  .compact-grid,
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ADMIN ITEM MANAGEMENT */
 .admin-items-grid {
   display: grid;
