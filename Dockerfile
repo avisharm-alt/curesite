@@ -28,5 +28,5 @@ RUN mkdir -p ../uploads
 
 # Railway will set PORT dynamically
 
-# Start the server with enhanced logging and port debugging
-CMD ["sh", "-c", "echo 'PORT environment variable: $PORT' && echo 'Starting CURE Backend on port ${PORT:-8000}' && python -m uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Start the server with fixed port
+CMD ["python", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]
