@@ -58,6 +58,7 @@ const PosterJournalPage = () => {
   };
 
   const handleViewPoster = (poster) => {
+    console.log('Opening poster modal for:', poster.title);
     setViewingPoster(poster);
   };
 
