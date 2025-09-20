@@ -183,14 +183,26 @@ const AdminPanelPage = () => {
   // Handler functions
   async function handlePosterReview(posterId, status) {
     try {
+      console.log('Reviewing poster:', posterId, 'with status:', status);
       const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
+      console.log('Token exists:', !!token);
       
-      await axios.put(`${API}/posters/${posterId}/review`, { status }, { headers });
+      if (!token) {
+        toast.error('No authentication token found. Please login again.');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      console.log('Making request to:', `${API}/posters/${posterId}/review`);
+      
+      const response = await axios.put(`${API}/posters/${posterId}/review`, { status }, { headers });
+      console.log('Review response:', response.data);
+      
       toast.success(`Poster ${status} successfully`);
       fetchData();
     } catch (error) {
-      console.error('Poster review error:', error.response?.data || error.message);
+      console.error('Poster review error:', error);
+      console.error('Error response:', error.response?.data || error.message);
       toast.error('Error reviewing poster: ' + (error.response?.data?.detail || error.message));
     }
   }
