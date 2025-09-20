@@ -39,9 +39,11 @@ const ECProfilesPage = () => {
   const fetchStats = async () => {
     try {
       const response = await axios.get(`${API}/ec-profiles/stats`);
-      setStats(response.data);
+      // Ensure we always have an array
+      setStats(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
-      console.error('Error fetching stats');
+      console.error('Error fetching stats:', error);
+      setStats([]); // Reset to empty array on error
     }
   };
 
