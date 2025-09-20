@@ -686,6 +686,23 @@ async def admin_create_volunteer_opportunity(opportunity: VolunteerOpportunityCr
     await db.volunteer_opportunities.insert_one(opportunity_dict)
     return opportunity_obj
 
+@api_router.put("/admin/volunteer-opportunities/{opportunity_id}", response_model=VolunteerOpportunity)
+async def admin_update_volunteer_opportunity(opportunity_id: str, opportunity: VolunteerOpportunityCreate, current_user: User = Depends(get_current_user)):
+    """Admin updates volunteer opportunity"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = prepare_for_mongo(opportunity.dict())
+    update_data["posted_by"] = current_user.id  # Keep admin as poster
+    
+    result = await db.volunteer_opportunities.update_one({"id": opportunity_id}, {"$set": update_data})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Volunteer opportunity not found")
+    
+    updated_opportunity = await db.volunteer_opportunities.find_one({"id": opportunity_id})
+    return VolunteerOpportunity(**parse_from_mongo(updated_opportunity))
+
 @api_router.delete("/admin/volunteer-opportunities/{opportunity_id}")
 async def admin_delete_volunteer_opportunity(opportunity_id: str, current_user: User = Depends(get_current_user)):
     """Admin deletes volunteer opportunity"""
