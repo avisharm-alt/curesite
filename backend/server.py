@@ -237,13 +237,18 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
+            print("❌ No user_id in JWT payload")
             raise HTTPException(status_code=401, detail="Invalid authentication credentials")
         
         user = await db.users.find_one({"id": user_id})
         if user is None:
+            print(f"❌ User not found in database: {user_id}")
             raise HTTPException(status_code=401, detail="User not found")
+        
+        print(f"✅ User authenticated: {user.get('email')} - Type: {user.get('user_type')}")
         return User(**user)
-    except jwt.PyJWTError:
+    except jwt.PyJWTError as e:
+        print(f"❌ JWT Error: {e}")
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
 # Helper functions
