@@ -196,6 +196,12 @@ Should load the CURE homepage
 - Verify all environment variables are set
 - Check MongoDB connection string
 
+**"pip: command not found" Error:**
+- Ensure `nixpacks.toml` is in your repository root
+- Verify Railway is using NIXPACKS builder (not Docker)
+- Check that the project structure has `backend/requirements.txt`
+- Try redeploying after pushing the configuration files
+
 **Frontend API Errors:**
 - Verify `REACT_APP_BACKEND_URL` points to Railway backend
 - Check CORS settings in backend
