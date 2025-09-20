@@ -25,9 +25,12 @@ const VolunteerOpportunitiesPage = () => {
       if (filters.location) params.append('location', filters.location);
       
       const response = await axios.get(`${API}/volunteer-opportunities?${params}`);
-      setOpportunities(response.data);
+      // Ensure we always have an array
+      setOpportunities(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.error('Error fetching volunteer opportunities:', error);
       toast.error('Error fetching volunteer opportunities');
+      setOpportunities([]); // Reset to empty array on error
     } finally {
       setLoading(false);
     }
