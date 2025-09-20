@@ -15,6 +15,7 @@ const PosterJournalPage = () => {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ status: 'approved', university: '' });
   const [viewingPoster, setViewingPoster] = useState(null);
+  const [viewingPoster, setViewingPoster] = useState(null);
 
   useEffect(() => {
     fetchPosters();
