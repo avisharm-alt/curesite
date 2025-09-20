@@ -34,13 +34,19 @@ def test_environment():
     required_vars = []  # No truly required vars for basic startup
     optional_vars = ['PORT', 'MONGO_URL', 'DB_NAME', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']
     
-    print("Required variables:")
-    for var in required_vars:
-        value = os.environ.get(var)
-        if value:
-            print(f"✅ {var}: {value}")
-        else:
-            print(f"❌ {var}: Not set")
+    all_required_set = True
+    
+    if required_vars:
+        print("Required variables:")
+        for var in required_vars:
+            value = os.environ.get(var)
+            if value:
+                print(f"✅ {var}: {value}")
+            else:
+                print(f"❌ {var}: Not set")
+                all_required_set = False
+    else:
+        print("Required variables: None (server can start with defaults)")
     
     print("\nOptional variables:")
     for var in optional_vars:
@@ -53,6 +59,8 @@ def test_environment():
                 print(f"✅ {var}: {value}")
         else:
             print(f"⚠️  {var}: Not set (will use fallback)")
+    
+    return all_required_set
 
 def test_server_creation():
     """Test if we can create the FastAPI app"""
