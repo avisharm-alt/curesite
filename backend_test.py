@@ -84,6 +84,246 @@ class CUREAPITester:
         """Test root API endpoint"""
         return self.run_test("Root Endpoint", "GET", "", 200)
 
+    def create_mock_admin_token(self):
+        """Create a mock admin token for testing (this won't work in real scenario)"""
+        # This is just for testing structure - real auth would require OAuth flow
+        print("\n🔐 Note: Admin authentication requires OAuth flow which cannot be automated")
+        print("   Testing admin endpoints will show expected 401 responses")
+        return None
+
+    def test_student_profile_update(self):
+        """CRITICAL: Test student profile update functionality"""
+        print("\n🚨 CRITICAL TEST: Student Profile Update")
+        
+        # Test profile update without authentication (should fail)
+        profile_data = {
+            "name": "John Smith",
+            "university": "University of Toronto", 
+            "program": "Medicine",
+            "year": 3,
+            "user_type": "student"
+        }
+        
+        success, response = self.run_test(
+            "Profile Update (No Auth)", 
+            "PUT", 
+            "users/profile", 
+            401, 
+            data=profile_data,
+            critical=True
+        )
+        
+        # This should fail with 401 since we don't have a valid token
+        if not success:
+            print("❌ CRITICAL ISSUE: Profile update endpoint not responding correctly to unauthenticated requests")
+        
+        return success, response
+
+    def test_admin_poster_review(self):
+        """CRITICAL: Test admin poster review functionality"""
+        print("\n🚨 CRITICAL TEST: Admin Poster Review")
+        
+        # First get a poster to review
+        success, posters = self.run_test("Get Posters for Review Test", "GET", "posters", 200)
+        
+        if success and isinstance(posters, list) and len(posters) > 0:
+            poster_id = posters[0].get('id')
+            if poster_id:
+                # Test poster review without admin auth (should fail with 401/403)
+                review_data = {
+                    "status": "approved",
+                    "comments": "Test review comment"
+                }
+                
+                success, response = self.run_test(
+                    "Poster Review (No Admin Auth)",
+                    "PUT",
+                    f"posters/{poster_id}/review",
+                    401,  # Should fail without auth
+                    data=review_data,
+                    critical=True
+                )
+                
+                return success, response
+        
+        print("❌ CRITICAL ISSUE: No posters available to test review functionality")
+        self.critical_failures.append("Admin Poster Review: No posters available for testing")
+        return False, {}
+
+    def test_admin_professor_management(self):
+        """CRITICAL: Test admin professor management"""
+        print("\n🚨 CRITICAL TEST: Admin Professor Management")
+        
+        # Test creating professor profile without admin auth
+        professor_data = {
+            "department": "Computer Science",
+            "research_areas": ["Machine Learning", "AI"],
+            "lab_description": "AI Research Lab focusing on medical applications",
+            "accepting_students": True,
+            "website": "https://example.com"
+        }
+        
+        # Test CREATE
+        success_create, response_create = self.run_test(
+            "Admin Create Professor (No Auth)",
+            "POST",
+            "admin/professor-network",
+            401,  # Should fail without admin auth
+            data=professor_data,
+            critical=True
+        )
+        
+        # Test GET all professors (admin endpoint)
+        success_get, response_get = self.run_test(
+            "Admin Get All Professors (No Auth)",
+            "GET",
+            "admin/professor-network",
+            401,  # Should fail without admin auth
+            critical=True
+        )
+        
+        return success_create and success_get, {"create": response_create, "get": response_get}
+
+    def test_admin_volunteer_management(self):
+        """CRITICAL: Test admin volunteer opportunities management"""
+        print("\n🚨 CRITICAL TEST: Admin Volunteer Management")
+        
+        volunteer_data = {
+            "title": "Medical Research Assistant",
+            "organization": "Toronto General Hospital",
+            "description": "Assist with clinical research studies",
+            "location": "Toronto, ON",
+            "contact_email": "research@tgh.ca",
+            "requirements": ["Undergraduate student", "Interest in medicine"],
+            "time_commitment": "10 hours/week"
+        }
+        
+        # Test CREATE
+        success_create, response_create = self.run_test(
+            "Admin Create Volunteer Opportunity (No Auth)",
+            "POST",
+            "admin/volunteer-opportunities",
+            401,  # Should fail without admin auth
+            data=volunteer_data,
+            critical=True
+        )
+        
+        # Test GET all volunteer opportunities (admin endpoint)
+        success_get, response_get = self.run_test(
+            "Admin Get All Volunteer Opportunities (No Auth)",
+            "GET",
+            "admin/volunteer-opportunities",
+            401,  # Should fail without admin auth
+            critical=True
+        )
+        
+        return success_create and success_get, {"create": response_create, "get": response_get}
+
+    def test_admin_ec_profiles_management(self):
+        """CRITICAL: Test admin EC profiles management"""
+        print("\n🚨 CRITICAL TEST: Admin EC Profiles Management")
+        
+        ec_profile_data = {
+            "medical_school": "University of Toronto",
+            "admission_year": 2024,
+            "undergraduate_gpa": 3.9,
+            "mcat_score": 520,
+            "research_hours": 500,
+            "volunteer_hours": 200,
+            "clinical_hours": 100,
+            "leadership_activities": ["Student Council President"],
+            "awards_scholarships": ["Dean's List"],
+            "publications": 2
+        }
+        
+        # Test CREATE
+        success_create, response_create = self.run_test(
+            "Admin Create EC Profile (No Auth)",
+            "POST",
+            "admin/ec-profiles",
+            401,  # Should fail without admin auth
+            data=ec_profile_data,
+            critical=True
+        )
+        
+        # Test GET all EC profiles (admin endpoint)
+        success_get, response_get = self.run_test(
+            "Admin Get All EC Profiles (No Auth)",
+            "GET",
+            "admin/ec-profiles",
+            401,  # Should fail without admin auth
+            critical=True
+        )
+        
+        return success_create and success_get, {"create": response_create, "get": response_get}
+
+    def test_authentication_flow(self):
+        """CRITICAL: Test authentication flow"""
+        print("\n🚨 CRITICAL TEST: Authentication Flow")
+        
+        # Test Google auth redirect
+        success_google, response_google = self.run_test(
+            "Google Auth Redirect",
+            "GET",
+            "auth/google",
+            302,  # Should redirect
+            critical=True
+        )
+        
+        # Test getting current user without token
+        success_me, response_me = self.run_test(
+            "Get Current User (No Token)",
+            "GET",
+            "auth/me",
+            401,  # Should fail without token
+            critical=True
+        )
+        
+        # Test admin test endpoint without auth
+        success_admin_test, response_admin_test = self.run_test(
+            "Admin Test Endpoint (No Auth)",
+            "GET",
+            "admin/test",
+            401,  # Should fail without admin token
+            critical=True
+        )
+        
+        return success_google and success_me and success_admin_test, {
+            "google": response_google,
+            "me": response_me,
+            "admin_test": response_admin_test
+        }
+
+    def test_admin_panel_endpoints(self):
+        """Test all admin panel endpoints that should require authentication"""
+        print("\n🚨 CRITICAL TEST: Admin Panel Endpoints")
+        
+        admin_endpoints = [
+            ("admin/posters/pending", "GET"),
+            ("admin/posters/all", "GET"),
+            ("admin/stats", "GET"),
+            ("admin/posters", "GET"),
+            ("admin/professor-network", "GET"),
+            ("admin/volunteer-opportunities", "GET"),
+            ("admin/ec-profiles", "GET")
+        ]
+        
+        all_success = True
+        responses = {}
+        
+        for endpoint, method in admin_endpoints:
+            success, response = self.run_test(
+                f"Admin Endpoint: {endpoint}",
+                method,
+                endpoint,
+                401,  # Should fail without admin auth
+                critical=True
+            )
+            responses[endpoint] = response
+            all_success = all_success and success
+        
+        return all_success, responses
+
     def test_posters_endpoint(self):
         """Test posters endpoint"""
         success, response = self.run_test("Get Posters", "GET", "posters", 200)
