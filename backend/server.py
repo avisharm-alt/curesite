@@ -698,6 +698,30 @@ async def admin_delete_ec_profile(profile_id: str, current_user: User = Depends(
     
     return {"message": "EC profile deleted successfully"}
 
+@api_router.get("/admin/posters", response_model=List[Dict[str, Any]])
+async def admin_get_all_posters(current_user: User = Depends(get_current_user)):
+    """Admin gets all poster submissions"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    posters = await db.poster_submissions.find({}).to_list(100)
+    result = []
+    for poster in posters:
+        result.append({
+            "id": poster["id"],
+            "title": poster["title"],
+            "authors": poster["authors"],
+            "abstract": poster["abstract"],
+            "keywords": poster["keywords"],
+            "university": poster["university"],
+            "program": poster["program"],
+            "status": poster.get("status", "pending"),
+            "submitted_at": poster.get("submitted_at"),
+            "submitted_by": poster.get("submitted_by"),
+            "poster_url": poster.get("poster_url")
+        })
+    return result
+
 @api_router.get("/admin/professor-network", response_model=List[Dict[str, Any]])
 async def admin_get_all_professors(current_user: User = Depends(get_current_user)):
     """Admin gets all professor profiles"""
