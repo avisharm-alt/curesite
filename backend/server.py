@@ -332,7 +332,7 @@ async def google_callback(request: Request):
         )
         
         # Redirect to frontend with token and user data
-        frontend_url = request.url.scheme + "://" + request.url.netloc
+        frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
         user_data_encoded = quote(user.json())
         redirect_url = f"{frontend_url}/?token={access_token}&user={user_data_encoded}"
         
