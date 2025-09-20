@@ -186,11 +186,12 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.put(`${API}/admin/posters/${posterId}/review`, { status }, { headers });
+      await axios.put(`${API}/posters/${posterId}/review?status=${status}`, {}, { headers });
       toast.success(`Poster ${status} successfully`);
       fetchData();
     } catch (error) {
-      toast.error('Error reviewing poster');
+      console.error('Poster review error:', error.response?.data || error.message);
+      toast.error('Error reviewing poster: ' + (error.response?.data?.detail || error.message));
     }
   }
 
