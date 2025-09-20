@@ -430,16 +430,20 @@ async def get_my_posters(current_user: User = Depends(get_current_user)):
     posters = await db.poster_submissions.find({"submitted_by": current_user.id}).to_list(100)
     return [PosterSubmission(**parse_from_mongo(poster)) for poster in posters]
 
+class PosterReviewRequest(BaseModel):
+    status: str
+    comments: Optional[str] = None
+
 @api_router.put("/posters/{poster_id}/review")
-async def review_poster(poster_id: str, status: str, comments: Optional[str] = None, current_user: User = Depends(get_current_user)):
+async def review_poster(poster_id: str, review_data: PosterReviewRequest, current_user: User = Depends(get_current_user)):
     if current_user.user_type not in ["admin", "professor"]:
         raise HTTPException(status_code=403, detail="Not authorized to review posters")
     
     update_data = {
-        "status": status,
+        "status": review_data.status,
         "reviewed_at": datetime.now(timezone.utc).isoformat(),
         "reviewer_id": current_user.id,
-        "reviewer_comments": comments
+        "reviewer_comments": review_data.comments
     }
     
     await db.poster_submissions.update_one({"id": poster_id}, {"$set": update_data})
