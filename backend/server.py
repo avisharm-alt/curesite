@@ -647,6 +647,21 @@ async def admin_create_professor(profile: ProfessorNetworkCreate, current_user: 
     await db.professor_network.insert_one(profile_dict)
     return profile_obj
 
+@api_router.put("/admin/professor-network/{profile_id}", response_model=ProfessorNetwork)
+async def admin_update_professor(profile_id: str, profile: ProfessorNetworkCreate, current_user: User = Depends(get_current_user)):
+    """Admin updates professor network profile"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = prepare_for_mongo(profile.dict())
+    result = await db.professor_network.update_one({"id": profile_id}, {"$set": update_data})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Professor profile not found")
+    
+    updated_profile = await db.professor_network.find_one({"id": profile_id})
+    return ProfessorNetwork(**parse_from_mongo(updated_profile))
+
 @api_router.delete("/admin/professor-network/{profile_id}")
 async def admin_delete_professor(profile_id: str, current_user: User = Depends(get_current_user)):
     """Admin deletes professor network profile"""
