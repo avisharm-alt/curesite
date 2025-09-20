@@ -50,9 +50,12 @@ cure-project/
 2. **Deploy from GitHub**: Select your repository
 3. **Configure Service**:
    - Service Name: `cure-backend`
-   - Root Directory: Leave empty (Railway will auto-detect)
-   - Build Command: `pip install -r requirements.txt`
-   - Start Command: `cd backend && python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
+   - Root Directory: Leave empty
+   - Railway will auto-detect configuration from `nixpacks.toml` and `railway.json`
+   
+**Alternative Manual Configuration (if auto-detection fails):**
+- Build Command: `pip install -r backend/requirements.txt`
+- Start Command: `cd backend && python -m uvicorn server:app --host 0.0.0.0 --port $PORT`
 
 ### 2.3 Add MongoDB Database
 1. In your Railway project dashboard
