@@ -170,6 +170,11 @@ const Footer = () => {
 
 // Main App Component
 const App = () => {
+  // Set document title
+  React.useEffect(() => {
+    document.title = "CURE Project";
+  }, []);
+
   return (
     <AuthProvider>
       <BrowserRouter>
