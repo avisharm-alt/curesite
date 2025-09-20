@@ -26,8 +26,7 @@ COPY uploads/ ../uploads/
 # Create uploads directory if it doesn't exist
 RUN mkdir -p ../uploads
 
-# Expose port (Railway will set this dynamically)
-EXPOSE $PORT
+# Railway will set PORT dynamically
 
 # Start the server with enhanced logging
 CMD ["sh", "-c", "echo 'Starting CURE Backend on port ${PORT:-8000}' && python -m uvicorn server:app --host 0.0.0.0 --port ${PORT:-8000} --log-level info"]
