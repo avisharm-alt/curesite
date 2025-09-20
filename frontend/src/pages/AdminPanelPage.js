@@ -387,10 +387,27 @@ const PosterManagementTab = ({ posters, onReview, onDelete }) => (
               {poster.poster_url && (
                 <>
                   <button
-                    onClick={() => {
-                      const token = localStorage.getItem('token');
-                      const viewUrl = `${API}/admin/posters/${poster.id}/view?token=${token}`;
-                      window.open(viewUrl, '_blank');
+                    onClick={async () => {
+                      try {
+                        const token = localStorage.getItem('token');
+                        const response = await fetch(`${API}/admin/posters/${poster.id}/view`, {
+                          headers: { Authorization: `Bearer ${token}` }
+                        });
+                        
+                        if (!response.ok) {
+                          throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        window.open(url, '_blank');
+                        
+                        // Clean up the URL after a delay
+                        setTimeout(() => window.URL.revokeObjectURL(url), 10000);
+                      } catch (error) {
+                        console.error('View poster error:', error);
+                        toast.error('Failed to view poster: ' + error.message);
+                      }
                     }}
                     className="view-btn"
                   >
