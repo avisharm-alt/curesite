@@ -1,24 +1,25 @@
 # Use Python 3.11 slim image
 FROM python:3.11-slim
 
-# Set working directory
-WORKDIR /app
-
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     gcc \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
+# Set working directory
+WORKDIR /app
+
 # Copy backend requirements and install Python dependencies
-COPY backend/requirements.txt /app/backend/requirements.txt
-RUN pip install --no-cache-dir -r backend/requirements.txt
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the backend application
-COPY backend/ /app/backend/
-COPY uploads/ /app/uploads/
+COPY backend/ ./
+COPY uploads/ ./uploads/
 
 # Create uploads directory if it doesn't exist
-RUN mkdir -p /app/uploads
+RUN mkdir -p ./uploads
 
 # Expose port
 EXPOSE $PORT
@@ -27,5 +28,5 @@ EXPOSE $PORT
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:$PORT/health || exit 1
 
-# Start command
-CMD ["/bin/bash", "-c", "cd backend && python -m uvicorn server:app --host 0.0.0.0 --port $PORT"]
+# Start command - now we're already in the right directory
+CMD ["python", "-m", "uvicorn", "server:app", "--host", "0.0.0.0", "--port", "$PORT"]
