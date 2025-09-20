@@ -202,11 +202,12 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.delete(`${API}/admin/posters/${posterId}`, { headers });
+      await axios.delete(`${API}/posters/${posterId}`, { headers });
       toast.success('Poster deleted successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error deleting poster');
+      console.error('Poster delete error:', error.response?.data || error.message);
+      toast.error('Error deleting poster: ' + (error.response?.data?.detail || error.message));
     }
   }
 
