@@ -286,7 +286,7 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.put(`${API}/admin/ecprofiles/${profileId}`, profileData, { headers });
+      await axios.put(`${API}/admin/ec-profiles/${profileId}`, profileData, { headers });
       toast.success('EC Profile updated successfully');
       fetchData();
     } catch (error) {
