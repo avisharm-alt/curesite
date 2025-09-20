@@ -99,7 +99,13 @@ const PosterJournalPage = () => {
         {poster.status === 'approved' && poster.poster_url && (
           <>
             <button
-              onClick={() => handleViewPoster(poster)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('VIEW BUTTON CLICKED for poster:', poster.title);
+                alert('Opening poster: ' + poster.title); // Debug alert
+                setViewingPoster(poster);
+              }}
               className="view-poster-btn"
             >
               <Eye size={16} />
