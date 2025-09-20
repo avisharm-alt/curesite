@@ -448,7 +448,8 @@ const ProfessorManagementTab = ({ professors, onAdd, onEdit, onDelete, onRefresh
     e.preventDefault();
     const professorData = {
       ...formData,
-      research_areas: formData.research_areas.split(',').map(area => area.trim()).filter(area => area)
+      research_areas: formData.research_areas.split(',').map(area => area.trim()).filter(area => area),
+      website: formData.website.trim() || null // Send null if empty to avoid URL validation issues
     };
 
     if (editingProfessor) {
