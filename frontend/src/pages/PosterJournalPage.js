@@ -28,9 +28,12 @@ const PosterJournalPage = () => {
       if (filters.university) params.append('university', filters.university);
       
       const response = await axios.get(`${API}/posters?${params}`);
-      setPosters(response.data);
+      // Ensure we always have an array
+      setPosters(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.error('Error fetching posters:', error);
       toast.error('Error fetching posters');
+      setPosters([]); // Reset to empty array on error
     } finally {
       setLoading(false);
     }
