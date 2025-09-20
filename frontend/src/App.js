@@ -184,6 +184,7 @@ const App = () => {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/submit-poster" element={<SubmitPosterPage />} />
               <Route path="/admin" element={<AdminPanelPage />} />
+              <Route path="*" element={<HomePage />} />
             </Routes>
           </main>
           <Footer />
