@@ -186,6 +186,7 @@ const App = () => {
               <Route path="/submit-poster" element={<SubmitPosterPage />} />
               <Route path="/admin" element={<AdminPanelPage />} />
               <Route path="/debug" element={<DebugPage />} />
+              <Route path="/test" element={<TestConnectionPage />} />
               <Route path="*" element={<HomePage />} />
             </Routes>
           </main>
