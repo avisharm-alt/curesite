@@ -1,0 +1,19 @@
+{
+  "name": "cure-project",
+  "version": "1.0.0",
+  "description": "Canadian Undergraduate Research Exchange - Full Stack Application",
+  "scripts": {
+    "dev": "concurrently \"cd backend && uvicorn server:app --reload\" \"cd frontend && yarn start\"",
+    "build": "cd frontend && yarn build",
+    "start": "cd backend && python -m uvicorn server:app --host 0.0.0.0 --port ${PORT:-8001}",
+    "install-all": "cd frontend && yarn install && cd ../backend && pip install -r requirements.txt",
+    "deploy-setup": "./deploy-setup.sh"
+  },
+  "keywords": ["react", "fastapi", "mongodb", "research", "medical"],
+  "author": "CURE Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=16.0.0",
+    "python": ">=3.11.0"
+  }
+}
