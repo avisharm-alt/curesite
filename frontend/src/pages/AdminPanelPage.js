@@ -746,8 +746,8 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
               </button>
             </div>
             
-            <form onSubmit={handleSubmit} className="volunteer-form">
-              <div className="form-grid">
+            <form onSubmit={handleSubmit} className="volunteer-form compact-form">
+              <div className="form-grid compact-grid">
                 <div className="form-field">
                   <label>Title *</label>
                   <input
@@ -755,7 +755,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                     value={formData.title}
                     onChange={(e) => setFormData({...formData, title: e.target.value})}
                     required
-                    className="form-input"
+                    className="form-input compact-input"
                   />
                 </div>
                 
@@ -766,7 +766,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                     value={formData.organization}
                     onChange={(e) => setFormData({...formData, organization: e.target.value})}
                     required
-                    className="form-input"
+                    className="form-input compact-input"
                   />
                 </div>
                 
@@ -776,7 +776,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                     value={formData.type}
                     onChange={(e) => setFormData({...formData, type: e.target.value})}
                     required
-                    className="form-input"
+                    className="form-input compact-input"
                   >
                     <option value="">Select Type</option>
                     <option value="Clinical">Clinical</option>
@@ -793,7 +793,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                     value={formData.location}
                     onChange={(e) => setFormData({...formData, location: e.target.value})}
                     required
-                    className="form-input"
+                    className="form-input compact-input"
                   />
                 </div>
                 
@@ -803,7 +803,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                     type="text"
                     value={formData.time_commitment}
                     onChange={(e) => setFormData({...formData, time_commitment: e.target.value})}
-                    className="form-input"
+                    className="form-input compact-input"
                     placeholder="e.g., 4-6 hours per week"
                   />
                 </div>
@@ -814,7 +814,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                     type="email"
                     value={formData.contact_email}
                     onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
-                    className="form-input"
+                    className="form-input compact-input"
                   />
                 </div>
               </div>
@@ -825,30 +825,33 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
                   required
-                  className="form-textarea"
-                  rows={4}
+                  className="form-textarea compact-textarea"
+                  rows={2}
                 />
               </div>
               
-              <div className="form-field">
-                <label>Requirements</label>
-                <input
-                  type="text"
-                  value={formData.requirements}
-                  onChange={(e) => setFormData({...formData, requirements: e.target.value})}
-                  className="form-input"
-                  placeholder="Separate multiple requirements with commas"
-                />
-              </div>
-              
-              <div className="form-field">
-                <label>Application Link</label>
-                <input
-                  type="url"
-                  value={formData.application_link}
-                  onChange={(e) => setFormData({...formData, application_link: e.target.value})}
-                  className="form-input"
-                />
+              <div className="form-row">
+                <div className="form-field">
+                  <label>Requirements</label>
+                  <input
+                    type="text"
+                    value={formData.requirements}
+                    onChange={(e) => setFormData({...formData, requirements: e.target.value})}
+                    className="form-input compact-input"
+                    placeholder="Separate with commas"
+                  />
+                </div>
+                
+                <div className="form-field">
+                  <label>Application Link</label>
+                  <input
+                    type="url"
+                    value={formData.application_link}
+                    onChange={(e) => setFormData({...formData, application_link: e.target.value})}
+                    className="form-input compact-input"
+                    placeholder="https://..."
+                  />
+                </div>
               </div>
               
               <div className="form-actions">
