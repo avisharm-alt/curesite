@@ -26,8 +26,9 @@ const AdminPanelPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      console.log('Token exists:', !!token);
+      console.log('Fetching admin data - Token exists:', !!token);
       console.log('Fetching data for tab:', activeTab);
+      console.log('User type:', user?.user_type);
       
       if (!token) {
         toast.error('No authentication token found. Please login again.');
@@ -48,7 +49,9 @@ const AdminPanelPage = () => {
 
       switch (activeTab) {
         case 'posters':
+          console.log('Fetching posters from:', `${API}/admin/posters`);
           const postersRes = await axios.get(`${API}/admin/posters`, { headers });
+          console.log('Posters response:', postersRes.data);
           setPosters(Array.isArray(postersRes.data) ? postersRes.data : []);
           break;
         case 'professors':
@@ -65,6 +68,7 @@ const AdminPanelPage = () => {
           break;
       }
       
+      console.log(`Successfully loaded ${activeTab} data`);
       toast.success(`Successfully loaded ${activeTab} data`);
     } catch (error) {
       console.error('Admin data fetch error:', error);
