@@ -703,6 +703,16 @@ async def admin_delete_ec_profile(profile_id: str, current_user: User = Depends(
     
     return {"message": "EC profile deleted successfully"}
 
+@api_router.get("/admin/test")
+async def admin_test(current_user: User = Depends(get_current_user)):
+    """Test admin access"""
+    return {
+        "message": "Admin access working",
+        "user_email": current_user.email,
+        "user_type": current_user.user_type,
+        "is_admin": current_user.user_type == "admin"
+    }
+
 @api_router.get("/admin/posters", response_model=List[Dict[str, Any]])
 async def admin_get_all_posters(current_user: User = Depends(get_current_user)):
     """Admin gets all poster submissions"""
