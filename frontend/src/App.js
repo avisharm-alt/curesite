@@ -14,6 +14,7 @@ import VolunteerOpportunitiesPage from './pages/VolunteerOpportunitiesPage';
 import ProfilePage from './pages/ProfilePage';
 import SubmitPosterPage from './pages/SubmitPosterPage';
 import AdminPanelPage from './pages/AdminPanelPage';
+import DebugPage from './pages/DebugPage';
 
 // Import hooks and components
 import { AuthProvider, useAuth } from './hooks/useAuth';
