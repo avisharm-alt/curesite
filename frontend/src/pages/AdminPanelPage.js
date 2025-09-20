@@ -26,29 +26,51 @@ const AdminPanelPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
+      console.log('Token exists:', !!token);
+      console.log('Fetching data for tab:', activeTab);
+      
+      if (!token) {
+        toast.error('No authentication token found. Please login again.');
+        return;
+      }
+      
       const headers = { Authorization: `Bearer ${token}` };
+
+      // Test admin access first
+      try {
+        const testRes = await axios.get(`${API}/admin/test`, { headers });
+        console.log('Admin test response:', testRes.data);
+      } catch (testError) {
+        console.error('Admin test failed:', testError.response?.data || testError.message);
+        toast.error('Admin access denied. Please login as admin.');
+        return;
+      }
 
       switch (activeTab) {
         case 'posters':
           const postersRes = await axios.get(`${API}/admin/posters`, { headers });
-          setPosters(postersRes.data);
+          setPosters(Array.isArray(postersRes.data) ? postersRes.data : []);
           break;
         case 'professors':
           const profsRes = await axios.get(`${API}/admin/professor-network`, { headers });
-          setProfessors(profsRes.data);
+          setProfessors(Array.isArray(profsRes.data) ? profsRes.data : []);
           break;
         case 'volunteer':
           const volRes = await axios.get(`${API}/admin/volunteer-opportunities`, { headers });
-          setVolunteerOpps(volRes.data);
+          setVolunteerOpps(Array.isArray(volRes.data) ? volRes.data : []);
           break;
         case 'ecprofiles':
           const ecRes = await axios.get(`${API}/admin/ec-profiles`, { headers });
-          setECProfiles(ecRes.data);
+          setECProfiles(Array.isArray(ecRes.data) ? ecRes.data : []);
           break;
       }
+      
+      toast.success(`Successfully loaded ${activeTab} data`);
     } catch (error) {
       console.error('Admin data fetch error:', error);
-      toast.error(`Error fetching ${activeTab} data: ${error.response?.data?.detail || error.message}`);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      toast.error(`ADMIN ERROR (${activeTab}): ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
     }
