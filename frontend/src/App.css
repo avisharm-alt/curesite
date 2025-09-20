@@ -2316,43 +2316,79 @@ a:focus {
   background: rgba(0, 255, 136, 0.1);
 }
 
+/* Small Modal Styles */
+.small-modal {
+  max-width: 600px;
+  max-height: 85vh;
+  width: 90vw;
+  overflow-y: auto;
+}
+
 /* Compact Form Styles */
 .compact-form {
-  max-height: 80vh;
+  max-height: 70vh;
   overflow-y: auto;
+  padding: 0;
 }
 
 .compact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .compact-input {
-  padding: 8px 12px;
-  font-size: 14px;
-  height: 36px;
+  padding: 6px 10px;
+  font-size: 13px;
+  height: 32px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .compact-textarea {
-  padding: 8px 12px;
-  font-size: 14px;
-  min-height: 60px;
+  padding: 6px 10px;
+  font-size: 13px;
+  min-height: 50px;
   resize: vertical;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
-  margin-bottom: 15px;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.compact-form .form-field {
+  margin-bottom: 8px;
+}
+
+.compact-form .form-field label {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 3px;
+  display: block;
+  color: #333;
+}
+
+.compact-form .form-actions {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
 }
 
 @media (max-width: 768px) {
   .compact-grid,
   .form-row {
     grid-template-columns: 1fr;
+  }
+  
+  .small-modal {
+    width: 95vw;
+    max-height: 90vh;
   }
 }
 
