@@ -42,7 +42,7 @@ const AdminPanelPage = () => {
           setVolunteerOpps(volRes.data);
           break;
         case 'ecprofiles':
-          const ecRes = await axios.get(`${API}/admin/ecprofiles`, { headers });
+          const ecRes = await axios.get(`${API}/admin/ec-profiles`, { headers });
           setECProfiles(ecRes.data);
           break;
       }
