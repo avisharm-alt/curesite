@@ -186,7 +186,7 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.put(`${API}/posters/${posterId}/review?status=${status}`, {}, { headers });
+      await axios.put(`${API}/posters/${posterId}/review`, { status }, { headers });
       toast.success(`Poster ${status} successfully`);
       fetchData();
     } catch (error) {
