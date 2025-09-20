@@ -53,6 +53,19 @@ app = FastAPI(title="CURE - Canadian Undergraduate Research Exchange")
 # Add session middleware
 app.add_middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32))
 
+# Add CORS middleware for deployment
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # Local development
+        "https://localhost:3000",  # Local development HTTPS
+        os.environ.get("FRONTEND_URL", "*"),  # Production frontend URL
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Health check endpoint for Railway
 @app.get("/health")
 async def health_check():
