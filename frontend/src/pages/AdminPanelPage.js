@@ -34,7 +34,7 @@ const AdminPanelPage = () => {
           setPosters(postersRes.data);
           break;
         case 'professors':
-          const profsRes = await axios.get(`${API}/admin/professors`, { headers });
+          const profsRes = await axios.get(`${API}/admin/professor-network`, { headers });
           setProfessors(profsRes.data);
           break;
         case 'volunteer':
