@@ -301,7 +301,7 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.delete(`${API}/admin/ecprofiles/${profileId}`, { headers });
+      await axios.delete(`${API}/admin/ec-profiles/${profileId}`, { headers });
       toast.success('EC Profile deleted successfully');
       fetchData();
     } catch (error) {
