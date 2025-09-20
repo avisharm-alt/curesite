@@ -204,7 +204,7 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.put(`${API}/admin/professors/${professorId}`, professorData, { headers });
+      await axios.put(`${API}/admin/professor-network/${professorId}`, professorData, { headers });
       toast.success('Professor updated successfully');
       fetchData();
     } catch (error) {
