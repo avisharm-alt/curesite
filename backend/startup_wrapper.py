@@ -17,17 +17,22 @@ def main():
         import server
         print("✅ Server imported successfully")
         
-        # Get port
-        port = os.environ.get('PORT', '8000')
-        print(f"🔧 Using port: {port}")
-        
+        # Get port - Railway should provide this, fallback to 8000
+        port_env = os.environ.get('PORT')
+        if port_env:
+            port = int(port_env)
+            print(f"🔧 Using Railway PORT: {port}")
+        else:
+            port = 8000
+            print(f"⚠️  No PORT env var set, using default: {port}")
+            
         # Start uvicorn
         print("🚀 Starting uvicorn server...")
         import uvicorn
         uvicorn.run(
             "server:app",
-            host="0.0.0.0",
-            port=int(port),
+            host="0.0.0.0", 
+            port=port,
             log_level="info"
         )
         
