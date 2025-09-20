@@ -570,12 +570,13 @@ const ProfessorManagementTab = ({ professors, onAdd, onEdit, onDelete, onRefresh
                 </div>
                 
                 <div className="form-field">
-                  <label>Website</label>
+                  <label>Website (Optional)</label>
                   <input
                     type="url"
                     value={formData.website}
                     onChange={(e) => setFormData({...formData, website: e.target.value})}
                     className="form-input"
+                    placeholder="https://example.com (optional)"
                   />
                 </div>
                 
