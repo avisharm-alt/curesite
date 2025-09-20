@@ -22,9 +22,12 @@ const StudentNetworkPage = () => {
       if (searchTerm) params.append('research_interest', searchTerm);
       
       const response = await axios.get(`${API}/student-network?${params}`);
-      setStudents(response.data);
+      // Ensure we always have an array
+      setStudents(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.error('Error fetching student network:', error);
       toast.error('Error fetching student network');
+      setStudents([]); // Reset to empty array on error
     } finally {
       setLoading(false);
     }
