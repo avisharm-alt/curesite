@@ -727,6 +727,23 @@ async def admin_create_ec_profile(profile: ECProfileCreate, current_user: User =
     await db.ec_profiles.insert_one(profile_dict)
     return profile_obj
 
+@api_router.put("/admin/ec-profiles/{profile_id}", response_model=ECProfile)
+async def admin_update_ec_profile(profile_id: str, profile: ECProfileCreate, current_user: User = Depends(get_current_user)):
+    """Admin updates EC profile"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = prepare_for_mongo(profile.dict())
+    update_data["submitted_by"] = current_user.id  # Keep admin as submitter
+    
+    result = await db.ec_profiles.update_one({"id": profile_id}, {"$set": update_data})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="EC profile not found")
+    
+    updated_profile = await db.ec_profiles.find_one({"id": profile_id})
+    return ECProfile(**parse_from_mongo(updated_profile))
+
 @api_router.delete("/admin/ec-profiles/{profile_id}")
 async def admin_delete_ec_profile(profile_id: str, current_user: User = Depends(get_current_user)):
     """Admin deletes EC profile"""
