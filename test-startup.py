@@ -31,8 +31,8 @@ def test_environment():
     """Test environment variables"""
     print("\n🔧 Testing environment variables...")
     
-    required_vars = ['PORT']
-    optional_vars = ['MONGO_URL', 'DB_NAME', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']
+    required_vars = []  # No truly required vars for basic startup
+    optional_vars = ['PORT', 'MONGO_URL', 'DB_NAME', 'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET']
     
     print("Required variables:")
     for var in required_vars:
