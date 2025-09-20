@@ -389,7 +389,7 @@ const PosterManagementTab = ({ posters, onReview, onDelete }) => (
                   <button
                     onClick={() => {
                       const token = localStorage.getItem('token');
-                      const viewUrl = `${API}/admin/posters/${poster.id}/view`;
+                      const viewUrl = `${API}/admin/posters/${poster.id}/view?token=${token}`;
                       window.open(viewUrl, '_blank');
                     }}
                     className="view-btn"
