@@ -722,7 +722,7 @@ async def admin_get_all_volunteer_opportunities(current_user: User = Depends(get
     opportunities = await db.volunteer_opportunities.find({}).to_list(100)
     return [VolunteerOpportunity(**parse_from_mongo(opportunity)) for opportunity in opportunities]
 
-@api_router.get("/admin/ec-profiles", response_model=List[ECProfile]])
+@api_router.get("/admin/ec-profiles", response_model=List[ECProfile])
 async def admin_get_all_ec_profiles(current_user: User = Depends(get_current_user)):
     """Admin gets all EC profiles"""
     if current_user.user_type != "admin":
