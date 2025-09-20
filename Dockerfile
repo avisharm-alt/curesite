@@ -14,6 +14,10 @@ WORKDIR /app
 COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the start script
+COPY start.sh ./start.sh
+RUN chmod +x ./start.sh
+
 # Copy the backend application
 COPY backend/ ./
 COPY uploads/ ./uploads/
@@ -28,5 +32,5 @@ EXPOSE $PORT
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:$PORT/health || exit 1
 
-# Start command - using shell form to handle environment variables
-CMD python -m uvicorn server:app --host 0.0.0.0 --port $PORT
+# Use the start script
+CMD ["./start.sh"]
