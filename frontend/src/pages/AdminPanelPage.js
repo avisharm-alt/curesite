@@ -731,7 +731,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
 
       {showForm && (
         <div className="modal-overlay">
-          <div className="modal-content">
+          <div className="modal-content small-modal">
             <div className="modal-header">
               <h3>{editingOpp ? 'Edit Opportunity' : 'Add New Opportunity'}</h3>
               <button 
