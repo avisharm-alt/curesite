@@ -17,7 +17,7 @@ class CUREAPITester:
         self.test_user_id = None
         self.test_poster_id = None
 
-    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None):
+    def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, critical=False):
         """Run a single API test"""
         url = f"{self.api_url}/{endpoint}" if not endpoint.startswith('http') else endpoint
         test_headers = {'Content-Type': 'application/json'}
@@ -37,6 +37,8 @@ class CUREAPITester:
                 response = requests.post(url, json=data, headers=test_headers, timeout=10)
             elif method == 'PUT':
                 response = requests.put(url, json=data, headers=test_headers, timeout=10)
+            elif method == 'DELETE':
+                response = requests.delete(url, headers=test_headers, timeout=10)
 
             success = response.status_code == expected_status
             if success:
@@ -53,17 +55,25 @@ class CUREAPITester:
             else:
                 print(f"❌ Failed - Expected {expected_status}, got {response.status_code}")
                 print(f"   Response: {response.text[:200]}...")
+                if critical:
+                    self.critical_failures.append(f"{name}: Expected {expected_status}, got {response.status_code}")
 
             return success, response.json() if response.headers.get('content-type', '').startswith('application/json') else response.text
 
         except requests.exceptions.Timeout:
             print(f"❌ Failed - Request timeout")
+            if critical:
+                self.critical_failures.append(f"{name}: Request timeout")
             return False, {}
         except requests.exceptions.ConnectionError:
             print(f"❌ Failed - Connection error")
+            if critical:
+                self.critical_failures.append(f"{name}: Connection error")
             return False, {}
         except Exception as e:
             print(f"❌ Failed - Error: {str(e)}")
+            if critical:
+                self.critical_failures.append(f"{name}: {str(e)}")
             return False, {}
 
     def test_health_check(self):
