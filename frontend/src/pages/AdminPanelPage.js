@@ -219,7 +219,7 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.delete(`${API}/admin/professors/${professorId}`, { headers });
+      await axios.delete(`${API}/admin/professor-network/${professorId}`, { headers });
       toast.success('Professor deleted successfully');
       fetchData();
     } catch (error) {
