@@ -53,6 +53,11 @@ app = FastAPI(title="CURE - Canadian Undergraduate Research Exchange")
 # Add session middleware
 app.add_middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32))
 
+# Health check endpoint for Railway
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "CURE Backend"}
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
