@@ -264,7 +264,8 @@ const AdminPanelPage = () => {
       toast.success('Volunteer opportunity added successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error adding volunteer opportunity');
+      console.error('Add volunteer error:', error.response?.data || error.message);
+      toast.error('Error adding volunteer opportunity: ' + (error.response?.data?.detail || error.message));
     }
   }
 
@@ -277,7 +278,8 @@ const AdminPanelPage = () => {
       toast.success('Volunteer opportunity updated successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error updating volunteer opportunity');
+      console.error('Edit volunteer error:', error.response?.data || error.message);
+      toast.error('Error updating volunteer opportunity: ' + (error.response?.data?.detail || error.message));
     }
   }
 
@@ -292,7 +294,8 @@ const AdminPanelPage = () => {
       toast.success('Volunteer opportunity deleted successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error deleting volunteer opportunity');
+      console.error('Delete volunteer error:', error.response?.data || error.message);
+      toast.error('Error deleting volunteer opportunity: ' + (error.response?.data?.detail || error.message));
     }
   }
 
@@ -305,7 +308,8 @@ const AdminPanelPage = () => {
       toast.success('EC Profile added successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error adding EC profile');
+      console.error('Add EC profile error:', error.response?.data || error.message);
+      toast.error('Error adding EC profile: ' + (error.response?.data?.detail || error.message));
     }
   }
 
@@ -318,7 +322,8 @@ const AdminPanelPage = () => {
       toast.success('EC Profile updated successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error updating EC profile');
+      console.error('Edit EC profile error:', error.response?.data || error.message);
+      toast.error('Error updating EC profile: ' + (error.response?.data?.detail || error.message));
     }
   }
 
@@ -333,7 +338,8 @@ const AdminPanelPage = () => {
       toast.success('EC Profile deleted successfully');
       fetchData();
     } catch (error) {
-      toast.error('Error deleting EC profile');
+      console.error('Delete EC profile error:', error.response?.data || error.message);
+      toast.error('Error deleting EC profile: ' + (error.response?.data?.detail || error.message));
     }
   }
 };
