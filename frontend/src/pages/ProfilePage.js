@@ -32,7 +32,7 @@ const ProfilePage = () => {
 
       // Fetch my posters
       const postersResponse = await axios.get(`${API}/posters/my`, { headers });
-      setMyPosters(postersResponse.data);
+      setMyPosters(Array.isArray(postersResponse.data) ? postersResponse.data : []);
 
       // Try to fetch my network profile
       try {
