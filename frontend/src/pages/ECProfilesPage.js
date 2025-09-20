@@ -25,9 +25,12 @@ const ECProfilesPage = () => {
       if (filters.admission_year) params.append('admission_year', filters.admission_year);
       
       const response = await axios.get(`${API}/ec-profiles?${params}`);
-      setProfiles(response.data);
+      // Ensure we always have an array
+      setProfiles(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
+      console.error('Error fetching EC profiles:', error);
       toast.error('Error fetching EC profiles');
+      setProfiles([]); // Reset to empty array on error
     } finally {
       setLoading(false);
     }
