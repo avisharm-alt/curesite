@@ -202,6 +202,12 @@ Should load the CURE homepage
 - Check that the project structure has `backend/requirements.txt`
 - Try redeploying after pushing the configuration files
 
+**"The executable 'cd' could not be found" Error:**
+- This happens when using Docker builder with incorrect CMD syntax
+- Solution: Use the updated Dockerfile that sets WORKDIR correctly
+- Alternative: Force Railway to use NIXPACKS instead of Docker
+- Check Railway logs to see which builder is being used
+
 **Frontend API Errors:**
 - Verify `REACT_APP_BACKEND_URL` points to Railway backend
 - Check CORS settings in backend
