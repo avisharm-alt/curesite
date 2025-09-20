@@ -104,9 +104,11 @@ class User(BaseModel):
 class UserCreate(BaseModel):
     email: EmailStr
     name: str
+    profile_picture: Optional[str] = None
     university: Optional[str] = None
     program: Optional[str] = None
     year: Optional[int] = None
+    user_type: Optional[str] = None
 
 class PosterSubmission(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
