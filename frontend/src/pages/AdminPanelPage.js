@@ -47,7 +47,8 @@ const AdminPanelPage = () => {
           break;
       }
     } catch (error) {
-      toast.error('Error fetching admin data');
+      console.error('Admin data fetch error:', error);
+      toast.error(`Error fetching ${activeTab} data: ${error.response?.data?.detail || error.message}`);
     } finally {
       setLoading(false);
     }
