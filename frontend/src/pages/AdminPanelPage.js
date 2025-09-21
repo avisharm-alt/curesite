@@ -11,9 +11,7 @@ const AdminPanelPage = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('posters');
   const [posters, setPosters] = useState([]);
-  const [professors, setProfessors] = useState([]);
   const [volunteerOpps, setVolunteerOpps] = useState([]);
-  const [ecProfiles, setECProfiles] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
