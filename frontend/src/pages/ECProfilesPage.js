@@ -3,48 +3,178 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { BarChart3 } from 'lucide-react';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Hardcoded EC Profiles data
+const EC_PROFILES_DATA = [
+  {
+    id: '1',
+    medical_school: 'University of Toronto',
+    admission_year: 2024,
+    undergraduate_gpa: 3.95,
+    mcat_score: 522,
+    research_hours: 2500,
+    volunteer_hours: 800,
+    leadership_activities: ['President of Pre-Med Society', 'Volunteer Coordinator at Local Hospital', 'Research Team Leader'],
+    awards_scholarships: ['Dean\'s List (4 years)', 'NSERC Undergraduate Research Award', 'University Entrance Scholarship']
+  },
+  {
+    id: '2',
+    medical_school: 'McGill University',
+    admission_year: 2024,
+    undergraduate_gpa: 3.89,
+    mcat_score: 518,
+    research_hours: 1800,
+    volunteer_hours: 1200,
+    leadership_activities: ['Vice-President of Science Students Association', 'Peer Tutor Program Coordinator'],
+    awards_scholarships: ['McGill Entrance Scholarship', 'Academic Excellence Award']
+  },
+  {
+    id: '3',
+    medical_school: 'University of British Columbia',
+    admission_year: 2023,
+    undergraduate_gpa: 3.92,
+    mcat_score: 520,
+    research_hours: 2200,
+    volunteer_hours: 950,
+    leadership_activities: ['Captain of University Volleyball Team', 'President of Biology Club', 'Orientation Week Leader'],
+    awards_scholarships: ['Provincial Academic Scholarship', 'Athletic Excellence Award', 'Research Excellence Grant']
+  },
+  {
+    id: '4',
+    medical_school: 'McMaster University',
+    admission_year: 2023,
+    undergraduate_gpa: 3.87,
+    mcat_score: 515,
+    research_hours: 1600,
+    volunteer_hours: 1400,
+    leadership_activities: ['Director of Campus Mental Health Initiative', 'Executive Member of Student Council'],
+    awards_scholarships: ['McMaster Scholars Award', 'Community Service Recognition']
+  },
+  {
+    id: '5',
+    medical_school: 'University of Western Ontario',
+    admission_year: 2024,
+    undergraduate_gpa: 3.94,
+    mcat_score: 519,
+    research_hours: 2100,
+    volunteer_hours: 750,
+    leadership_activities: ['Editor-in-Chief of Science Journal', 'Head Teaching Assistant', 'Research Symposium Organizer'],
+    awards_scholarships: ['Western Scholarship of Excellence', 'Research Publication Award']
+  },
+  {
+    id: '6',
+    medical_school: 'Queen\'s University',
+    admission_year: 2023,
+    undergraduate_gpa: 3.91,
+    mcat_score: 517,
+    research_hours: 1900,
+    volunteer_hours: 1100,
+    leadership_activities: ['President of Global Health Club', 'Peer Mentor Program Leader'],
+    awards_scholarships: ['Queen\'s Excellence Award', 'International Experience Grant']
+  },
+  {
+    id: '7',
+    medical_school: 'University of Ottawa',
+    admission_year: 2024,
+    undergraduate_gpa: 3.88,
+    mcat_score: 516,
+    research_hours: 1700,
+    volunteer_hours: 1300,
+    leadership_activities: ['VP External of Health Sciences Student Association', 'Community Outreach Coordinator'],
+    awards_scholarships: ['Ottawa Entrance Scholarship', 'Volunteer Excellence Award']
+  },
+  {
+    id: '8',
+    medical_school: 'University of Alberta',
+    admission_year: 2023,
+    undergraduate_gpa: 3.93,
+    mcat_score: 521,
+    research_hours: 2400,
+    volunteer_hours: 850,
+    leadership_activities: ['Research Lab Manager', 'President of Pre-Professional Health Club', 'Student Senator'],
+    awards_scholarships: ['Jason Lang Scholarship', 'Research Excellence Award', 'Leadership Recognition']
+  },
+  {
+    id: '9',
+    medical_school: 'University of Toronto',
+    admission_year: 2023,
+    undergraduate_gpa: 3.96,
+    mcat_score: 523,
+    research_hours: 2800,
+    volunteer_hours: 700,
+    leadership_activities: ['Chief Research Officer for Student Society', 'Mentor for Incoming Students'],
+    awards_scholarships: ['President\'s Entrance Scholarship', 'Research Publication Grant', 'Academic Achievement Award']
+  },
+  {
+    id: '10',
+    medical_school: 'McGill University',
+    admission_year: 2023,
+    undergraduate_gpa: 3.90,
+    mcat_score: 519,
+    research_hours: 2000,
+    volunteer_hours: 1000,
+    leadership_activities: ['Director of Student Wellness Program', 'Executive Board Member of Science Society'],
+    awards_scholarships: ['McGill Major Scholarship', 'Community Impact Award']
+  }
+];
+
+// Generate stats from the hardcoded data
+const generateStats = (profiles) => {
+  const stats = {};
+  
+  profiles.forEach(profile => {
+    const school = profile.medical_school;
+    if (!stats[school]) {
+      stats[school] = {
+        medical_school: school,
+        count: 0,
+        avg_gpa: 0,
+        avg_mcat: 0,
+        avg_research_hours: 0,
+        avg_volunteer_hours: 0
+      };
+    }
+    
+    stats[school].count += 1;
+    stats[school].avg_gpa += profile.undergraduate_gpa;
+    stats[school].avg_mcat += profile.mcat_score;
+    stats[school].avg_research_hours += profile.research_hours;
+    stats[school].avg_volunteer_hours += profile.volunteer_hours;
+  });
+  
+  // Calculate averages
+  Object.values(stats).forEach(stat => {
+    stat.avg_gpa = (stat.avg_gpa / stat.count).toFixed(2);
+    stat.avg_mcat = Math.round(stat.avg_mcat / stat.count);
+    stat.avg_research_hours = Math.round(stat.avg_research_hours / stat.count);
+    stat.avg_volunteer_hours = Math.round(stat.avg_volunteer_hours / stat.count);
+  });
+  
+  return Object.values(stats);
+};
 
 const ECProfilesPage = () => {
-  const [profiles, setProfiles] = useState([]);
-  const [stats, setStats] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [profiles, setProfiles] = useState(EC_PROFILES_DATA);
+  const [stats, setStats] = useState(generateStats(EC_PROFILES_DATA));
+  const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState({ medical_school: '', admission_year: '' });
 
   useEffect(() => {
-    fetchProfiles();
-    fetchStats();
+    filterProfiles();
   }, [filters]);
 
-  const fetchProfiles = async () => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (filters.medical_school) params.append('medical_school', filters.medical_school);
-      if (filters.admission_year) params.append('admission_year', filters.admission_year);
-      
-      const response = await axios.get(`${API}/ec-profiles?${params}`);
-      // Ensure we always have an array
-      setProfiles(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.error('Error fetching EC profiles:', error);
-      toast.error('Error fetching EC profiles');
-      setProfiles([]); // Reset to empty array on error
-    } finally {
-      setLoading(false);
+  const filterProfiles = () => {
+    let filtered = EC_PROFILES_DATA;
+    
+    if (filters.medical_school) {
+      filtered = filtered.filter(profile => profile.medical_school === filters.medical_school);
     }
-  };
-
-  const fetchStats = async () => {
-    try {
-      const response = await axios.get(`${API}/ec-profiles/stats`);
-      // Ensure we always have an array
-      setStats(Array.isArray(response.data) ? response.data : []);
-    } catch (error) {
-      console.error('Error fetching stats:', error);
-      setStats([]); // Reset to empty array on error
+    
+    if (filters.admission_year) {
+      filtered = filtered.filter(profile => profile.admission_year.toString() === filters.admission_year);
     }
+    
+    setProfiles(filtered);
+    setStats(generateStats(filtered));
   };
 
   const ProfileCard = ({ profile }) => (
