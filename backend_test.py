@@ -608,59 +608,112 @@ class CUREAPITester:
         return diagnostics
 
 def main():
-    print("🚀 Starting CURE API CRITICAL REGRESSION Testing...")
-    print("🚨 Focus: Student Profile Update & Admin Panel Issues")
-    print("=" * 60)
+    print("🚀 Starting CURE API PRODUCTION TESTING...")
+    print("🚨 Focus: Admin functionality in production environment")
+    print("🌐 Testing URL: https://curesite-production.up.railway.app")
+    print("=" * 70)
     
     tester = CUREAPITester()
     
-    # Test basic connectivity first
-    print("\n📋 Testing Basic Connectivity...")
-    tester.test_health_check()
-    tester.test_root_endpoint()
+    # Run comprehensive production diagnostics first
+    print("\n🔍 PRODUCTION ENVIRONMENT DIAGNOSTICS")
+    diagnostics = tester.test_production_environment_diagnostics()
     
-    # CRITICAL TESTS - Focus on reported issues
-    print("\n🚨 CRITICAL REGRESSION TESTS...")
-    print("   Testing issues reported by user:")
-    print("   1. Student profile saving functionality broken")
-    print("   2. Admin panel still doesn't work")
+    # CRITICAL PRODUCTION TESTS - As specified in review request
+    print("\n🚨 CRITICAL PRODUCTION TESTS...")
+    print("   Testing specific endpoints mentioned in review request:")
+    print("   1. Health endpoint: GET /health")
+    print("   2. Admin test endpoint: GET /api/admin/test")
+    print("   3. Google OAuth flow: GET /api/auth/google")
+    print("   4. Admin professor endpoint: GET /api/admin/professor-network")
+    print("   5. Admin posters endpoint: GET /api/admin/posters")
     
-    # Test 1: Student Profile Update
-    tester.test_student_profile_update()
+    # Test 1: Health endpoint
+    tester.test_production_health_endpoint()
     
-    # Test 2: Admin Panel Functionality
-    tester.test_admin_panel_endpoints()
-    tester.test_admin_poster_review()
-    tester.test_admin_professor_management()
-    tester.test_admin_volunteer_management()
-    tester.test_admin_ec_profiles_management()
+    # Test 2: Admin test endpoint
+    tester.test_production_admin_test_endpoint()
     
-    # Test 3: Authentication Flow
+    # Test 3: Google OAuth flow
+    tester.test_production_google_oauth()
+    
+    # Test 4: Admin professor endpoint
+    tester.test_production_admin_professor_endpoint()
+    
+    # Test 5: Admin posters endpoint
+    tester.test_production_admin_posters_endpoint()
+    
+    # Additional authentication flow tests
+    print("\n🔐 AUTHENTICATION FLOW TESTS...")
     tester.test_authentication_flow()
     
-    # Test supporting endpoints to verify they work
-    print("\n📚 Testing Supporting Endpoints...")
+    # Test supporting public endpoints to verify backend is working
+    print("\n📚 PUBLIC ENDPOINTS VERIFICATION...")
     tester.test_posters_endpoint()
     tester.test_student_network_endpoint()
     tester.test_professor_network_endpoint()
     tester.test_ec_profiles_endpoint()
     tester.test_volunteer_opportunities_endpoint()
     
+    # Test CORS configuration
+    print("\n🌐 CORS CONFIGURATION TEST...")
+    tester.test_cors_headers()
+    
     # Print final results
-    print("\n" + "=" * 60)
+    print("\n" + "=" * 70)
     print(f"📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
+    
+    # Analysis of production issues
+    print("\n🔍 PRODUCTION ISSUE ANALYSIS:")
+    print("=" * 40)
     
     if tester.critical_failures:
         print(f"\n🚨 CRITICAL FAILURES ({len(tester.critical_failures)}):")
         for failure in tester.critical_failures:
             print(f"   ❌ {failure}")
     
+    # Specific analysis for admin functionality
+    print("\n📋 ADMIN FUNCTIONALITY ANALYSIS:")
+    print("   Based on testing results:")
+    
+    if diagnostics.get('health_status') == 200:
+        print("   ✅ Backend server is running and accessible")
+    else:
+        print("   ❌ Backend server connectivity issues")
+    
+    if diagnostics.get('oauth_status') == 302:
+        print("   ✅ Google OAuth redirect is working")
+    else:
+        print("   ❌ Google OAuth redirect issues")
+    
+    admin_protected = True
+    for key in diagnostics:
+        if key.startswith('admin_') and not key.endswith('_error'):
+            if diagnostics[key].get('status') not in [401, 403]:
+                admin_protected = False
+                break
+    
+    if admin_protected:
+        print("   ✅ Admin endpoints are properly protected")
+        print("   🔍 Issue likely: Admin user doesn't exist in production MongoDB")
+        print("   🔍 Issue likely: JWT token authentication not working in production")
+    else:
+        print("   ❌ Admin endpoints protection issues")
+    
+    # Recommendations
+    print("\n💡 RECOMMENDATIONS:")
+    print("   1. Verify curejournal@gmail.com exists as admin user in production MongoDB")
+    print("   2. Check JWT_SECRET_KEY consistency between local and production")
+    print("   3. Verify Google OAuth redirect URIs include production URLs")
+    print("   4. Test complete OAuth flow manually to get valid admin token")
+    
     if tester.tests_passed == tester.tests_run:
-        print("🎉 All tests passed! Backend is working correctly.")
+        print("\n🎉 All tests passed! Backend endpoints are responding correctly.")
+        print("   Issue is likely with admin user setup or JWT configuration.")
         return 0
     else:
         failed_tests = tester.tests_run - tester.tests_passed
-        print(f"⚠️  {failed_tests} test(s) failed. Check the issues above.")
+        print(f"\n⚠️  {failed_tests} test(s) failed. Check the issues above.")
         
         if tester.critical_failures:
             print("\n🚨 CRITICAL ISSUES FOUND - These need immediate attention!")
