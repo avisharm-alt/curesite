@@ -448,6 +448,165 @@ class CUREAPITester:
             print(f"❌ CORS test failed: {str(e)}")
             return False
 
+    def test_production_health_endpoint(self):
+        """Test production health endpoint specifically"""
+        print("\n🚨 PRODUCTION TEST: Health Endpoint")
+        url = f"{self.base_url}/health"
+        success, response = self.run_test(
+            "Production Health Check",
+            "GET",
+            url,
+            200,
+            critical=True
+        )
+        return success, response
+
+    def test_production_admin_test_endpoint(self):
+        """Test production admin test endpoint without auth"""
+        print("\n🚨 PRODUCTION TEST: Admin Test Endpoint")
+        url = f"{self.api_url}/admin/test"
+        success, response = self.run_test(
+            "Production Admin Test (No Auth)",
+            "GET",
+            url,
+            401,  # Should fail without auth
+            critical=True
+        )
+        return success, response
+
+    def test_production_google_oauth(self):
+        """Test production Google OAuth flow"""
+        print("\n🚨 PRODUCTION TEST: Google OAuth Flow")
+        url = f"{self.api_url}/auth/google"
+        success, response = self.run_test(
+            "Production Google OAuth",
+            "GET",
+            url,
+            302,  # Should redirect
+            critical=True
+        )
+        return success, response
+
+    def test_production_admin_professor_endpoint(self):
+        """Test production admin professor endpoint without auth"""
+        print("\n🚨 PRODUCTION TEST: Admin Professor Network")
+        url = f"{self.api_url}/admin/professor-network"
+        success, response = self.run_test(
+            "Production Admin Professor Network (No Auth)",
+            "GET",
+            url,
+            401,  # Should fail without auth
+            critical=True
+        )
+        return success, response
+
+    def test_production_admin_posters_endpoint(self):
+        """Test production admin posters endpoint without auth"""
+        print("\n🚨 PRODUCTION TEST: Admin Posters Management")
+        url = f"{self.api_url}/admin/posters"
+        success, response = self.run_test(
+            "Production Admin Posters (No Auth)",
+            "GET",
+            url,
+            401,  # Should fail without auth
+            critical=True
+        )
+        return success, response
+
+    def test_production_environment_diagnostics(self):
+        """Run comprehensive production environment diagnostics"""
+        print("\n🔍 PRODUCTION ENVIRONMENT DIAGNOSTICS")
+        print("=" * 50)
+        
+        diagnostics = {}
+        
+        # Test 1: Basic connectivity
+        print("\n1. Testing basic connectivity...")
+        try:
+            response = requests.get(f"{self.base_url}/health", timeout=10)
+            diagnostics['health_status'] = response.status_code
+            diagnostics['health_response'] = response.json() if response.headers.get('content-type', '').startswith('application/json') else response.text
+            print(f"   ✅ Health endpoint: {response.status_code}")
+        except Exception as e:
+            diagnostics['health_error'] = str(e)
+            print(f"   ❌ Health endpoint failed: {e}")
+        
+        # Test 2: API root
+        print("\n2. Testing API root...")
+        try:
+            response = requests.get(f"{self.api_url}/", timeout=10)
+            diagnostics['api_root_status'] = response.status_code
+            diagnostics['api_root_response'] = response.json() if response.headers.get('content-type', '').startswith('application/json') else response.text
+            print(f"   ✅ API root: {response.status_code}")
+        except Exception as e:
+            diagnostics['api_root_error'] = str(e)
+            print(f"   ❌ API root failed: {e}")
+        
+        # Test 3: Google OAuth redirect
+        print("\n3. Testing Google OAuth redirect...")
+        try:
+            response = requests.get(f"{self.api_url}/auth/google", timeout=10, allow_redirects=False)
+            diagnostics['oauth_status'] = response.status_code
+            diagnostics['oauth_location'] = response.headers.get('Location', 'No redirect location')
+            print(f"   ✅ OAuth redirect: {response.status_code}")
+            if response.status_code == 302:
+                print(f"   📍 Redirect to: {response.headers.get('Location', 'Unknown')[:100]}...")
+        except Exception as e:
+            diagnostics['oauth_error'] = str(e)
+            print(f"   ❌ OAuth redirect failed: {e}")
+        
+        # Test 4: Admin endpoints (should fail without auth)
+        print("\n4. Testing admin endpoints (should return 401/403)...")
+        admin_endpoints = [
+            "/admin/test",
+            "/admin/professor-network", 
+            "/admin/posters",
+            "/admin/stats"
+        ]
+        
+        for endpoint in admin_endpoints:
+            try:
+                response = requests.get(f"{self.api_url}{endpoint}", timeout=10)
+                diagnostics[f'admin_{endpoint.replace("/", "_")}'] = {
+                    'status': response.status_code,
+                    'response': response.text[:200] if response.text else 'No response'
+                }
+                expected = 401 if endpoint != "/admin/test" else 401
+                if response.status_code in [401, 403]:
+                    print(f"   ✅ {endpoint}: {response.status_code} (correctly protected)")
+                else:
+                    print(f"   ❌ {endpoint}: {response.status_code} (unexpected)")
+            except Exception as e:
+                diagnostics[f'admin_{endpoint.replace("/", "_")}_error'] = str(e)
+                print(f"   ❌ {endpoint} failed: {e}")
+        
+        # Test 5: Public endpoints
+        print("\n5. Testing public endpoints...")
+        public_endpoints = [
+            "/posters",
+            "/student-network",
+            "/professor-network",
+            "/ec-profiles",
+            "/volunteer-opportunities"
+        ]
+        
+        for endpoint in public_endpoints:
+            try:
+                response = requests.get(f"{self.api_url}{endpoint}", timeout=10)
+                diagnostics[f'public_{endpoint.replace("/", "_")}'] = {
+                    'status': response.status_code,
+                    'count': len(response.json()) if response.headers.get('content-type', '').startswith('application/json') and isinstance(response.json(), list) else 'N/A'
+                }
+                if response.status_code == 200:
+                    print(f"   ✅ {endpoint}: {response.status_code}")
+                else:
+                    print(f"   ❌ {endpoint}: {response.status_code}")
+            except Exception as e:
+                diagnostics[f'public_{endpoint.replace("/", "_")}_error'] = str(e)
+                print(f"   ❌ {endpoint} failed: {e}")
+        
+        return diagnostics
+
 def main():
     print("🚀 Starting CURE API CRITICAL REGRESSION Testing...")
     print("🚨 Focus: Student Profile Update & Admin Panel Issues")
