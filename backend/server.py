@@ -649,8 +649,14 @@ async def admin_create_professor(profile: AdminProfessorNetworkProfile, current_
 
     existing_user = await db.users.find_one({"email": contact_email})
     if existing_user:
-        professor_user_id = existing_user["id"]
+        # Some legacy records might be missing an explicit `id` field
+        # which would previously cause a KeyError and break the admin flow.
+        professor_user_id = existing_user.get("id") or str(uuid.uuid4())
         user_updates = {}
+
+        # Ensure the legacy record also gets an id so future lookups succeed
+        if "id" not in existing_user or existing_user.get("id") != professor_user_id:
+            user_updates["id"] = professor_user_id
         if existing_user.get("name") != professor_name:
             user_updates["name"] = professor_name
         if professor_university and existing_user.get("university") != professor_university:
@@ -661,7 +667,7 @@ async def admin_create_professor(profile: AdminProfessorNetworkProfile, current_
             user_updates["verified"] = True
 
         if user_updates:
-            await db.users.update_one({"id": professor_user_id}, {"$set": user_updates})
+            await db.users.update_one({"email": contact_email}, {"$set": user_updates})
     else:
         prof_user = User(
             email=contact_email,
