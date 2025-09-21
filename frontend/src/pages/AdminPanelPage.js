@@ -54,17 +54,9 @@ const AdminPanelPage = () => {
           console.log('Posters response:', postersRes.data);
           setPosters(Array.isArray(postersRes.data) ? postersRes.data : []);
           break;
-        case 'professors':
-          const profsRes = await axios.get(`${API}/admin/professor-network`, { headers });
-          setProfessors(Array.isArray(profsRes.data) ? profsRes.data : []);
-          break;
         case 'volunteer':
           const volRes = await axios.get(`${API}/admin/volunteer-opportunities`, { headers });
           setVolunteerOpps(Array.isArray(volRes.data) ? volRes.data : []);
-          break;
-        case 'ecprofiles':
-          const ecRes = await axios.get(`${API}/admin/ec-profiles`, { headers });
-          setECProfiles(Array.isArray(ecRes.data) ? ecRes.data : []);
           break;
       }
       
