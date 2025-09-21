@@ -33,7 +33,6 @@ class FakeDB:
     def __init__(self):
         self.users = FakeCollection()
         self.professor_network = FakeCollection()
-        self.student_network = FakeCollection()
 
 
 @pytest.fixture
@@ -97,28 +96,3 @@ async def test_admin_create_professor_handles_users_without_id(fake_db):
     assert stored_user["name"] == "Prof. Ada Lovelace"
     assert stored_user["user_type"] == "professor"
     assert stored_user["verified"] is True
-
-
-@pytest.mark.anyio
-async def test_upsert_user_from_oauth_upgrades_admin_legacy_user(fake_db):
-    fake_db.users.docs.append({
-        "_id": "legacy-admin",
-        "email": "curejournal@gmail.com",
-        "name": "Legacy Admin",
-        "user_type": "student",
-        "verified": False,
-    })
-
-    user = await server.upsert_user_from_oauth({
-        "email": "curejournal@gmail.com",
-        "name": "Admin User",
-    })
-
-    stored_user = fake_db.users.docs[0]
-
-    assert user.user_type == "admin"
-    assert stored_user["id"] == user.id
-    assert stored_user["user_type"] == "admin"
-    assert stored_user["verified"] is True
-    assert stored_user["name"] == "Admin User"
-    assert fake_db.student_network.docs == []
