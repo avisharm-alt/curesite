@@ -235,6 +235,74 @@ class AdminProfessorNetworkProfile(ProfessorNetworkCreate):
     contact_email: EmailStr
     user_university: Optional[str] = None
 
+
+def _normalize_email(value: Optional[str]) -> str:
+    if not value:
+        return ""
+    return value.strip().lower()
+
+
+def _is_admin_email(email: Optional[str]) -> bool:
+    return _normalize_email(email) in ADMIN_EMAILS
+
+
+def _is_admin_user(user_record: Optional[Dict[str, Any]]) -> bool:
+    if not user_record:
+        return False
+    if user_record.get("user_type") == "admin":
+        return True
+    return _is_admin_email(user_record.get("email"))
+
+
+async def _upsert_professor_user(
+    *,
+    contact_email: str,
+    professor_name: str,
+    professor_university: Optional[str] = None,
+    existing_user: Optional[Dict[str, Any]] = None,
+) -> str:
+    clean_email = contact_email.strip()
+    target_user = existing_user
+
+    if target_user is None:
+        target_user = await db.users.find_one({"email": clean_email})
+
+    updates: Dict[str, Any] = {}
+    desired_role = "admin" if _is_admin_email(contact_email) else "professor"
+
+    if target_user:
+        if target_user.get("email") != clean_email:
+            updates["email"] = clean_email
+        if target_user.get("name") != professor_name:
+            updates["name"] = professor_name
+        if professor_university and target_user.get("university") != professor_university:
+            updates["university"] = professor_university
+
+        if _is_admin_user(target_user):
+            desired_role = "admin"
+
+        if target_user.get("user_type") != desired_role:
+            updates["user_type"] = desired_role
+
+        if not target_user.get("verified"):
+            updates["verified"] = True
+
+        if updates:
+            await db.users.update_one({"id": target_user["id"]}, {"$set": updates})
+
+        return target_user["id"]
+
+    new_user = User(
+        email=clean_email,
+        name=professor_name,
+        university=professor_university,
+        user_type=desired_role,
+        verified=True,
+    )
+
+    await db.users.insert_one(prepare_for_mongo(new_user.model_dump()))
+    return new_user.id
+
 # JWT Functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
@@ -657,50 +725,24 @@ async def admin_create_professor(profile: AdminProfessorNetworkProfile, current_
     if current_user.user_type != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
 
-    profile_data = profile.dict()
+    profile_data = profile.model_dump()
     professor_name = profile_data.pop("user_name")
     contact_email = profile_data.pop("contact_email")
+    clean_email = contact_email.strip()
     professor_university = profile_data.pop("user_university", None)
 
-    existing_user = await db.users.find_one({"email": contact_email})
-    if existing_user:
-        professor_user_id = existing_user["id"]
-        user_updates = {}
-        if existing_user.get("name") != professor_name:
-            user_updates["name"] = professor_name
-        if professor_university and existing_user.get("university") != professor_university:
-            user_updates["university"] = professor_university
-
-        current_role = existing_user.get("user_type")
-        is_admin_account = existing_user.get("email", "").lower() in ADMIN_EMAILS or current_role == "admin"
-        if is_admin_account:
-            if current_role != "admin":
-                user_updates["user_type"] = "admin"
-        elif current_role != "professor":
-            user_updates["user_type"] = "professor"
-
-        if not existing_user.get("verified"):
-            user_updates["verified"] = True
-
-        if user_updates:
-            await db.users.update_one({"id": professor_user_id}, {"$set": user_updates})
-    else:
-        prof_user = User(
-            email=contact_email,
-            name=professor_name,
-            university=professor_university,
-            user_type="professor",
-            verified=True
-        )
-        await db.users.insert_one(prepare_for_mongo(prof_user.dict()))
-        professor_user_id = prof_user.id
+    professor_user_id = await _upsert_professor_user(
+        contact_email=clean_email,
+        professor_name=professor_name,
+        professor_university=professor_university,
+    )
 
     profile_obj = ProfessorNetwork(
         **profile_data,
         user_id=professor_user_id,
-        contact_email=contact_email
+        contact_email=clean_email
     )
-    profile_dict = prepare_for_mongo(profile_obj.dict())
+    profile_dict = prepare_for_mongo(profile_obj.model_dump())
     await db.professor_network.insert_one(profile_dict)
     return profile_obj
 
@@ -714,9 +756,10 @@ async def admin_update_professor(profile_id: str, profile: AdminProfessorNetwork
     if not existing_profile:
         raise HTTPException(status_code=404, detail="Professor profile not found")
 
-    profile_data = profile.dict()
+    profile_data = profile.model_dump()
     professor_name = profile_data.pop("user_name")
     contact_email = profile_data.pop("contact_email")
+    clean_email = contact_email.strip()
     professor_university = profile_data.pop("user_university", None)
 
     professor_user_id = existing_profile.get("user_id")
@@ -724,41 +767,18 @@ async def admin_update_professor(profile_id: str, profile: AdminProfessorNetwork
     if professor_user_id:
         existing_user = await db.users.find_one({"id": professor_user_id})
 
-    if existing_user:
-        user_updates = {}
-        if existing_user.get("email") != contact_email:
-            user_updates["email"] = contact_email
-        if existing_user.get("name") != professor_name:
-            user_updates["name"] = professor_name
-        if professor_university and existing_user.get("university") != professor_university:
-            user_updates["university"] = professor_university
+    if not existing_user or existing_user.get("email") != clean_email:
+        existing_user = await db.users.find_one({"email": clean_email})
 
-        current_role = existing_user.get("user_type")
-        is_admin_account = existing_user.get("email", "").lower() in ADMIN_EMAILS or current_role == "admin"
-        if is_admin_account:
-            if current_role != "admin":
-                user_updates["user_type"] = "admin"
-        elif current_role != "professor":
-            user_updates["user_type"] = "professor"
-
-        if not existing_user.get("verified"):
-            user_updates["verified"] = True
-
-        if user_updates:
-            await db.users.update_one({"id": professor_user_id}, {"$set": user_updates})
-    else:
-        new_user = User(
-            email=contact_email,
-            name=professor_name,
-            university=professor_university,
-            user_type="professor",
-            verified=True
-        )
-        await db.users.insert_one(prepare_for_mongo(new_user.dict()))
-        professor_user_id = new_user.id
+    professor_user_id = await _upsert_professor_user(
+        contact_email=clean_email,
+        professor_name=professor_name,
+        professor_university=professor_university,
+        existing_user=existing_user,
+    )
 
     update_payload = prepare_for_mongo(profile_data)
-    update_payload["contact_email"] = contact_email
+    update_payload["contact_email"] = clean_email
     update_payload["user_id"] = professor_user_id
 
     await db.professor_network.update_one({"id": profile_id}, {"$set": update_payload})

@@ -195,3 +195,68 @@ async def test_admin_create_promotes_student_to_professor(fake_db):
     assert student_record["user_type"] == "professor"
     assert student_record["verified"] is True
     assert fake_db.professor_network.items[0]["user_id"] == student_record["id"]
+
+
+@pytest.mark.anyio("asyncio")
+async def test_admin_update_professor_switches_linked_user(fake_db):
+    admin_record = {
+        "id": "admin-controller",
+        "email": "curejournal@gmail.com",
+        "name": "CURE Admin",
+        "user_type": "admin",
+        "verified": True,
+    }
+    fake_db.users.items.append(admin_record)
+
+    original_professor_user = {
+        "id": "prof-user-1",
+        "email": "old-prof@example.com",
+        "name": "Original Professor",
+        "user_type": "professor",
+        "verified": True,
+    }
+    fake_db.users.items.append(original_professor_user)
+
+    new_user = {
+        "id": "new-user-1",
+        "email": "new-faculty@example.com",
+        "name": "New Faculty",
+        "user_type": "student",
+        "verified": False,
+    }
+    fake_db.users.items.append(new_user)
+
+    existing_profile = {
+        "id": "prof-switch",
+        "user_id": original_professor_user["id"],
+        "department": "Dermatology",
+        "research_areas": ["Skin"],
+        "lab_description": "Derm research",
+        "accepting_students": True,
+        "contact_email": original_professor_user["email"],
+        "website": None,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    }
+    fake_db.professor_network.items.append(existing_profile)
+
+    current_user = User(**admin_record)
+    update_payload = AdminProfessorNetworkProfile(
+        user_name="New Faculty",
+        user_university="Switch University",
+        department="Dermatology",
+        research_areas=["Skin"],
+        lab_description="Derm research",
+        accepting_students=True,
+        contact_email="new-faculty@example.com",
+        website=None,
+    )
+
+    updated_profile = await admin_update_professor(
+        existing_profile["id"], update_payload, current_user=current_user
+    )
+
+    assert updated_profile.user_id == new_user["id"]
+    assert new_user["user_type"] == "professor"
+    assert new_user["verified"] is True
+    stored_profile = fake_db.professor_network.items[0]
+    assert stored_profile["contact_email"] == "new-faculty@example.com"
