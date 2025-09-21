@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "URGENT REGRESSION TESTING: User reports I broke student profile saving functionality and admin panel still doesn't work. Need immediate comprehensive testing to verify critical functionality."
+user_problem_statement: "CRITICAL ADMIN ISSUE - PRODUCTION DEPLOYMENT: Admin functionalities not working in production (Railway + Vercel). Admin panel shows but cannot add professors/ECs, view posters, or accept/reject submissions. Backend works locally, issue is production-specific deployment configuration."
 
 backend:
   - task: "Student profile update functionality"
