@@ -205,3 +205,5 @@ test_plan:
 agent_communication:
     - agent: "testing"
       message: "CRITICAL FINDING: Backend is working correctly. All reported 'broken' functionality is actually working as expected. The issue is likely with frontend authentication integration or user understanding of OAuth flow. All backend endpoints are properly implemented and protected. User needs to authenticate via Google OAuth to test profile updates and admin functionality."
+    - agent: "main"
+      message: "PRODUCTION ISSUE IDENTIFIED: Problem is NOT with code but with production deployment configuration. Created comprehensive solution: 1) Admin user needs to exist in Railway MongoDB with user_type='admin' 2) JWT secret key mismatch between production and tokens 3) OAuth redirect URIs need production URLs. Backend code already handles curejournal@gmail.com as admin automatically. Created production_diagnostic.py script and ADMIN_ISSUE_SOLUTION.md with complete fix instructions."
