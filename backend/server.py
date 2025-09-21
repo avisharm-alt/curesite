@@ -223,6 +223,12 @@ class ProfessorNetworkCreate(BaseModel):
     accepting_students: bool = True
     website: Optional[str] = None
 
+
+class AdminProfessorNetworkProfile(ProfessorNetworkCreate):
+    user_name: str
+    contact_email: EmailStr
+    user_university: Optional[str] = None
+
 # JWT Functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
@@ -631,36 +637,103 @@ async def delete_poster(poster_id: str, current_user: User = Depends(get_current
 # Admin Network Management Routes
 
 @api_router.post("/admin/professor-network", response_model=ProfessorNetwork)
-async def admin_create_professor(profile: ProfessorNetworkCreate, current_user: User = Depends(get_current_user)):
+async def admin_create_professor(profile: AdminProfessorNetworkProfile, current_user: User = Depends(get_current_user)):
     """Admin creates professor network profile"""
     if current_user.user_type != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
-    # Create a dummy user for the professor or use existing
-    prof_user = User(
-        email=profile.dict().get("contact_email", "unknown@university.edu"),
-        name="Professor (Admin Created)",
-        user_type="professor"
-    )
-    
+
     profile_data = profile.dict()
-    profile_obj = ProfessorNetwork(**profile_data, user_id=str(uuid.uuid4()), contact_email=profile_data.get("contact_email", ""))
+    professor_name = profile_data.pop("user_name")
+    contact_email = profile_data.pop("contact_email")
+    professor_university = profile_data.pop("user_university", None)
+
+    existing_user = await db.users.find_one({"email": contact_email})
+    if existing_user:
+        professor_user_id = existing_user["id"]
+        user_updates = {}
+        if existing_user.get("name") != professor_name:
+            user_updates["name"] = professor_name
+        if professor_university and existing_user.get("university") != professor_university:
+            user_updates["university"] = professor_university
+        if existing_user.get("user_type") != "professor":
+            user_updates["user_type"] = "professor"
+        if not existing_user.get("verified"):
+            user_updates["verified"] = True
+
+        if user_updates:
+            await db.users.update_one({"id": professor_user_id}, {"$set": user_updates})
+    else:
+        prof_user = User(
+            email=contact_email,
+            name=professor_name,
+            university=professor_university,
+            user_type="professor",
+            verified=True
+        )
+        await db.users.insert_one(prepare_for_mongo(prof_user.dict()))
+        professor_user_id = prof_user.id
+
+    profile_obj = ProfessorNetwork(
+        **profile_data,
+        user_id=professor_user_id,
+        contact_email=contact_email
+    )
     profile_dict = prepare_for_mongo(profile_obj.dict())
     await db.professor_network.insert_one(profile_dict)
     return profile_obj
 
 @api_router.put("/admin/professor-network/{profile_id}", response_model=ProfessorNetwork)
-async def admin_update_professor(profile_id: str, profile: ProfessorNetworkCreate, current_user: User = Depends(get_current_user)):
+async def admin_update_professor(profile_id: str, profile: AdminProfessorNetworkProfile, current_user: User = Depends(get_current_user)):
     """Admin updates professor network profile"""
     if current_user.user_type != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
-    
-    update_data = prepare_for_mongo(profile.dict())
-    result = await db.professor_network.update_one({"id": profile_id}, {"$set": update_data})
-    
-    if result.matched_count == 0:
+
+    existing_profile = await db.professor_network.find_one({"id": profile_id})
+    if not existing_profile:
         raise HTTPException(status_code=404, detail="Professor profile not found")
-    
+
+    profile_data = profile.dict()
+    professor_name = profile_data.pop("user_name")
+    contact_email = profile_data.pop("contact_email")
+    professor_university = profile_data.pop("user_university", None)
+
+    professor_user_id = existing_profile.get("user_id")
+    existing_user = None
+    if professor_user_id:
+        existing_user = await db.users.find_one({"id": professor_user_id})
+
+    if existing_user:
+        user_updates = {}
+        if existing_user.get("email") != contact_email:
+            user_updates["email"] = contact_email
+        if existing_user.get("name") != professor_name:
+            user_updates["name"] = professor_name
+        if professor_university and existing_user.get("university") != professor_university:
+            user_updates["university"] = professor_university
+        if existing_user.get("user_type") != "professor":
+            user_updates["user_type"] = "professor"
+        if not existing_user.get("verified"):
+            user_updates["verified"] = True
+
+        if user_updates:
+            await db.users.update_one({"id": professor_user_id}, {"$set": user_updates})
+    else:
+        new_user = User(
+            email=contact_email,
+            name=professor_name,
+            university=professor_university,
+            user_type="professor",
+            verified=True
+        )
+        await db.users.insert_one(prepare_for_mongo(new_user.dict()))
+        professor_user_id = new_user.id
+
+    update_payload = prepare_for_mongo(profile_data)
+    update_payload["contact_email"] = contact_email
+    update_payload["user_id"] = professor_user_id
+
+    await db.professor_network.update_one({"id": profile_id}, {"$set": update_payload})
+
     updated_profile = await db.professor_network.find_one({"id": profile_id})
     return ProfessorNetwork(**parse_from_mongo(updated_profile))
 
@@ -799,11 +872,21 @@ async def admin_get_all_professors(current_user: User = Depends(get_current_user
         raise HTTPException(status_code=403, detail="Admin access required")
     
     profiles = await db.professor_network.find({}).to_list(100)
+    user_ids = [profile.get("user_id") for profile in profiles if profile.get("user_id")]
+    users_by_id: Dict[str, Dict[str, Any]] = {}
+
+    if user_ids:
+        user_records = await db.users.find({"id": {"$in": user_ids}}).to_list(len(user_ids))
+        users_by_id = {record["id"]: record for record in user_records}
+
     result = []
     for profile in profiles:
+        parsed_profile = parse_from_mongo(profile)
+        user = users_by_id.get(parsed_profile.get("user_id"))
         result.append({
-            **parse_from_mongo(profile),
-            "user_name": "Professor (Admin Created)"
+            **parsed_profile,
+            "user_name": user.get("name", "Professor (Admin Created)") if user else "Professor (Admin Created)",
+            "user_university": user.get("university", "") if user else ""
         })
     return result
 
