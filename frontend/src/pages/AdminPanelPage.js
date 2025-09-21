@@ -142,30 +142,12 @@ const AdminPanelPage = () => {
                   onDelete={handlePosterDelete}
                 />
               )}
-              {activeTab === 'professors' && (
-                <ProfessorManagementTab 
-                  professors={professors}
-                  onAdd={handleAddProfessor}
-                  onEdit={handleEditProfessor}
-                  onDelete={handleDeleteProfessor}
-                  onRefresh={fetchData}
-                />
-              )}
               {activeTab === 'volunteer' && (
                 <VolunteerManagementTab 
                   opportunities={volunteerOpps}
                   onAdd={handleAddVolunteerOpp}
                   onEdit={handleEditVolunteerOpp}
                   onDelete={handleDeleteVolunteerOpp}
-                  onRefresh={fetchData}
-                />
-              )}
-              {activeTab === 'ecprofiles' && (
-                <ECProfileManagementTab 
-                  profiles={ecProfiles}
-                  onAdd={handleAddECProfile}
-                  onEdit={handleEditECProfile}
-                  onDelete={handleDeleteECProfile}
                   onRefresh={fetchData}
                 />
               )}
