@@ -143,7 +143,7 @@ const generateStats = (profiles) => {
   
   // Calculate averages
   Object.values(stats).forEach(stat => {
-    stat.avg_gpa = (stat.avg_gpa / stat.count).toFixed(2);
+    stat.avg_gpa = (stat.avg_gpa / stat.count);
     stat.avg_mcat = Math.round(stat.avg_mcat / stat.count);
     stat.avg_research_hours = Math.round(stat.avg_research_hours / stat.count);
     stat.avg_volunteer_hours = Math.round(stat.avg_volunteer_hours / stat.count);
