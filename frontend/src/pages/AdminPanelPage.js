@@ -118,23 +118,15 @@ const AdminPanelPage = () => {
             Poster Management
           </button>
           <button
-            onClick={() => setActiveTab('professors')}
-            className={`admin-tab ${activeTab === 'professors' ? 'active' : ''}`}
-          >
-            Professor Network
-          </button>
-          <button
             onClick={() => setActiveTab('volunteer')}
             className={`admin-tab ${activeTab === 'volunteer' ? 'active' : ''}`}
           >
             Volunteer Opportunities
           </button>
-          <button
-            onClick={() => setActiveTab('ecprofiles')}
-            className={`admin-tab ${activeTab === 'ecprofiles' ? 'active' : ''}`}
-          >
-            EC Profiles
-          </button>
+        </div>
+        
+        <div className="admin-info">
+          <p>📝 <strong>Note:</strong> Professor Network and EC Profiles are now pre-loaded with sample data and don't require admin management.</p>
         </div>
 
         {/* Tab Content */}
