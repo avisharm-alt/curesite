@@ -294,63 +294,88 @@ async def google_auth(request: Request):
     redirect_uri = os.environ.get('GOOGLE_REDIRECT_URI', 'https://curesite-production.up.railway.app/api/auth/google/callback')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
+async def upsert_user_from_oauth(user_info: Dict[str, Any]) -> User:
+    """Ensure the OAuth user exists with the correct metadata."""
+    email = user_info['email']
+    display_name = user_info.get('name')
+
+    existing_user = await db.users.find_one({"email": email})
+
+    if existing_user:
+        normalized_user = parse_from_mongo(existing_user)
+        updates: Dict[str, Any] = {}
+
+        if not normalized_user.get("id"):
+            normalized_user["id"] = str(uuid.uuid4())
+            updates["id"] = normalized_user["id"]
+
+        if display_name and normalized_user.get("name") != display_name:
+            updates["name"] = display_name
+
+        if email == "curejournal@gmail.com":
+            if normalized_user.get("user_type") != "admin":
+                updates["user_type"] = "admin"
+            if not normalized_user.get("verified"):
+                updates["verified"] = True
+
+        if updates:
+            await db.users.update_one({"email": email}, {"$set": updates})
+            normalized_user.update(updates)
+
+        return User(**normalized_user)
+
+    # Create a new user record when none exists yet
+    user_type = "admin" if email == "curejournal@gmail.com" else "student"
+    user = User(
+        email=email,
+        name=display_name or email,
+        profile_picture=user_info.get('picture'),
+        user_type=user_type,
+        verified=True if user_type == "admin" else False
+    )
+    user_dict = prepare_for_mongo(user.dict())
+    await db.users.insert_one(user_dict)
+
+    # Auto-create student network profile for new students
+    if user_type == "student":
+        student_profile = StudentNetwork(
+            user_id=user.id,
+            research_interests=["General Research"],
+            skills=["Research Skills"],
+            looking_for=["Research Opportunities"],
+            contact_preferences="Email",
+            public_profile=True
+        )
+        profile_dict = prepare_for_mongo(student_profile.dict())
+        await db.student_network.insert_one(profile_dict)
+
+    return user
+
+
 @api_router.get("/auth/google/callback")
 async def google_callback(request: Request):
     try:
         token = await oauth.google.authorize_access_token(request)
         user_info = token.get('userinfo')
-        
+
         if not user_info:
             raise HTTPException(status_code=400, detail="Failed to get user info from Google")
-        
-        # Check if user exists
-        existing_user = await db.users.find_one({"email": user_info['email']})
-        
-        if existing_user:
-            user = User(**parse_from_mongo(existing_user))
-        else:
-            # Create new user
-            user_data = UserCreate(
-                email=user_info['email'],
-                name=user_info['name']
-            )
-            
-            # Set admin role for curejournal@gmail.com
-            user_type = "admin" if user_info['email'] == "curejournal@gmail.com" else "student"
-            
-            user = User(**user_data.dict(), 
-                       profile_picture=user_info.get('picture'),
-                       user_type=user_type,
-                       verified=True if user_type == "admin" else False)
-            user_dict = prepare_for_mongo(user.dict())
-            await db.users.insert_one(user_dict)
-            
-            # Auto-create student network profile for new students
-            if user_type == "student":
-                student_profile = StudentNetwork(
-                    user_id=user.id,
-                    research_interests=["General Research"],
-                    skills=["Research Skills"],
-                    looking_for=["Research Opportunities"],
-                    contact_preferences="Email",
-                    public_profile=True
-                )
-                profile_dict = prepare_for_mongo(student_profile.dict())
-                await db.student_network.insert_one(profile_dict)
-        
+
+        user = await upsert_user_from_oauth(user_info)
+
         # Create JWT token
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(
             data={"sub": user.id}, expires_delta=access_token_expires
         )
-        
+
         # Redirect to frontend with token and user data
         frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
         user_data_encoded = quote(user.json())
         redirect_url = f"{frontend_url}/?token={access_token}&user={user_data_encoded}"
-        
+
         return RedirectResponse(url=redirect_url)
-        
+
     except Exception as e:
         # Redirect to frontend with error
         frontend_url = request.url.scheme + "://" + request.url.netloc
@@ -649,8 +674,14 @@ async def admin_create_professor(profile: AdminProfessorNetworkProfile, current_
 
     existing_user = await db.users.find_one({"email": contact_email})
     if existing_user:
-        professor_user_id = existing_user["id"]
+        # Some legacy records might be missing an explicit `id` field
+        # which would previously cause a KeyError and break the admin flow.
+        professor_user_id = existing_user.get("id") or str(uuid.uuid4())
         user_updates = {}
+
+        # Ensure the legacy record also gets an id so future lookups succeed
+        if "id" not in existing_user or existing_user.get("id") != professor_user_id:
+            user_updates["id"] = professor_user_id
         if existing_user.get("name") != professor_name:
             user_updates["name"] = professor_name
         if professor_university and existing_user.get("university") != professor_university:
@@ -661,7 +692,7 @@ async def admin_create_professor(profile: AdminProfessorNetworkProfile, current_
             user_updates["verified"] = True
 
         if user_updates:
-            await db.users.update_one({"id": professor_user_id}, {"$set": user_updates})
+            await db.users.update_one({"email": contact_email}, {"$set": user_updates})
     else:
         prof_user = User(
             email=contact_email,
