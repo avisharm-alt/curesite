@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { BarChart3 } from 'lucide-react';
 
-// Hardcoded EC Profiles data
+// Hardcoded EC Profiles data - no backend dependency
 const EC_PROFILES_DATA = [
   {
     id: '1',
@@ -180,8 +179,8 @@ const ECProfilesPage = () => {
   const ProfileCard = ({ profile }) => (
     <div className="profile-card">
       <div className="profile-header">
-        <h3 className="profile-school">{profile.medical_school}</h3>
-        <span className="profile-year">Class of {profile.admission_year}</span>
+        <h3>{profile.medical_school}</h3>
+        <span className="admission-year">Class of {profile.admission_year}</span>
       </div>
       
       <div className="profile-stats">
@@ -197,40 +196,52 @@ const ECProfilesPage = () => {
           </div>
         )}
         
-        <div className="stat-item">
-          <span className="stat-label">Research Hours</span>
-          <span className="stat-value">{profile.research_hours || 'N/A'}</span>
-        </div>
+        {profile.research_hours && (
+          <div className="stat-item">
+            <span className="stat-label">Research Hours</span>
+            <span className="stat-value">{profile.research_hours}</span>
+          </div>
+        )}
         
-        <div className="stat-item">
-          <span className="stat-label">Volunteer Hours</span>
-          <span className="stat-value">{profile.volunteer_hours || 'N/A'}</span>
-        </div>
+        {profile.volunteer_hours && (
+          <div className="stat-item">
+            <span className="stat-label">Volunteer Hours</span>
+            <span className="stat-value">{profile.volunteer_hours}</span>
+          </div>
+        )}
       </div>
       
       {profile.leadership_activities && profile.leadership_activities.length > 0 && (
-        <div className="profile-activities">
+        <div className="profile-section">
           <h4>Leadership Activities</h4>
-          <div className="activity-tags">
+          <ul className="activities-list">
             {profile.leadership_activities.map((activity, index) => (
-              <span key={index} className="activity-tag">{activity}</span>
+              <li key={index}>{activity}</li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
       
       {profile.awards_scholarships && profile.awards_scholarships.length > 0 && (
-        <div className="profile-awards">
+        <div className="profile-section">
           <h4>Awards & Scholarships</h4>
-          <div className="award-tags">
+          <ul className="awards-list">
             {profile.awards_scholarships.map((award, index) => (
-              <span key={index} className="award-tag">{award}</span>
+              <li key={index}>{award}</li>
             ))}
-          </div>
+          </ul>
         </div>
       )}
     </div>
   );
+
+  const getUniqueSchools = () => {
+    return [...new Set(EC_PROFILES_DATA.map(profile => profile.medical_school))];
+  };
+
+  const getUniqueYears = () => {
+    return [...new Set(EC_PROFILES_DATA.map(profile => profile.admission_year))].sort((a, b) => b - a);
+  };
 
   return (
     <div className="page">
@@ -247,77 +258,77 @@ const ECProfilesPage = () => {
       </div>
 
       <div className="page-content">
-        <div className="profile-controls">
+        <div className="filters">
           <select
             value={filters.medical_school}
-            onChange={(e) => setFilters({...filters, medical_school: e.target.value})}
+            onChange={(e) => setFilters({ ...filters, medical_school: e.target.value })}
             className="filter-select"
           >
             <option value="">All Medical Schools</option>
-            <option value="University of Toronto">University of Toronto</option>
-            <option value="University of Western Ontario">University of Western Ontario</option>
-            <option value="McMaster University">McMaster University</option>
-            <option value="Queen's University">Queen's University</option>
-            <option value="University of Ottawa">University of Ottawa</option>
+            {getUniqueSchools().map(school => (
+              <option key={school} value={school}>{school}</option>
+            ))}
           </select>
           
-          <input
-            type="number"
-            placeholder="Admission year..."
+          <select
             value={filters.admission_year}
-            onChange={(e) => setFilters({...filters, admission_year: e.target.value})}
-            className="filter-input"
-            min="2020"
-            max="2030"
-          />
+            onChange={(e) => setFilters({ ...filters, admission_year: e.target.value })}
+            className="filter-select"
+          >
+            <option value="">All Admission Years</option>
+            {getUniqueYears().map(year => (
+              <option key={year} value={year}>Class of {year}</option>
+            ))}
+          </select>
         </div>
 
-        {stats.length > 0 && (
-          <div className="stats-overview">
-            <h3>Average Statistics by School</h3>
-            <div className="stats-grid">
-              {stats.map((stat, index) => (
-                <div key={index} className="stat-card">
-                  <h4>{stat._id}</h4>
-                  <div className="stat-details">
-                    <div className="stat-detail">
-                      <span>Avg GPA</span>
-                      <span>{stat.avg_gpa?.toFixed(2) || 'N/A'}</span>
-                    </div>
-                    <div className="stat-detail">
-                      <span>Avg MCAT</span>
-                      <span>{stat.avg_mcat?.toFixed(0) || 'N/A'}</span>
-                    </div>
-                    <div className="stat-detail">
-                      <span>Profiles</span>
-                      <span>{stat.count}</span>
-                    </div>
+        {/* Statistics Section */}
+        <div className="stats-section">
+          <h2>Average Statistics by School</h2>
+          <div className="stats-grid">
+            {stats.map((stat, index) => (
+              <div key={index} className="stat-card">
+                <h4>{stat.medical_school}</h4>
+                <div className="stat-details">
+                  <div className="stat-detail">
+                    <span>Avg GPA</span>
+                    <span>{stat.avg_gpa?.toFixed(2) || 'N/A'}</span>
+                  </div>
+                  <div className="stat-detail">
+                    <span>Avg MCAT</span>
+                    <span>{stat.avg_mcat?.toFixed(0) || 'N/A'}</span>
+                  </div>
+                  <div className="stat-detail">
+                    <span>Profiles</span>
+                    <span>{stat.count}</span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {loading ? (
-          <div className="loading">Loading profiles...</div>
-        ) : (
-          <>
-            <div className="profiles-grid">
-              {profiles.map((profile) => (
-                <ProfileCard key={profile.id} profile={profile} />
-              ))}
-            </div>
-
-            {profiles.length === 0 && (
-              <div className="empty-state">
-                <BarChart3 size={48} />
-                <h3>No profiles found</h3>
-                <p>Submit your profile to help future students!</p>
               </div>
-            )}
-          </>
-        )}
+            ))}
+          </div>
+        </div>
+
+        {/* Profiles Section */}
+        <div className="profiles-section">
+          <h2>Individual Profiles</h2>
+          {loading ? (
+            <div className="loading">Loading profiles...</div>
+          ) : (
+            <div className="profiles-grid">
+              {profiles.length > 0 ? (
+                profiles.map((profile) => (
+                  <ProfileCard key={profile.id} profile={profile} />
+                ))
+              ) : (
+                <div className="empty-state">
+                  <BarChart3 size={48} />
+                  <h3>No profiles found</h3>
+                  <p>Try adjusting your filter criteria.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
