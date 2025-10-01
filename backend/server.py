@@ -637,7 +637,7 @@ async def view_approved_poster(poster_id: str):
         }
     )
 
-@api_router.delete("/posters/{poster_id}")
+@api_router.delete("/admin/posters/{poster_id}")
 async def delete_poster(poster_id: str, current_user: User = Depends(get_current_user)):
     """Delete poster (user can delete their own, admin can delete any)"""
     poster = await db.poster_submissions.find_one({"id": poster_id})
