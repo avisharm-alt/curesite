@@ -467,7 +467,7 @@ class PosterReviewRequest(BaseModel):
     status: str
     comments: Optional[str] = None
 
-@api_router.put("/posters/{poster_id}/review")
+@api_router.put("/admin/posters/{poster_id}/review")
 async def review_poster(poster_id: str, review_data: PosterReviewRequest, current_user: User = Depends(get_current_user)):
     if current_user.user_type not in ["admin", "professor"]:
         raise HTTPException(status_code=403, detail="Not authorized to review posters")
