@@ -40,16 +40,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-# SendGrid Configuration
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
-SENDGRID_FROM_EMAIL = os.environ.get('SENDGRID_FROM_EMAIL', 'curejournal@gmail.com')
+# Stripe Payment Configuration
 STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/cNi6oJdBXd8j4COeMqgrS00'
-
-# Warn if SendGrid is not configured
-if not SENDGRID_API_KEY:
-    print("⚠️  WARNING: SENDGRID_API_KEY environment variable not set")
-    print("   Email notifications will not be sent when posters are approved")
-    print("   Set SENDGRID_API_KEY in your environment to enable email sending")
 
 # OAuth Setup with environment checks
 oauth = OAuth()
