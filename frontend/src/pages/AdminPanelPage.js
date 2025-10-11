@@ -254,7 +254,7 @@ const AdminPanelPage = () => {
 };
 
 // Poster Management Tab Component
-const PosterManagementTab = ({ posters, onReview, onDelete }) => (
+const PosterManagementTab = ({ posters, onReview, onDelete, onMarkPayment }) => (
   <div className="admin-section">
     <h2>Poster Management</h2>
     {posters.length > 0 ? (
