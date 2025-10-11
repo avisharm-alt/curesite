@@ -42,6 +42,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
+# SendGrid Configuration
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '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')
+SENDGRID_FROM_EMAIL = os.environ.get('SENDGRID_FROM_EMAIL', 'curejournal@gmail.com')
+STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/cNi6oJdBXd8j4COeMqgrS00'
+
 # OAuth Setup with environment checks
 oauth = OAuth()
 
