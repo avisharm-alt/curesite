@@ -16,6 +16,8 @@ class CUREAPITester:
         self.critical_failures = []
         self.test_user_id = None
         self.test_poster_id = None
+        # Specific poster ID from review request
+        self.quantum_poster_id = "1ef0a4d6-ff70-4d8d-8726-8ef74a0f8a73"
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, critical=False):
         """Run a single API test"""
