@@ -282,6 +282,9 @@ class PaymentIntegrationTester:
         # Test 7: Stripe configuration
         self.test_stripe_payment_link_configuration()
         
+        # Test 8: Backend payment filtering logic
+        self.test_backend_payment_filtering_logic()
+        
         # Print results
         print("\n" + "=" * 60)
         print(f"📊 Test Results: {self.tests_passed}/{self.tests_run} tests passed")
