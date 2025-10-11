@@ -453,20 +453,12 @@ class CUREAPITester:
         return all_tests_passed, results
 
     def test_payment_fields_in_poster_model(self):
-        """Test that poster model includes payment fields"""
-        print("\n🔍 Testing payment fields in poster model...")
-        
-        # Test GET /api/posters/my endpoint (should fail without auth)
-        success, response = self.run_test(
-            "Get My Posters (Payment Fields Check - No Auth)",
-            "GET",
-            "posters/my",
-            401,  # Should fail without auth token
-            critical=True
-        )
+        """CRITICAL: Test that poster model includes payment fields"""
+        print("\n🚨 CRITICAL TEST: Payment Fields in Poster Model")
+        print("   Verifying poster model includes: payment_status, payment_link, payment_completed_at")
         
         # Test public posters to check if payment fields are present
-        success_public, public_posters = self.run_test("Get Public Posters (Payment Fields)", "GET", "posters", 200)
+        success_public, public_posters = self.run_test("Get Public Posters (Payment Fields)", "GET", "posters", 200, critical=True)
         
         if success_public and isinstance(public_posters, list) and len(public_posters) > 0:
             sample_poster = public_posters[0]
@@ -482,16 +474,80 @@ class CUREAPITester:
                 print(f"   Payment Status: {sample_poster.get('payment_status')}")
                 print(f"   Payment Link: {'Present' if sample_poster.get('payment_link') else 'None'}")
                 print(f"   Payment Completed At: {'Present' if sample_poster.get('payment_completed_at') else 'None'}")
+                
+                # Verify default payment_status is correct for new submissions
+                if sample_poster.get('payment_status') in ['not_required', 'pending', 'completed']:
+                    print(f"✅ Valid payment_status value: {sample_poster.get('payment_status')}")
+                else:
+                    print(f"❌ Invalid payment_status value: {sample_poster.get('payment_status')}")
+                    self.critical_failures.append(f"Invalid payment_status: {sample_poster.get('payment_status')}")
+                    return False, sample_poster
+                
+                # Check if payment_link contains Stripe URL when present
+                payment_link = sample_poster.get('payment_link')
+                if payment_link and 'stripe.com' in payment_link:
+                    print(f"✅ Payment link contains Stripe URL: {payment_link}")
+                elif payment_link:
+                    print(f"⚠️  Payment link present but not Stripe: {payment_link}")
+                
                 self.tests_passed += 1
             else:
                 print(f"❌ CRITICAL: Missing payment fields in poster model: {missing_fields}")
                 self.critical_failures.append(f"Missing payment fields: {missing_fields}")
+                return False, sample_poster
             
             self.tests_run += 1
             return True, sample_poster
         else:
             print("❌ No posters available to check payment fields")
+            self.critical_failures.append("No posters available to verify payment fields")
+            self.tests_run += 1
             return False, {}
+
+    def test_regression_existing_functionality(self):
+        """CRITICAL: Regression tests - verify existing functionality not broken"""
+        print("\n🚨 REGRESSION TESTS: Verify existing functionality not broken")
+        
+        all_tests_passed = True
+        results = {}
+        
+        # Test student network
+        print("\n📚 Testing Student Network...")
+        success_student, response_student = self.run_test("Student Network", "GET", "student-network", 200, critical=True)
+        results['student_network'] = {'success': success_student, 'response': response_student}
+        all_tests_passed = all_tests_passed and success_student
+        
+        # Test professor network  
+        print("\n👨‍🏫 Testing Professor Network...")
+        success_prof, response_prof = self.run_test("Professor Network", "GET", "professor-network", 200, critical=True)
+        results['professor_network'] = {'success': success_prof, 'response': response_prof}
+        all_tests_passed = all_tests_passed and success_prof
+        
+        # Test volunteer opportunities
+        print("\n🤝 Testing Volunteer Opportunities...")
+        success_vol, response_vol = self.run_test("Volunteer Opportunities", "GET", "volunteer-opportunities", 200, critical=True)
+        results['volunteer_opportunities'] = {'success': success_vol, 'response': response_vol}
+        all_tests_passed = all_tests_passed and success_vol
+        
+        # Test EC profiles
+        print("\n📊 Testing EC Profiles...")
+        success_ec, response_ec = self.run_test("EC Profiles", "GET", "ec-profiles", 200, critical=True)
+        results['ec_profiles'] = {'success': success_ec, 'response': response_ec}
+        all_tests_passed = all_tests_passed and success_ec
+        
+        # Test authentication endpoints
+        print("\n🔐 Testing Authentication...")
+        success_auth, response_auth = self.run_test("Google OAuth Redirect", "GET", "auth/google", 302, critical=True)
+        results['authentication'] = {'success': success_auth, 'response': response_auth}
+        all_tests_passed = all_tests_passed and success_auth
+        
+        # Test that protected endpoints still return correct status codes
+        print("\n🛡️  Testing Protected Endpoints...")
+        success_me, response_me = self.run_test("Get Current User (No Auth)", "GET", "auth/me", 401, critical=True)
+        results['protected_endpoints'] = {'success': success_me, 'response': response_me}
+        all_tests_passed = all_tests_passed and success_me
+        
+        return all_tests_passed, results
 
     def test_sendgrid_email_integration(self):
         """Test SendGrid email integration (indirectly through poster approval)"""
