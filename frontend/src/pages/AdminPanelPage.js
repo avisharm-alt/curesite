@@ -162,9 +162,9 @@ const AdminPanelPage = () => {
       }
       
       const headers = { Authorization: `Bearer ${token}` };
-      console.log('Making request to:', `${API}/posters/${posterId}/review`);
+      console.log('Making request to:', `${API}/admin/posters/${posterId}/review`);
       
-      const response = await axios.put(`${API}/posters/${posterId}/review`, { status }, { headers });
+      const response = await axios.put(`${API}/admin/posters/${posterId}/review`, { status }, { headers });
       console.log('Review response:', response.data);
       
       toast.success(`Poster ${status} successfully`);
