@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "CRITICAL ADMIN ISSUE - PRODUCTION DEPLOYMENT: Admin functionalities not working in production (Railway + Vercel). Admin panel shows but cannot add professors/ECs, view posters, or accept/reject submissions. Backend works locally, issue is production-specific deployment configuration."
+user_problem_statement: "Implement Stripe checkout integration for accepted research posters. When admin approves a poster, system should send acceptance email with payment link. Student sees payment link in profile and completes payment via Stripe. After payment, poster becomes visible on public network."
 
 backend:
   - task: "Student profile update functionality"
