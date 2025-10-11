@@ -237,16 +237,56 @@ backend:
           agent: "testing"
           comment: "PRODUCTION TESTING COMPLETE: Tested https://curesite-production.up.railway.app - Health endpoint working (200), Google OAuth redirecting correctly to Google login, all admin endpoints properly protected (403 without auth), all public endpoints accessible (200). Backend code is working correctly in production. Issue is with admin user setup in production MongoDB or JWT authentication flow, NOT with backend implementation."
 
+frontend:
+  - task: "Display payment status and link in student profile"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/ProfilePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Updated ProfilePage to show payment status badges for approved posters. Shows 'Payment Pending' or 'Paid' badges. For pending payments, displays green notice with 'Complete Payment' button linking to Stripe. For completed payments, shows success message."
+
+  - task: "Admin panel payment status display and mark as paid button"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/AdminPanelPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Updated AdminPanelPage to show payment status badges in poster cards. Added 'Mark as Paid' button for approved posters with pending payment. Button calls PUT /api/admin/posters/{id}/payment endpoint."
+
+  - task: "Payment UI styling and badges"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/App.css"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Added CSS classes: .status-paid, .status-payment-pending, .payment-notice, .payment-link-btn, .payment-btn. Styled payment button with green theme and hover effects."
+
 metadata:
-  created_by: "testing_agent"
-  version: "1.0"
-  test_sequence: 1
+  created_by: "main_agent"
+  version: "2.0"
+  test_sequence: 0
   run_ui: false
 
 test_plan:
   current_focus:
-    - "Production admin functionality testing completed"
-    - "All critical backend tests completed successfully"
+    - "SendGrid email integration for acceptance notifications"
+    - "Payment status fields in PosterSubmission model"
+    - "Enhanced poster review endpoint with email and payment logic"
+    - "Admin endpoint to mark payment as completed"
+    - "Public posters endpoint filter for paid posters only"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
