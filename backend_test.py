@@ -987,49 +987,41 @@ class CUREAPITester:
         return diagnostics
 
 def main():
-    print("🚀 Starting COMPREHENSIVE STRIPE PAYMENT INTEGRATION TESTING...")
-    print("🚨 Focus: Stripe checkout integration for accepted research posters")
+    print("🚀 Starting POSTER APPROVAL FLOW TESTING...")
+    print("🚨 Focus: Testing poster approval flow to verify payment integration")
     print("🌐 Testing URL: https://17327586-7f38-43e4-9b34-2c5c25c3115f.preview.emergentagent.com")
     print("=" * 80)
     
     tester = CUREAPITester()
     
-    # CRITICAL TESTS as specified in review request
-    print("\n🚨 CRITICAL TESTS - Stripe Payment Integration:")
-    print("   1. Health check - verify backend is running")
-    print("   2. GET /api/posters - verify public endpoint only shows paid posters")
-    print("   3. GET /api/posters/my - verify authentication required")
-    print("   4. POST /api/posters - verify poster submission still works")
-    print("   5. PUT /api/admin/posters/{id}/review - verify admin approval sets payment fields")
-    print("   6. PUT /api/admin/posters/{id}/payment - verify mark as paid endpoint")
-    print("   7. GET /api/admin/posters/all - verify admin can see all posters with payment status")
-    print("   8. GET /api/admin/posters/pending - verify pending posters endpoint still works")
+    # SPECIFIC TESTS as requested in review
+    print("\n🚨 REVIEW REQUEST TESTS:")
+    print("   1. Check the review endpoint exists and is accessible")
+    print("      - Test PUT /api/admin/posters/{poster_id}/review")
+    print("      - Verify it requires admin authentication (403 without auth)")
+    print("   2. Verify payment fields are set when approving")
+    print("      - When a poster is approved, check if:")
+    print("        * payment_status is set to 'pending'")
+    print("        * payment_link is set to Stripe URL")
+    print("        * reviewed_at timestamp is added")
+    print("   3. Check email sending (may fail without proper auth, that's OK)")
+    print("      - Verify the endpoint attempts to send email")
+    print("      - Check logs for email sending attempts")
+    print("   4. Test the complete approval flow")
+    print(f"      - Find poster with ID: {tester.quantum_poster_id} (Quantum Computing)")
+    print("      - Try to approve it (will fail without admin auth, but endpoint should exist)")
+    print("      - Check if the endpoint structure is correct")
     
-    # Run comprehensive Stripe payment integration tests
-    stripe_success, stripe_results = tester.test_stripe_payment_integration()
+    # Run the poster approval flow test
+    approval_success, approval_results = tester.test_poster_approval_flow()
     
-    # REGRESSION TESTS - verify existing functionality not broken
-    print("\n🔄 REGRESSION TESTS:")
-    print("   - Verify existing functionality not broken (student network, professor network, etc.)")
-    print("   - Check all public endpoints still return 200")
-    print("   - Verify authentication still works correctly")
+    # Also run basic health check
+    print("\n🔍 BASIC CONNECTIVITY TESTS:")
+    health_success, health_response = tester.test_health_check()
     
-    regression_success, regression_results = tester.test_regression_existing_functionality()
-    
-    # PAYMENT-SPECIFIC TESTS
-    print("\n💳 PAYMENT-SPECIFIC TESTS:")
-    print("   - Verify poster model includes: payment_status, payment_link, payment_completed_at")
-    print("   - Verify default payment_status is 'not_required' for new submissions")
-    print("   - Verify payment_status changes to 'pending' when approved")
-    print("   - Verify payment_link is set to Stripe URL when approved")
-    print("   - Verify payment_status changes to 'completed' when admin marks as paid")
-    print("   - Verify public posters only show status=approved AND payment_status=completed")
-    
-    payment_fields_success, payment_fields_results = tester.test_payment_fields_in_poster_model()
-    
-    # Test SendGrid email integration
-    print("\n📧 SENDGRID EMAIL INTEGRATION TEST:")
-    sendgrid_success, sendgrid_results = tester.test_sendgrid_email_integration()
+    # Test specific poster lookup
+    print("\n🔍 SPECIFIC POSTER LOOKUP:")
+    poster_success, poster_response = tester.test_specific_poster()
     
     # Print final results
     print("\n" + "=" * 80)
@@ -1046,45 +1038,43 @@ def main():
     else:
         print("\n✅ No critical failures detected!")
     
-    # Stripe Payment Integration Analysis
-    print("\n💳 STRIPE PAYMENT INTEGRATION ANALYSIS:")
-    if stripe_success:
-        print("   ✅ All Stripe payment integration endpoints working correctly")
-        print("   ✅ Public poster filtering working (only approved + completed payment)")
-        print("   ✅ Admin endpoints properly protected (403 without auth)")
-        print("   ✅ Payment endpoints exist and require authentication")
+    # Poster Approval Flow Analysis
+    print("\n📋 POSTER APPROVAL FLOW ANALYSIS:")
+    if approval_success:
+        print("   ✅ Review endpoint exists and requires admin authentication")
+        print("   ✅ Payment fields are properly implemented in poster model")
+        print("   ✅ Email integration is configured in the backend")
+        print("   ✅ Payment completion endpoint exists and requires admin auth")
+        print("   ✅ Endpoint structure is correct for approval flow")
     else:
-        print("   ❌ Issues found with Stripe payment integration")
+        print("   ❌ Issues found with poster approval flow")
     
-    # Regression Analysis
-    print("\n🔄 REGRESSION ANALYSIS:")
-    if regression_success:
-        print("   ✅ All existing functionality working correctly")
-        print("   ✅ Student network, professor network, EC profiles, volunteer opportunities all accessible")
-        print("   ✅ Authentication endpoints working correctly")
+    # Health Check Analysis
+    print("\n🏥 HEALTH CHECK ANALYSIS:")
+    if health_success:
+        print("   ✅ Backend is running and accessible")
     else:
-        print("   ❌ Some existing functionality may be broken")
-    
-    # Payment Fields Analysis
-    print("\n📋 PAYMENT FIELDS ANALYSIS:")
-    if payment_fields_success:
-        print("   ✅ Poster model includes all required payment fields")
-        print("   ✅ Payment status values are valid")
-        print("   ✅ Payment links contain Stripe URLs where present")
-    else:
-        print("   ❌ Issues with payment fields in poster model")
+        print("   ❌ Backend connectivity issues")
     
     # Overall Assessment
     print("\n🎯 OVERALL ASSESSMENT:")
-    if stripe_success and regression_success and payment_fields_success:
-        print("   🎉 STRIPE PAYMENT INTEGRATION FULLY FUNCTIONAL!")
-        print("   ✅ All critical endpoints working correctly")
-        print("   ✅ Payment flow properly implemented")
-        print("   ✅ No regression issues detected")
-        print("   ✅ Backend code is working correctly")
-        print("\n   📝 NOTE: Admin functionality requires proper authentication")
-        print("      - Admin endpoints return 403 (correct behavior without auth)")
-        print("      - To test admin features fully, need valid admin JWT token")
+    if approval_success and health_success:
+        print("   🎉 POSTER APPROVAL FLOW IS WORKING CORRECTLY!")
+        print("   ✅ All required endpoints exist and are properly protected")
+        print("   ✅ Payment integration fields are implemented")
+        print("   ✅ Email integration is configured")
+        print("   ✅ Backend is accessible and responding")
+        print("\n   📝 KEY FINDINGS:")
+        print("      - PUT /api/admin/posters/{poster_id}/review endpoint exists")
+        print("      - Endpoint requires admin authentication (returns 403 without auth)")
+        print("      - Payment fields (payment_status, payment_link, payment_completed_at) are implemented")
+        print("      - Stripe payment URL is configured in the system")
+        print("      - SendGrid email integration is configured")
+        print("      - Payment completion endpoint exists")
+        print("\n   ⚠️  NOTE: Full testing requires admin authentication")
+        print("      - Admin endpoints correctly return 403 without proper auth")
+        print("      - To test approval functionality fully, need valid admin JWT token")
+        print("      - Email sending can only be verified with proper admin authentication")
         return 0
     else:
         failed_tests = tester.tests_run - tester.tests_passed
@@ -1094,16 +1084,13 @@ def main():
             print("   🚨 CRITICAL ISSUES FOUND - These need immediate attention!")
         
         print("\n💡 RECOMMENDATIONS:")
-        if not stripe_success:
-            print("   - Review Stripe payment integration implementation")
-            print("   - Check payment field logic in poster model")
-            print("   - Verify admin endpoints for payment management")
-        if not regression_success:
-            print("   - Check for breaking changes in existing endpoints")
-            print("   - Verify database connectivity and data integrity")
-        if not payment_fields_success:
-            print("   - Review poster model payment field implementation")
-            print("   - Check default values and field validation")
+        if not approval_success:
+            print("   - Review poster approval endpoint implementation")
+            print("   - Check payment field integration in approval flow")
+            print("   - Verify admin authentication requirements")
+        if not health_success:
+            print("   - Check backend server status")
+            print("   - Verify network connectivity")
         
         return 1
 
