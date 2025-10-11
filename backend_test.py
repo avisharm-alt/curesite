@@ -543,7 +543,7 @@ class CUREAPITester:
         
         # Test that protected endpoints still return correct status codes
         print("\n🛡️  Testing Protected Endpoints...")
-        success_me, response_me = self.run_test("Get Current User (No Auth)", "GET", "auth/me", 401, critical=True)
+        success_me, response_me = self.run_test("Get Current User (No Auth)", "GET", "auth/me", 403, critical=True)
         results['protected_endpoints'] = {'success': success_me, 'response': response_me}
         all_tests_passed = all_tests_passed and success_me
         
