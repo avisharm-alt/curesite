@@ -524,9 +524,10 @@ async def submit_poster(poster: PosterSubmissionCreate, current_user: User = Dep
 
 @api_router.get("/posters", response_model=List[PosterSubmission])
 async def get_posters(status: Optional[str] = None, university: Optional[str] = None):
-    query = {}
-    if status:
-        query["status"] = status
+    query = {
+        "status": "approved",
+        "payment_status": "completed"  # Only show paid posters to public
+    }
     if university:
         query["university"] = university
     
