@@ -847,133 +847,123 @@ class CUREAPITester:
         return diagnostics
 
 def main():
-    print("🚀 Starting CURE API PRODUCTION TESTING...")
-    print("🚨 Focus: Admin functionality in production environment")
-    print("🌐 Testing URL: http://localhost:8001")
-    print("=" * 70)
+    print("🚀 Starting COMPREHENSIVE STRIPE PAYMENT INTEGRATION TESTING...")
+    print("🚨 Focus: Stripe checkout integration for accepted research posters")
+    print("🌐 Testing URL: https://17327586-7f38-43e4-9b34-2c5c25c3115f.preview.emergentagent.com")
+    print("=" * 80)
     
     tester = CUREAPITester()
     
-    # Run comprehensive production diagnostics first
-    print("\n🔍 PRODUCTION ENVIRONMENT DIAGNOSTICS")
-    diagnostics = tester.test_production_environment_diagnostics()
+    # CRITICAL TESTS as specified in review request
+    print("\n🚨 CRITICAL TESTS - Stripe Payment Integration:")
+    print("   1. Health check - verify backend is running")
+    print("   2. GET /api/posters - verify public endpoint only shows paid posters")
+    print("   3. GET /api/posters/my - verify authentication required")
+    print("   4. POST /api/posters - verify poster submission still works")
+    print("   5. PUT /api/admin/posters/{id}/review - verify admin approval sets payment fields")
+    print("   6. PUT /api/admin/posters/{id}/payment - verify mark as paid endpoint")
+    print("   7. GET /api/admin/posters/all - verify admin can see all posters with payment status")
+    print("   8. GET /api/admin/posters/pending - verify pending posters endpoint still works")
     
-    # CRITICAL PRODUCTION TESTS - As specified in review request
-    print("\n🚨 CRITICAL PRODUCTION TESTS...")
-    print("   Testing specific endpoints mentioned in review request:")
-    print("   1. Health endpoint: GET /health")
-    print("   2. Admin test endpoint: GET /api/admin/test")
-    print("   3. Google OAuth flow: GET /api/auth/google")
-    print("   4. Admin professor endpoint: GET /api/admin/professor-network")
-    print("   5. Admin posters endpoint: GET /api/admin/posters")
+    # Run comprehensive Stripe payment integration tests
+    stripe_success, stripe_results = tester.test_stripe_payment_integration()
     
-    # Test 1: Health endpoint
-    tester.test_production_health_endpoint()
+    # REGRESSION TESTS - verify existing functionality not broken
+    print("\n🔄 REGRESSION TESTS:")
+    print("   - Verify existing functionality not broken (student network, professor network, etc.)")
+    print("   - Check all public endpoints still return 200")
+    print("   - Verify authentication still works correctly")
     
-    # Test 2: Admin test endpoint
-    tester.test_production_admin_test_endpoint()
+    regression_success, regression_results = tester.test_regression_existing_functionality()
     
-    # Test 3: Google OAuth flow
-    tester.test_production_google_oauth()
+    # PAYMENT-SPECIFIC TESTS
+    print("\n💳 PAYMENT-SPECIFIC TESTS:")
+    print("   - Verify poster model includes: payment_status, payment_link, payment_completed_at")
+    print("   - Verify default payment_status is 'not_required' for new submissions")
+    print("   - Verify payment_status changes to 'pending' when approved")
+    print("   - Verify payment_link is set to Stripe URL when approved")
+    print("   - Verify payment_status changes to 'completed' when admin marks as paid")
+    print("   - Verify public posters only show status=approved AND payment_status=completed")
     
-    # Test 4: Admin professor endpoint
-    tester.test_production_admin_professor_endpoint()
-    
-    # Test 5: Admin posters endpoint
-    tester.test_production_admin_posters_endpoint()
-    
-    # Additional authentication flow tests
-    print("\n🔐 AUTHENTICATION FLOW TESTS...")
-    tester.test_authentication_flow()
-    
-    # STRIPE PAYMENT INTEGRATION TESTS - As requested in review
-    print("\n💳 STRIPE PAYMENT INTEGRATION TESTS...")
-    print("   Testing new payment functionality for poster submissions:")
-    print("   1. Payment fields in poster model")
-    print("   2. Poster review with payment logic")
-    print("   3. Mark payment completed endpoint")
-    print("   4. Public posters payment filtering")
-    print("   5. SendGrid email integration")
-    
-    # Test payment fields in poster model
-    tester.test_payment_fields_in_poster_model()
-    
-    # Test Stripe payment integration flow
-    tester.test_stripe_payment_integration()
+    payment_fields_success, payment_fields_results = tester.test_payment_fields_in_poster_model()
     
     # Test SendGrid email integration
-    tester.test_sendgrid_email_integration()
-    
-    # Test supporting public endpoints to verify backend is working
-    print("\n📚 PUBLIC ENDPOINTS VERIFICATION...")
-    tester.test_posters_endpoint()
-    tester.test_student_network_endpoint()
-    tester.test_professor_network_endpoint()
-    tester.test_ec_profiles_endpoint()
-    tester.test_volunteer_opportunities_endpoint()
-    
-    # Test CORS configuration
-    print("\n🌐 CORS CONFIGURATION TEST...")
-    tester.test_cors_headers()
+    print("\n📧 SENDGRID EMAIL INTEGRATION TEST:")
+    sendgrid_success, sendgrid_results = tester.test_sendgrid_email_integration()
     
     # Print final results
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 80)
     print(f"📊 Final Results: {tester.tests_passed}/{tester.tests_run} tests passed")
     
-    # Analysis of production issues
-    print("\n🔍 PRODUCTION ISSUE ANALYSIS:")
-    print("=" * 40)
+    # Detailed analysis of test results
+    print("\n🔍 DETAILED TEST ANALYSIS:")
+    print("=" * 50)
     
     if tester.critical_failures:
         print(f"\n🚨 CRITICAL FAILURES ({len(tester.critical_failures)}):")
         for failure in tester.critical_failures:
             print(f"   ❌ {failure}")
-    
-    # Specific analysis for admin functionality
-    print("\n📋 ADMIN FUNCTIONALITY ANALYSIS:")
-    print("   Based on testing results:")
-    
-    if diagnostics.get('health_status') == 200:
-        print("   ✅ Backend server is running and accessible")
     else:
-        print("   ❌ Backend server connectivity issues")
+        print("\n✅ No critical failures detected!")
     
-    if diagnostics.get('oauth_status') == 302:
-        print("   ✅ Google OAuth redirect is working")
+    # Stripe Payment Integration Analysis
+    print("\n💳 STRIPE PAYMENT INTEGRATION ANALYSIS:")
+    if stripe_success:
+        print("   ✅ All Stripe payment integration endpoints working correctly")
+        print("   ✅ Public poster filtering working (only approved + completed payment)")
+        print("   ✅ Admin endpoints properly protected (403 without auth)")
+        print("   ✅ Payment endpoints exist and require authentication")
     else:
-        print("   ❌ Google OAuth redirect issues")
+        print("   ❌ Issues found with Stripe payment integration")
     
-    admin_protected = True
-    for key in diagnostics:
-        if key.startswith('admin_') and not key.endswith('_error'):
-            if diagnostics[key].get('status') not in [401, 403]:
-                admin_protected = False
-                break
-    
-    if admin_protected:
-        print("   ✅ Admin endpoints are properly protected")
-        print("   🔍 Issue likely: Admin user doesn't exist in production MongoDB")
-        print("   🔍 Issue likely: JWT token authentication not working in production")
+    # Regression Analysis
+    print("\n🔄 REGRESSION ANALYSIS:")
+    if regression_success:
+        print("   ✅ All existing functionality working correctly")
+        print("   ✅ Student network, professor network, EC profiles, volunteer opportunities all accessible")
+        print("   ✅ Authentication endpoints working correctly")
     else:
-        print("   ❌ Admin endpoints protection issues")
+        print("   ❌ Some existing functionality may be broken")
     
-    # Recommendations
-    print("\n💡 RECOMMENDATIONS:")
-    print("   1. Verify curejournal@gmail.com exists as admin user in production MongoDB")
-    print("   2. Check JWT_SECRET_KEY consistency between local and production")
-    print("   3. Verify Google OAuth redirect URIs include production URLs")
-    print("   4. Test complete OAuth flow manually to get valid admin token")
+    # Payment Fields Analysis
+    print("\n📋 PAYMENT FIELDS ANALYSIS:")
+    if payment_fields_success:
+        print("   ✅ Poster model includes all required payment fields")
+        print("   ✅ Payment status values are valid")
+        print("   ✅ Payment links contain Stripe URLs where present")
+    else:
+        print("   ❌ Issues with payment fields in poster model")
     
-    if tester.tests_passed == tester.tests_run:
-        print("\n🎉 All tests passed! Backend endpoints are responding correctly.")
-        print("   Issue is likely with admin user setup or JWT configuration.")
+    # Overall Assessment
+    print("\n🎯 OVERALL ASSESSMENT:")
+    if stripe_success and regression_success and payment_fields_success:
+        print("   🎉 STRIPE PAYMENT INTEGRATION FULLY FUNCTIONAL!")
+        print("   ✅ All critical endpoints working correctly")
+        print("   ✅ Payment flow properly implemented")
+        print("   ✅ No regression issues detected")
+        print("   ✅ Backend code is working correctly")
+        print("\n   📝 NOTE: Admin functionality requires proper authentication")
+        print("      - Admin endpoints return 403 (correct behavior without auth)")
+        print("      - To test admin features fully, need valid admin JWT token")
         return 0
     else:
         failed_tests = tester.tests_run - tester.tests_passed
-        print(f"\n⚠️  {failed_tests} test(s) failed. Check the issues above.")
+        print(f"   ⚠️  {failed_tests} test(s) failed")
         
         if tester.critical_failures:
-            print("\n🚨 CRITICAL ISSUES FOUND - These need immediate attention!")
+            print("   🚨 CRITICAL ISSUES FOUND - These need immediate attention!")
+        
+        print("\n💡 RECOMMENDATIONS:")
+        if not stripe_success:
+            print("   - Review Stripe payment integration implementation")
+            print("   - Check payment field logic in poster model")
+            print("   - Verify admin endpoints for payment management")
+        if not regression_success:
+            print("   - Check for breaking changes in existing endpoints")
+            print("   - Verify database connectivity and data integrity")
+        if not payment_fields_success:
+            print("   - Review poster model payment field implementation")
+            print("   - Check default values and field validation")
         
         return 1
 
