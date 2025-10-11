@@ -751,7 +751,7 @@ class CUREAPITester:
 def main():
     print("🚀 Starting CURE API PRODUCTION TESTING...")
     print("🚨 Focus: Admin functionality in production environment")
-    print("🌐 Testing URL: https://curesite-production.up.railway.app")
+    print("🌐 Testing URL: http://localhost:8001")
     print("=" * 70)
     
     tester = CUREAPITester()
