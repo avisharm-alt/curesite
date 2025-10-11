@@ -594,6 +594,24 @@ async def get_all_posters_admin(current_user: User = Depends(get_current_user)):
     posters = await db.poster_submissions.find({}).to_list(100)
     return [PosterSubmission(**parse_from_mongo(poster)) for poster in posters]
 
+@api_router.put("/admin/posters/{poster_id}/payment")
+async def mark_payment_completed(poster_id: str, current_user: User = Depends(get_current_user)):
+    """Admin endpoint to mark payment as completed"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = {
+        "payment_status": "completed",
+        "payment_completed_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    result = await db.poster_submissions.update_one({"id": poster_id}, {"$set": update_data})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    updated_poster = await db.poster_submissions.find_one({"id": poster_id})
+    return PosterSubmission(**parse_from_mongo(updated_poster))
+
 @api_router.get("/admin/stats")
 async def get_admin_stats(current_user: User = Depends(get_current_user)):
     if current_user.user_type != "admin":
