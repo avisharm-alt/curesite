@@ -500,15 +500,13 @@ async def review_poster(poster_id: str, review_data: PosterReviewRequest, curren
         update_data["payment_status"] = "pending"
         update_data["payment_link"] = STRIPE_PAYMENT_LINK
         
-        # Get user details to send email
+        # Log approval for admin to send manual email
         user = await db.users.find_one({"id": poster["submitted_by"]})
         if user:
-            # Send acceptance email asynchronously
-            await send_acceptance_email(
-                user_email=user["email"],
-                user_name=user["name"],
-                poster_title=poster["title"]
-            )
+            print(f"✅ Poster approved: '{poster['title']}'")
+            print(f"   Student: {user['name']} ({user['email']})")
+            print(f"   Payment link set: {STRIPE_PAYMENT_LINK}")
+            print(f"   ⚠️  Send acceptance email manually to student!")
     
     await db.poster_submissions.update_one({"id": poster_id}, {"$set": update_data})
     updated_poster = await db.poster_submissions.find_one({"id": poster_id})
