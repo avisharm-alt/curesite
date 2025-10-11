@@ -340,75 +340,117 @@ class CUREAPITester:
     def test_stripe_payment_integration(self):
         """CRITICAL: Test Stripe payment integration for poster submissions"""
         print("\n🚨 CRITICAL TEST: Stripe Payment Integration")
-        print("   Testing payment flow for accepted research posters")
+        print("   Testing ALL payment endpoints and functionality as requested")
         
-        # Test 1: Get all posters to find one for testing
-        success, all_posters = self.run_test("Get All Posters for Payment Test", "GET", "posters", 200)
+        all_tests_passed = True
+        results = {}
         
-        if not success or not isinstance(all_posters, list):
-            print("❌ CRITICAL: Cannot retrieve posters for payment testing")
-            self.critical_failures.append("Stripe Payment Integration: Cannot retrieve posters")
-            return False, {}
+        # Test 1: Health check - verify backend is running
+        print("\n1. Health Check - Verify backend is running")
+        success_health, response_health = self.run_test("Health Check", "GET", "../health", 200, critical=True)
+        results['health_check'] = {'success': success_health, 'response': response_health}
+        all_tests_passed = all_tests_passed and success_health
         
-        # Test 2: Check if public posters have payment filtering (only completed payments should show)
-        print("\n🔍 Testing public posters payment filtering...")
-        payment_filtered_correctly = True
-        for poster in all_posters:
-            status = poster.get('status')
-            payment_status = poster.get('payment_status')
+        # Test 2: GET /api/posters - verify public endpoint only shows paid posters
+        print("\n2. GET /api/posters - Verify public endpoint only shows paid posters")
+        success_public, all_posters = self.run_test("Get Public Posters", "GET", "posters", 200, critical=True)
+        results['public_posters'] = {'success': success_public, 'response': all_posters}
+        
+        if success_public and isinstance(all_posters, list):
+            payment_filtered_correctly = True
+            for poster in all_posters:
+                status = poster.get('status')
+                payment_status = poster.get('payment_status')
+                
+                # Public endpoint should only show approved AND completed payment posters
+                if status != 'approved' or payment_status != 'completed':
+                    print(f"❌ Found invalid poster in public list: {poster.get('title', 'No title')}")
+                    print(f"   Status: {status}, Payment Status: {payment_status}")
+                    payment_filtered_correctly = False
+                    self.critical_failures.append(f"Public poster filtering failed: {poster.get('title')} has status={status}, payment_status={payment_status}")
             
-            # Public endpoint should only show approved AND completed payment posters
-            if status == 'approved' and payment_status != 'completed':
-                print(f"❌ Found approved poster without completed payment in public list: {poster.get('title', 'No title')}")
-                print(f"   Status: {status}, Payment Status: {payment_status}")
-                payment_filtered_correctly = False
-            elif status != 'approved':
-                print(f"❌ Found non-approved poster in public list: {poster.get('title', 'No title')}")
-                print(f"   Status: {status}")
-                payment_filtered_correctly = False
-        
-        if payment_filtered_correctly:
-            print("✅ Public posters correctly filtered for approved + completed payment only")
-            self.tests_passed += 1
+            if payment_filtered_correctly:
+                print("✅ Public posters correctly filtered for approved + completed payment only")
+            else:
+                print("❌ CRITICAL: Public posters not properly filtered by payment status")
+                all_tests_passed = False
         else:
-            print("❌ CRITICAL: Public posters not properly filtered by payment status")
-            self.critical_failures.append("Public posters showing unpaid or unapproved posters")
-        self.tests_run += 1
+            all_tests_passed = False
         
-        # Test 3: Test poster review endpoint (should fail without admin auth)
-        if all_posters:
-            test_poster_id = all_posters[0].get('id') if all_posters else None
-            if test_poster_id:
-                review_data = {
-                    "status": "approved",
-                    "comments": "Test approval for payment integration"
-                }
-                
-                success_review, response_review = self.run_test(
-                    "Poster Review for Payment (No Admin Auth)",
-                    "PUT",
-                    f"admin/posters/{test_poster_id}/review",
-                    403,  # Should fail without admin auth
-                    data=review_data,
-                    critical=True
-                )
-                
-                # Test 4: Test mark payment completed endpoint (should fail without admin auth)
-                success_payment, response_payment = self.run_test(
-                    "Mark Payment Completed (No Admin Auth)",
-                    "PUT",
-                    f"admin/posters/{test_poster_id}/payment",
-                    403,  # Should fail without admin auth
-                    critical=True
-                )
-                
-                return success_review and success_payment and payment_filtered_correctly, {
-                    "review": response_review,
-                    "payment": response_payment,
-                    "public_filtering": payment_filtered_correctly
-                }
+        # Test 3: GET /api/posters/my - verify authentication required
+        print("\n3. GET /api/posters/my - Verify authentication required")
+        success_my, response_my = self.run_test("Get My Posters (No Auth)", "GET", "posters/my", 401, critical=True)
+        results['my_posters_auth'] = {'success': success_my, 'response': response_my}
+        all_tests_passed = all_tests_passed and success_my
         
-        return payment_filtered_correctly, {"public_filtering": payment_filtered_correctly}
+        # Test 4: POST /api/posters - verify poster submission still works (without auth should fail)
+        print("\n4. POST /api/posters - Verify poster submission endpoint exists")
+        poster_data = {
+            "title": "Test Research Poster for Payment Integration",
+            "authors": ["Dr. Sarah Johnson", "Michael Chen"],
+            "abstract": "This is a test poster submission to verify the payment integration system works correctly.",
+            "keywords": ["payment", "integration", "testing"],
+            "university": "University of Toronto",
+            "program": "Computer Science"
+        }
+        success_submit, response_submit = self.run_test("Submit Poster (No Auth)", "POST", "posters", 401, data=poster_data, critical=True)
+        results['poster_submission'] = {'success': success_submit, 'response': response_submit}
+        all_tests_passed = all_tests_passed and success_submit
+        
+        # Test 5: PUT /api/admin/posters/{id}/review - verify admin approval sets payment fields
+        print("\n5. PUT /api/admin/posters/{id}/review - Verify admin approval endpoint")
+        if success_public and all_posters and len(all_posters) > 0:
+            test_poster_id = all_posters[0].get('id')
+            review_data = {
+                "status": "approved",
+                "comments": "Test approval for payment integration testing"
+            }
+            success_review, response_review = self.run_test(
+                "Admin Poster Review (No Auth)", 
+                "PUT", 
+                f"admin/posters/{test_poster_id}/review", 
+                403,  # Should fail without admin auth
+                data=review_data, 
+                critical=True
+            )
+            results['admin_review'] = {'success': success_review, 'response': response_review}
+            all_tests_passed = all_tests_passed and success_review
+        else:
+            print("❌ No posters available to test admin review")
+            self.critical_failures.append("No posters available for admin review testing")
+            all_tests_passed = False
+        
+        # Test 6: PUT /api/admin/posters/{id}/payment - verify mark as paid endpoint
+        print("\n6. PUT /api/admin/posters/{id}/payment - Verify mark as paid endpoint")
+        if success_public and all_posters and len(all_posters) > 0:
+            test_poster_id = all_posters[0].get('id')
+            success_payment, response_payment = self.run_test(
+                "Admin Mark Payment Completed (No Auth)", 
+                "PUT", 
+                f"admin/posters/{test_poster_id}/payment", 
+                403,  # Should fail without admin auth
+                critical=True
+            )
+            results['admin_payment'] = {'success': success_payment, 'response': response_payment}
+            all_tests_passed = all_tests_passed and success_payment
+        else:
+            print("❌ No posters available to test payment completion")
+            self.critical_failures.append("No posters available for payment completion testing")
+            all_tests_passed = False
+        
+        # Test 7: GET /api/admin/posters/all - verify admin can see all posters with payment status
+        print("\n7. GET /api/admin/posters/all - Verify admin can see all posters")
+        success_admin_all, response_admin_all = self.run_test("Admin Get All Posters (No Auth)", "GET", "admin/posters/all", 403, critical=True)
+        results['admin_all_posters'] = {'success': success_admin_all, 'response': response_admin_all}
+        all_tests_passed = all_tests_passed and success_admin_all
+        
+        # Test 8: GET /api/admin/posters/pending - verify pending posters endpoint still works
+        print("\n8. GET /api/admin/posters/pending - Verify pending posters endpoint")
+        success_pending, response_pending = self.run_test("Admin Get Pending Posters (No Auth)", "GET", "admin/posters/pending", 403, critical=True)
+        results['admin_pending'] = {'success': success_pending, 'response': response_pending}
+        all_tests_passed = all_tests_passed and success_pending
+        
+        return all_tests_passed, results
 
     def test_payment_fields_in_poster_model(self):
         """Test that poster model includes payment fields"""
