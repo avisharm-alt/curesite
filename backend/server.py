@@ -132,6 +132,9 @@ class PosterSubmission(BaseModel):
     reviewed_at: Optional[datetime] = None
     reviewer_id: Optional[str] = None
     reviewer_comments: Optional[str] = None
+    payment_status: str = "not_required"  # not_required, pending, completed
+    payment_link: Optional[str] = None
+    payment_completed_at: Optional[datetime] = None
 
 class PosterSubmissionCreate(BaseModel):
     title: str
