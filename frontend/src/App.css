@@ -2635,6 +2635,22 @@ a:focus {
   transform: translateY(-1px);
 }
 
+.payment-btn {
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.payment-btn:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
 /* RESPONSIVE FORMS */
 @media (max-width: 768px) {
   .form-actions {
