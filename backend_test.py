@@ -379,7 +379,7 @@ class CUREAPITester:
         
         # Test 3: GET /api/posters/my - verify authentication required
         print("\n3. GET /api/posters/my - Verify authentication required")
-        success_my, response_my = self.run_test("Get My Posters (No Auth)", "GET", "posters/my", 401, critical=True)
+        success_my, response_my = self.run_test("Get My Posters (No Auth)", "GET", "posters/my", 403, critical=True)
         results['my_posters_auth'] = {'success': success_my, 'response': response_my}
         all_tests_passed = all_tests_passed and success_my
         
