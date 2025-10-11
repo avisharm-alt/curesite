@@ -280,6 +280,8 @@ def prepare_for_mongo(data):
             data['reviewed_at'] = data['reviewed_at'].isoformat()
         if 'expires_at' in data and isinstance(data['expires_at'], datetime):
             data['expires_at'] = data['expires_at'].isoformat()
+        if 'payment_completed_at' in data and isinstance(data['payment_completed_at'], datetime):
+            data['payment_completed_at'] = data['payment_completed_at'].isoformat()
     return data
 
 def parse_from_mongo(item):
