@@ -297,6 +297,8 @@ def parse_from_mongo(item):
             item['reviewed_at'] = datetime.fromisoformat(item['reviewed_at'])
         if 'expires_at' in item and isinstance(item['expires_at'], str):
             item['expires_at'] = datetime.fromisoformat(item['expires_at'])
+        if 'payment_completed_at' in item and isinstance(item['payment_completed_at'], str):
+            item['payment_completed_at'] = datetime.fromisoformat(item['payment_completed_at'])
     return item
 
 # Authentication Routes
