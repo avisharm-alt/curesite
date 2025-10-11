@@ -248,6 +248,11 @@ const PosterManagementTab = ({ posters, onReview, onDelete }) => (
               <h3>{poster.title}</h3>
               <div className="poster-meta-header">
                 <span className={`status-badge status-${poster.status}`}>{poster.status}</span>
+                {poster.status === 'approved' && (
+                  <span className={`status-badge status-${poster.payment_status === 'completed' ? 'paid' : 'payment-pending'}`}>
+                    {poster.payment_status === 'completed' ? 'Paid' : 'Payment Pending'}
+                  </span>
+                )}
                 <span className="submitted-date">
                   {new Date(poster.submitted_at).toLocaleDateString()}
                 </span>
