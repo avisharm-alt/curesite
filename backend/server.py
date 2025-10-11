@@ -40,10 +40,6 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
-# SendGrid Configuration
-SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY', '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')
-SENDGRID_FROM_EMAIL = os.environ.get('SENDGRID_FROM_EMAIL', 'curejournal@gmail.com')
-
 # Stripe Payment Configuration
 STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/cNi6oJdBXd8j4COeMqgrS00'
 
