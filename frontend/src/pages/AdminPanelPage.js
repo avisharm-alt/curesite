@@ -130,6 +130,7 @@ const AdminPanelPage = () => {
                   posters={posters} 
                   onReview={handlePosterReview}
                   onDelete={handlePosterDelete}
+                  onMarkPayment={handleMarkPaymentCompleted}
                 />
               )}
               {activeTab === 'volunteer' && (
