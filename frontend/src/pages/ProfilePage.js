@@ -287,15 +287,48 @@ const ProfilePage = () => {
                 <div key={poster.id} className="poster-card compact">
                   <div className="poster-header">
                     <h3 className="poster-title">{poster.title}</h3>
-                    <span className={`status-badge status-${poster.status}`}>
-                      {poster.status}
-                    </span>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span className={`status-badge status-${poster.status}`}>
+                        {poster.status}
+                      </span>
+                      {poster.status === 'approved' && (
+                        <span className={`status-badge status-${poster.payment_status === 'completed' ? 'paid' : 'payment-pending'}`}>
+                          {poster.payment_status === 'completed' ? 'Paid' : 'Payment Pending'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <div className="poster-meta">
                     <span className="poster-university">{poster.university}</span>
                     <span className="poster-program">{poster.program}</span>
                   </div>
                   <p className="poster-abstract">{poster.abstract.length > 150 ? poster.abstract.substring(0, 150) + '...' : poster.abstract}</p>
+                  
+                  {/* Show payment link for approved but unpaid posters */}
+                  {poster.status === 'approved' && poster.payment_status === 'pending' && poster.payment_link && (
+                    <div className="payment-notice">
+                      <p style={{ marginBottom: '8px', fontSize: '14px', color: '#059669' }}>
+                        🎉 Your poster has been accepted! Complete payment to publish it on the network.
+                      </p>
+                      <a 
+                        href={poster.payment_link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="payment-link-btn"
+                      >
+                        Complete Payment
+                      </a>
+                    </div>
+                  )}
+                  
+                  {poster.status === 'approved' && poster.payment_status === 'completed' && (
+                    <div className="payment-notice" style={{ backgroundColor: '#d1fae5' }}>
+                      <p style={{ marginBottom: '0', fontSize: '14px', color: '#059669' }}>
+                        ✅ Payment completed! Your poster is live on the network.
+                      </p>
+                    </div>
+                  )}
+                  
                   <div className="poster-footer">
                     <div className="poster-keywords">
                       {poster.keywords.slice(0, 3).map((keyword, index) => (
