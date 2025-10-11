@@ -191,6 +191,22 @@ const AdminPanelPage = () => {
     }
   }
 
+  async function handleMarkPaymentCompleted(posterId) {
+    if (!window.confirm('Are you sure you want to mark this payment as completed?')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      await axios.put(`${API}/admin/posters/${posterId}/payment`, {}, { headers });
+      toast.success('Payment marked as completed');
+      fetchData();
+    } catch (error) {
+      console.error('Mark payment error:', error.response?.data || error.message);
+      toast.error('Error marking payment: ' + (error.response?.data?.detail || error.message));
+    }
+  }
+
   async function handleAddVolunteerOpp(opportunityData) {
     try {
       const token = localStorage.getItem('token');
