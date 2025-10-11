@@ -544,6 +544,44 @@ body {
   border: 1px solid var(--error);
 }
 
+.status-paid {
+  background: rgba(16, 185, 129, 0.2);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.status-payment-pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+  border: 1px solid #f59e0b;
+}
+
+.payment-notice {
+  background-color: #ecfdf5;
+  border: 1px solid #10b981;
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md);
+  margin: var(--spacing-md) 0;
+}
+
+.payment-link-btn {
+  display: inline-block;
+  background-color: var(--cure-blue);
+  color: white;
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.payment-link-btn:hover {
+  background-color: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
 .poster-authors {
   font-size: 0.9rem;
   color: var(--gray-400);
