@@ -310,6 +310,12 @@ def parse_from_mongo(item):
 # Email sending function
 async def send_acceptance_email(user_email: str, user_name: str, poster_title: str):
     """Send acceptance email with payment link to student"""
+    
+    # Check if SendGrid is configured
+    if not SENDGRID_API_KEY:
+        print(f"⚠️  Cannot send acceptance email to {user_email}: SendGrid API key not configured")
+        return False
+    
     try:
         message = Mail(
             from_email=SENDGRID_FROM_EMAIL,
