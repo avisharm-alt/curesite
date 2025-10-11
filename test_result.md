@@ -122,15 +122,18 @@ backend:
 
   - task: "Payment status fields in PosterSubmission model"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Added payment_status ('not_required', 'pending', 'completed'), payment_link (Stripe URL), and payment_completed_at (datetime) fields to PosterSubmission model. Updated prepare_for_mongo() and parse_from_mongo() helpers."
+        - working: true
+          agent: "testing"
+          comment: "TESTED: Payment fields properly implemented in PosterSubmission model. Verified payment_status field with values ('not_required', 'pending', 'completed'), payment_link field for Stripe checkout URL, and payment_completed_at field for timestamp tracking. All fields correctly integrated in prepare_for_mongo() and parse_from_mongo() helper functions."
 
   - task: "Enhanced poster review endpoint with email and payment logic"
     implemented: true
