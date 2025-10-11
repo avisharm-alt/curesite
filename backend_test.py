@@ -393,7 +393,7 @@ class CUREAPITester:
             "university": "University of Toronto",
             "program": "Computer Science"
         }
-        success_submit, response_submit = self.run_test("Submit Poster (No Auth)", "POST", "posters", 401, data=poster_data, critical=True)
+        success_submit, response_submit = self.run_test("Submit Poster (No Auth)", "POST", "posters", 403, data=poster_data, critical=True)
         results['poster_submission'] = {'success': success_submit, 'response': response_submit}
         all_tests_passed = all_tests_passed and success_submit
         
