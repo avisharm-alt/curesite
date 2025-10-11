@@ -321,11 +321,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "SendGrid email integration for acceptance notifications"
-    - "Payment status fields in PosterSubmission model"
-    - "Enhanced poster review endpoint with email and payment logic"
-    - "Admin endpoint to mark payment as completed"
-    - "Public posters endpoint filter for paid posters only"
+    - "Display payment status and link in student profile"
+    - "Admin panel payment status display and mark as paid button"
+    - "Payment UI styling and badges"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
