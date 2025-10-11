@@ -374,6 +374,16 @@ const PosterManagementTab = ({ posters, onReview, onDelete, onMarkPayment }) => 
                 </>
               )}
               
+              {poster.status === 'approved' && poster.payment_status === 'pending' && (
+                <button
+                  onClick={() => onMarkPayment(poster.id)}
+                  className="payment-btn"
+                  title="Mark payment as completed"
+                >
+                  Mark as Paid
+                </button>
+              )}
+              
               <button
                 onClick={() => onDelete(poster.id)}
                 className="delete-btn"
