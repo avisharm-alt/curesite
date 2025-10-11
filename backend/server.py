@@ -547,12 +547,32 @@ async def review_poster(poster_id: str, review_data: PosterReviewRequest, curren
     if current_user.user_type not in ["admin", "professor"]:
         raise HTTPException(status_code=403, detail="Not authorized to review posters")
     
+    # Get the poster to check if status is changing to approved
+    poster = await db.poster_submissions.find_one({"id": poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
     update_data = {
         "status": review_data.status,
         "reviewed_at": datetime.now(timezone.utc).isoformat(),
         "reviewer_id": current_user.id,
         "reviewer_comments": review_data.comments
     }
+    
+    # If poster is being approved, set payment requirements
+    if review_data.status == "approved":
+        update_data["payment_status"] = "pending"
+        update_data["payment_link"] = STRIPE_PAYMENT_LINK
+        
+        # Get user details to send email
+        user = await db.users.find_one({"id": poster["submitted_by"]})
+        if user:
+            # Send acceptance email asynchronously
+            await send_acceptance_email(
+                user_email=user["email"],
+                user_name=user["name"],
+                poster_title=poster["title"]
+            )
     
     await db.poster_submissions.update_one({"id": poster_id}, {"$set": update_data})
     updated_poster = await db.poster_submissions.find_one({"id": poster_id})
