@@ -5,7 +5,7 @@ from datetime import datetime
 from urllib.parse import quote
 
 class CUREAPITester:
-    def __init__(self, base_url="https://curesite-production.up.railway.app"):
+    def __init__(self, base_url="http://localhost:8001"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
