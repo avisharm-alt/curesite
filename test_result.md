@@ -105,29 +105,65 @@
 user_problem_statement: "Implement Stripe checkout integration for accepted research posters. When admin approves a poster, system should send acceptance email with payment link. Student sees payment link in profile and completes payment via Stripe. After payment, poster becomes visible on public network."
 
 backend:
-  - task: "Student profile update functionality"
+  - task: "SendGrid email integration for acceptance notifications"
     implemented: true
-    working: true
+    working: "NA"
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: true
-          agent: "testing"
-          comment: "Profile update endpoint (PUT /api/users/profile) is working correctly. Returns 403 Forbidden when no authentication provided, which is expected behavior. Endpoint exists and is properly protected."
+        - working: "NA"
+          agent: "main"
+          comment: "Integrated SendGrid with API key. Created send_acceptance_email() function that sends HTML email with congratulations message, poster title, payment link, and instructions. Email triggered when poster status changes to 'approved'."
 
-  - task: "Admin panel poster review functionality"
+  - task: "Payment status fields in PosterSubmission model"
     implemented: true
-    working: true
+    working: "NA"
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: true
-          agent: "testing"
-          comment: "Poster review endpoint (PUT /api/posters/{id}/review) is working correctly. Returns 403 Forbidden when no admin authentication provided, which is expected behavior. Endpoint exists and is properly protected."
+        - working: "NA"
+          agent: "main"
+          comment: "Added payment_status ('not_required', 'pending', 'completed'), payment_link (Stripe URL), and payment_completed_at (datetime) fields to PosterSubmission model. Updated prepare_for_mongo() and parse_from_mongo() helpers."
+
+  - task: "Enhanced poster review endpoint with email and payment logic"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Modified PUT /api/admin/posters/{poster_id}/review endpoint. When status='approved', sets payment_status='pending', payment_link to Stripe URL, fetches user details, and sends acceptance email asynchronously."
+
+  - task: "Admin endpoint to mark payment as completed"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Created PUT /api/admin/posters/{poster_id}/payment endpoint for admin to manually mark payment as completed. Sets payment_status='completed' and payment_completed_at timestamp."
+
+  - task: "Public posters endpoint filter for paid posters only"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Updated GET /api/posters endpoint to only return posters with status='approved' AND payment_status='completed'. Unpaid approved posters are hidden from public view."
 
   - task: "Admin panel professor management"
     implemented: true
