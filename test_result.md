@@ -167,15 +167,18 @@ backend:
 
   - task: "Public posters endpoint filter for paid posters only"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Updated GET /api/posters endpoint to only return posters with status='approved' AND payment_status='completed'. Unpaid approved posters are hidden from public view."
+        - working: true
+          agent: "testing"
+          comment: "TESTED: Public posters endpoint payment filtering working correctly. GET /api/posters returns 200 and implements correct filtering logic: status='approved' AND payment_status='completed'. Verified that unpaid approved posters are hidden from public view. Query parameters work correctly. Only completed payment posters appear in public listing as required."
 
   - task: "Admin panel professor management"
     implemented: true
