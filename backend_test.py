@@ -788,6 +788,24 @@ def main():
     print("\n🔐 AUTHENTICATION FLOW TESTS...")
     tester.test_authentication_flow()
     
+    # STRIPE PAYMENT INTEGRATION TESTS - As requested in review
+    print("\n💳 STRIPE PAYMENT INTEGRATION TESTS...")
+    print("   Testing new payment functionality for poster submissions:")
+    print("   1. Payment fields in poster model")
+    print("   2. Poster review with payment logic")
+    print("   3. Mark payment completed endpoint")
+    print("   4. Public posters payment filtering")
+    print("   5. SendGrid email integration")
+    
+    # Test payment fields in poster model
+    tester.test_payment_fields_in_poster_model()
+    
+    # Test Stripe payment integration flow
+    tester.test_stripe_payment_integration()
+    
+    # Test SendGrid email integration
+    tester.test_sendgrid_email_integration()
+    
     # Test supporting public endpoints to verify backend is working
     print("\n📚 PUBLIC ENDPOINTS VERIFICATION...")
     tester.test_posters_endpoint()
