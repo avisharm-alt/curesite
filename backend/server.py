@@ -138,6 +138,7 @@ class PosterSubmission(BaseModel):
     reviewer_comments: Optional[str] = None
     payment_status: str = "not_required"  # not_required, pending, completed
     payment_link: Optional[str] = None
+    stripe_session_id: Optional[str] = None
     payment_completed_at: Optional[datetime] = None
 
 class PosterSubmissionCreate(BaseModel):
