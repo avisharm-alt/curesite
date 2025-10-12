@@ -10,7 +10,6 @@ import PosterJournalPage from './pages/PosterJournalPage';
 import SocialPage from './pages/SocialPage';
 import StudentNetworkPage from './pages/StudentNetworkPage';
 import ProfessorNetworkPage from './pages/ProfessorNetworkPage';
-import ECProfilesPage from './pages/ECProfilesPage';
 import VolunteerOpportunitiesPage from './pages/VolunteerOpportunitiesPage';
 import ProfilePage from './pages/ProfilePage';
 import SubmitPosterPage from './pages/SubmitPosterPage';
