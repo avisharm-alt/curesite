@@ -7053,23 +7053,22 @@ a:focus {
 }
 
 /* ============================================================================
-   SOCIAL STATS IN PROFILE - DARK THEME
+   SOCIAL STATS IN PROFILE - MODERN CLEAN DESIGN
    ============================================================================ */
 
 .social-stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: var(--spacing-xl);
+  gap: 1.25rem;
 }
 
 .stat-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-2xl);
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1.75rem;
   text-align: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
 }
@@ -7085,23 +7084,23 @@ a:focus {
 }
 
 .stat-card:hover {
-  border-color: rgba(0, 255, 136, 0.5);
+  border-color: #d1d5db;
   transform: translateY(-4px);
-  box-shadow: 0 8px 30px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .stat-number {
-  font-size: 2.5rem;
-  font-weight: 900;
-  color: var(--cure-green);
-  margin-bottom: var(--spacing-sm);
-  letter-spacing: -0.03em;
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.375rem;
+  letter-spacing: -0.02em;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: var(--gray-300);
-  font-weight: 700;
+  color: #6b7280;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -7114,15 +7113,11 @@ a:focus {
 
 @media (max-width: 480px) {
   .stat-card {
-    padding: var(--spacing-xl);
+    padding: 1.5rem;
   }
   
   .stat-number {
     font-size: 2rem;
-  }
-  
-  .stat-label {
-    font-size: 0.8125rem;
   }
 }
 
