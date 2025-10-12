@@ -29,7 +29,10 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
   };
 
   const fileType = getFileType(poster.poster_url);
-  const viewerUrl = `${API}/posters/${poster.id}/view`;
+  // Use the direct poster_url with backend prefix
+  const viewerUrl = poster.poster_url.startsWith('http') 
+    ? poster.poster_url 
+    : `${BACKEND_URL}${poster.poster_url}`;
 
   return (
     <div className="poster-modal-overlay" onClick={onClose}>
