@@ -148,6 +148,19 @@ const PostCard = ({ post, onPostDeleted }) => {
           </div>
         </div>
         
+        {/* Follow Button (only show if not your own post) */}
+        {user && user.id !== post.author_id && (
+          <div className="follow-btn-container">
+            <button
+              className={`follow-btn ${isFollowing ? 'following' : ''}`}
+              onClick={handleFollow}
+              disabled={following}
+            >
+              {following ? 'Loading...' : isFollowing ? 'Following' : 'Follow'}
+            </button>
+          </div>
+        )}
+        
         {canDelete && (
           <div className="post-menu">
             <button
