@@ -115,6 +115,7 @@ const ProfilePage = () => {
   };
 
   const [paymentProcessing, setPaymentProcessing] = useState(false);
+  const [checkingPayment, setCheckingPayment] = useState(false);
 
   const handlePayment = async (posterId) => {
     try {
