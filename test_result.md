@@ -146,15 +146,18 @@ backend:
   
   - task: "Feed endpoints (global, following, university, circle)"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Implemented GET /api/social/feed with mode parameter (global, following, university, circle). Supports cursor-based pagination. Enriches posts with author details, like status, follow status. Chronological sorting. Returns post array with cursor and has_more flag."
+        - working: true
+          agent: "testing"
+          comment: "TESTED: Feed endpoints working correctly. ✅ GET /api/social/feed?mode=global accessible without auth (200 OK) with proper response structure (posts, cursor, has_more). ✅ GET /api/social/feed?mode=following properly protected (401 without auth). ✅ University and circle modes have appropriate validation (require university info and valid circle_id). ✅ Cursor-based pagination implemented. All feed modes working as designed."
   
   - task: "Engagement endpoints (likes, comments)"
     implemented: true
