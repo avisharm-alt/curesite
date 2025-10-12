@@ -47,7 +47,7 @@ const HomePage = () => {
       {/* Features Overview */}
       <section className="features-overview">
         <div className="container">
-          <h2 className="section-title">Explore Our Platform</h2>
+          <h2 className="section-title">Explore The Platform</h2>
           <div className="features-grid">
             <div className="feature-card" onClick={() => navigate('/posters')}>
               <div className="feature-icon">
