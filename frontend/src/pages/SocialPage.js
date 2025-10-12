@@ -186,14 +186,34 @@ const SocialPage = () => {
                 </>
               ) : (
                 <>
-                  {activeTab === 'global' && 'Global Feed'}
-                  {activeTab === 'following' && 'Following'}
-                  {activeTab === 'university' && `${user.university || 'University'} Feed`}
+                  {activeTab === 'global' && (
+                    <>
+                      <Globe size={28} />
+                      Global Feed
+                    </>
+                  )}
+                  {activeTab === 'following' && (
+                    <>
+                      <Users size={28} />
+                      Following
+                    </>
+                  )}
+                  {activeTab === 'university' && (
+                    <>
+                      <School size={28} />
+                      {user.university || 'University'} Network
+                    </>
+                  )}
                 </>
               )}
             </h1>
             {selectedCircle && (
               <p className="circle-description">{selectedCircle.description}</p>
+            )}
+            {activeTab === 'university' && (
+              <p className="circle-description">
+                Connect with researchers and students at {user.university}. Follow your peers to see their latest work!
+              </p>
             )}
           </div>
 
