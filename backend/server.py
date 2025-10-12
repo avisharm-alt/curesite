@@ -571,6 +571,205 @@ async def mark_payment_completed(poster_id: str, current_user: User = Depends(ge
     updated_poster = await db.poster_submissions.find_one({"id": poster_id})
     return PosterSubmission(**parse_from_mongo(updated_poster))
 
+# Stripe Payment Endpoints
+@api_router.post("/payments/create-checkout")
+async def create_checkout_session(request_data: CreateCheckoutRequest, current_user: User = Depends(get_current_user)):
+    """Create a Stripe checkout session for poster publication payment"""
+    if not STRIPE_API_KEY:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+    
+    # Get the poster
+    poster = await db.poster_submissions.find_one({"id": request_data.poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    # Verify user owns this poster
+    if poster["submitted_by"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Verify poster is approved and payment is pending
+    if poster["status"] != "approved" or poster["payment_status"] != "pending":
+        raise HTTPException(status_code=400, detail="Poster is not eligible for payment")
+    
+    # Check if there's already a pending transaction
+    existing_transaction = await db.payment_transactions.find_one({
+        "poster_id": request_data.poster_id,
+        "payment_status": {"$in": ["pending", "completed"]}
+    })
+    
+    if existing_transaction and existing_transaction.get("payment_status") == "completed":
+        raise HTTPException(status_code=400, detail="Payment already completed")
+    
+    # Initialize Stripe checkout
+    webhook_url = f"{request_data.origin_url}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    
+    # Create success and cancel URLs
+    success_url = f"{request_data.origin_url}/profile?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{request_data.origin_url}/profile"
+    
+    # Create checkout session
+    checkout_request = CheckoutSessionRequest(
+        amount=POSTER_PUBLICATION_FEE,
+        currency="usd",
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={
+            "poster_id": request_data.poster_id,
+            "user_id": current_user.id,
+            "user_email": current_user.email,
+            "poster_title": poster["title"]
+        }
+    )
+    
+    session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+    
+    # Create payment transaction record
+    transaction = PaymentTransaction(
+        session_id=session.session_id,
+        poster_id=request_data.poster_id,
+        user_id=current_user.id,
+        amount=POSTER_PUBLICATION_FEE,
+        currency="usd",
+        payment_status="pending",
+        checkout_status="initiated",
+        metadata={
+            "poster_title": poster["title"],
+            "user_email": current_user.email
+        }
+    )
+    
+    await db.payment_transactions.insert_one(prepare_for_mongo(transaction.model_dump()))
+    
+    # Update poster with checkout session info
+    await db.poster_submissions.update_one(
+        {"id": request_data.poster_id},
+        {"$set": {"payment_link": session.url, "stripe_session_id": session.session_id}}
+    )
+    
+    print(f"💳 Created checkout session for poster {request_data.poster_id}")
+    
+    return {"url": session.url, "session_id": session.session_id}
+
+@api_router.get("/payments/status/{session_id}")
+async def get_payment_status(session_id: str, current_user: User = Depends(get_current_user)):
+    """Check the status of a payment by session ID"""
+    if not STRIPE_API_KEY:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+    
+    # Get transaction
+    transaction = await db.payment_transactions.find_one({"session_id": session_id})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    # Verify user owns this transaction
+    if transaction["user_id"] != current_user.id and current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # If already completed, return cached status
+    if transaction["payment_status"] == "completed":
+        return {
+            "status": transaction["checkout_status"],
+            "payment_status": transaction["payment_status"],
+            "amount": transaction["amount"],
+            "currency": transaction["currency"]
+        }
+    
+    # Check with Stripe for latest status
+    webhook_url = "https://placeholder.com/webhook"  # Not used for status checks
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    
+    checkout_status: CheckoutStatusResponse = await stripe_checkout.get_checkout_status(session_id)
+    
+    # Update transaction status
+    update_data = {
+        "checkout_status": checkout_status.status,
+        "payment_status": "completed" if checkout_status.payment_status == "paid" else transaction["payment_status"]
+    }
+    
+    # If payment is completed, update poster and transaction
+    if checkout_status.payment_status == "paid" and transaction["payment_status"] != "completed":
+        update_data["payment_status"] = "completed"
+        update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
+        
+        # Update poster payment status
+        await db.poster_submissions.update_one(
+            {"id": transaction["poster_id"]},
+            {"$set": {
+                "payment_status": "completed",
+                "payment_completed_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        print(f"✅ Payment completed for poster {transaction['poster_id']}")
+    
+    await db.payment_transactions.update_one(
+        {"session_id": session_id},
+        {"$set": update_data}
+    )
+    
+    return {
+        "status": checkout_status.status,
+        "payment_status": checkout_status.payment_status,
+        "amount": checkout_status.amount_total / 100,  # Convert from cents
+        "currency": checkout_status.currency
+    }
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events"""
+    if not STRIPE_API_KEY:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+    
+    # Get raw body and signature
+    body = await request.body()
+    signature = request.headers.get("Stripe-Signature")
+    
+    if not signature:
+        raise HTTPException(status_code=400, detail="No signature provided")
+    
+    try:
+        # Initialize Stripe checkout
+        webhook_url = "https://placeholder.com/webhook"  # Not used in handler
+        stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+        
+        # Handle webhook
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        # Process based on event type
+        if webhook_response.event_type == "checkout.session.completed":
+            session_id = webhook_response.session_id
+            
+            # Get transaction
+            transaction = await db.payment_transactions.find_one({"session_id": session_id})
+            if transaction and transaction["payment_status"] != "completed":
+                # Update transaction
+                await db.payment_transactions.update_one(
+                    {"session_id": session_id},
+                    {"$set": {
+                        "payment_status": "completed",
+                        "checkout_status": "complete",
+                        "completed_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                # Update poster
+                await db.poster_submissions.update_one(
+                    {"id": transaction["poster_id"]},
+                    {"$set": {
+                        "payment_status": "completed",
+                        "payment_completed_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                print(f"🎉 Webhook: Payment completed for poster {transaction['poster_id']}")
+        
+        return {"status": "success"}
+    
+    except Exception as e:
+        print(f"❌ Webhook error: {str(e)}")
+        raise HTTPException(status_code=400, detail=str(e))
+
 @api_router.get("/admin/stats")
 async def get_admin_stats(current_user: User = Depends(get_current_user)):
     if current_user.user_type != "admin":
