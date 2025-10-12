@@ -605,8 +605,8 @@ class CURESocialAPITester:
                 print(f"      - ... and {len(self.critical_failures) - 3} more issues")
 
 if __name__ == "__main__":
-    # Use production URL from vercel.json
-    base_url = "https://curesite-production.up.railway.app"
+    # Use local backend URL since social endpoints are implemented locally
+    base_url = "http://localhost:8001"  # Direct backend URL
     
     print("🚀 CURE SOCIAL BACKEND API TESTER")
     print("=" * 50)
