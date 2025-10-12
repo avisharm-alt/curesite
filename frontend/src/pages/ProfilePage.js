@@ -159,11 +159,15 @@ const ProfilePage = () => {
       const response = await axios.get(`${API}/payments/status/${sessionId}`, { headers });
       
       if (response.data.payment_status === 'paid') {
-        toast.success('Payment successful! Your poster is now live on the network.');
+        toast.dismiss('payment-check');
+        toast.success('✅ Payment successful! Your poster is now live on the network.', { duration: 5000 });
+        setCheckingPayment(false);
         fetchMyData(); // Refresh data to show updated payment status
         return;
       } else if (response.data.status === 'expired') {
+        toast.dismiss('payment-check');
         toast.error('Payment session expired. Please try again.');
+        setCheckingPayment(false);
         return;
       }
 
