@@ -1960,6 +1960,24 @@ async def update_social_profile(
         update_data["interests"] = interests
     if role is not None and role in ["student", "professor"]:
         update_data["role"] = role
+        
+        # Auto-create professor network profile when user becomes professor
+        if role == "professor":
+            # Check if professor profile already exists
+            existing_prof_profile = await db.professor_network.find_one({"user_id": current_user.id})
+            if not existing_prof_profile:
+                # Create basic professor network profile with user's existing data
+                professor_profile = ProfessorNetwork(
+                    user_id=current_user.id,
+                    department=current_user.program or "Not specified",
+                    research_areas=current_user.interests if hasattr(current_user, 'interests') and current_user.interests else interests or [],
+                    lab_description=bio or "Newly joined professor",
+                    accepting_students=True,
+                    contact_email=current_user.email,
+                    website=None
+                )
+                await db.professor_network.insert_one(prepare_for_mongo(professor_profile.dict()))
+                print(f"✅ Auto-created professor network profile for {current_user.email}")
     
     if update_data:
         await db.users.update_one({"id": current_user.id}, {"$set": update_data})
