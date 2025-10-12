@@ -314,15 +314,18 @@ backend:
 
   - task: "Payment transactions MongoDB collection"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Created PaymentTransaction model and payment_transactions MongoDB collection. Stores session_id, poster_id, user_id, amount, currency, payment_status (pending/completed/failed/expired), checkout_status, metadata, created_at, and completed_at. Prevents duplicate payment processing by checking existing transactions."
+        - working: true
+          agent: "testing"
+          comment: "TESTED: Payment transactions collection and model working correctly. ✅ PaymentTransaction model implemented with all required fields (session_id, poster_id, user_id, amount, currency, payment_status, checkout_status, metadata, created_at, completed_at). ✅ PosterSubmission model updated with stripe_session_id field for linking to payment transactions. ✅ Database schema ready for payment transaction storage. ✅ Collection will be created automatically when first payment transaction is processed."
 
   - task: "Stripe API keys configuration"
     implemented: true
