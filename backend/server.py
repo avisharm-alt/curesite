@@ -243,6 +243,23 @@ class AdminProfessorNetworkProfile(ProfessorNetworkCreate):
     contact_email: EmailStr
     user_university: Optional[str] = None
 
+class PaymentTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    session_id: str
+    poster_id: str
+    user_id: str
+    amount: float
+    currency: str = "usd"
+    payment_status: str = "pending"  # pending, completed, failed, expired
+    checkout_status: str = "initiated"  # initiated, open, complete, expired
+    metadata: Dict[str, str] = {}
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+
+class CreateCheckoutRequest(BaseModel):
+    poster_id: str
+    origin_url: str
+
 # JWT Functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
