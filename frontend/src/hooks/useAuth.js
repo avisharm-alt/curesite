@@ -49,9 +49,18 @@ export const AuthProvider = ({ children }) => {
         const userData = JSON.parse(decodeURIComponent(user_param));
         localStorage.setItem('token', token_param);
         setUser(userData);
-        toast.success(`Welcome, ${userData.name}!`);
-        // Clean up URL
-        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Check if user needs onboarding
+        const needsOnboarding = !userData.university || !userData.program;
+        
+        if (needsOnboarding) {
+          toast.success(`Welcome, ${userData.name}! Let's set up your profile.`);
+          window.location.href = '/onboarding';
+        } else {
+          toast.success(`Welcome back, ${userData.name}!`);
+          // Clean up URL
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       } catch (error) {
         console.error('Error parsing auth callback:', error);
         toast.error('Authentication failed. Please try again.');
