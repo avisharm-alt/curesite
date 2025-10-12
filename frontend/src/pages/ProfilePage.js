@@ -181,7 +181,8 @@ const ProfilePage = () => {
     const sessionId = urlParams.get('session_id');
     
     if (sessionId) {
-      toast.info('Checking payment status...');
+      setCheckingPayment(true);
+      toast.loading('Verifying your payment...', { id: 'payment-check' });
       pollPaymentStatus(sessionId);
       
       // Clean up URL
