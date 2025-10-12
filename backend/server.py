@@ -414,7 +414,7 @@ async def google_callback(request: Request):
 
     except Exception as e:
         # Redirect to frontend with error
-        frontend_url = request.url.scheme + "://" + request.url.netloc
+        frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
         error_message = quote(str(e))
         redirect_url = f"{frontend_url}/?error={error_message}"
         return RedirectResponse(url=redirect_url)
