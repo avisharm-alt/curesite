@@ -611,7 +611,7 @@ async def create_checkout_session(request_data: CreateCheckoutRequest, current_u
     # Create checkout session
     checkout_request = CheckoutSessionRequest(
         amount=POSTER_PUBLICATION_FEE,
-        currency="usd",
+        currency="cad",
         success_url=success_url,
         cancel_url=cancel_url,
         metadata={
@@ -630,7 +630,7 @@ async def create_checkout_session(request_data: CreateCheckoutRequest, current_u
         poster_id=request_data.poster_id,
         user_id=current_user.id,
         amount=POSTER_PUBLICATION_FEE,
-        currency="usd",
+        currency="cad",
         payment_status="pending",
         checkout_status="initiated",
         metadata={
