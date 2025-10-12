@@ -14,6 +14,7 @@ const ProfilePage = () => {
   const [profile, setProfile] = useState(user || {});
   const [myPosters, setMyPosters] = useState([]);
   const [myNetworkProfile, setMyNetworkProfile] = useState(null);
+  const [socialStats, setSocialStats] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -21,8 +22,47 @@ const ProfilePage = () => {
   useEffect(() => {
     if (user) {
       fetchMyData();
+      fetchSocialStats();
     }
   }, [user]);
+
+  const fetchSocialStats = async () => {
+    if (!user) return;
+    try {
+      const response = await axios.get(`${API}/social/user/${user.id}/stats`);
+      setSocialStats(response.data);
+    } catch (error) {
+      console.error('Error fetching social stats:', error);
+    }
+  };
+
+  const handleShareToSocial = async (poster) => {
+    try {
+      const token = localStorage.getItem('token');
+      const shareText = `Just published my research poster: "${poster.title}"! ${poster.keywords.slice(0, 3).map(k => `#${k.replace(/\s+/g, '')}`).join(' ')}`;
+      
+      const response = await axios.post(
+        `${API}/social/posts`,
+        {
+          text: shareText,
+          tags: poster.keywords.slice(0, 5),
+          attachments: [{
+            type: 'poster',
+            url: `${BACKEND_URL}${poster.poster_url}`,
+            title: poster.title
+          }],
+          visibility: 'public'
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success('Shared to Social feed!');
+      navigate('/social');
+    } catch (error) {
+      console.error('Error sharing to social:', error);
+      toast.error('Failed to share to social');
+    }
+  };
 
   const fetchMyData = async () => {
     try {
