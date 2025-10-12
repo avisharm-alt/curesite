@@ -1,0 +1,11 @@
+{
+  "buildCommand": "yarn --cwd frontend install && yarn --cwd frontend build",
+  "installCommand": "echo 'Using build command for install'",
+  "outputDirectory": "frontend/build",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
