@@ -126,6 +126,13 @@ class UserCreate(BaseModel):
     year: Optional[int] = None
     user_type: Optional[str] = None
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    profile_picture: Optional[str] = None
+    university: Optional[str] = None
+    program: Optional[str] = None
+    year: Optional[int] = None
+
 class PosterSubmission(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
