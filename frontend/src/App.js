@@ -38,6 +38,7 @@ const Header = () => {
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
+    { name: 'Social', href: '/social', icon: MessageSquare },
     { name: 'Poster Journal', href: '/posters', icon: FileText },
     { name: 'Student Network', href: '/students', icon: Users },
     { name: 'Professor Network', href: '/professors', icon: GraduationCap },
