@@ -42,7 +42,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 # Stripe Payment Configuration
-STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/cNi6oJdBXd8j4COeMqgrS00'
+STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
+STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
+POSTER_PUBLICATION_FEE = 25.00  # Fixed fee in USD for poster publication
+
+if STRIPE_API_KEY:
+    print("✅ Stripe configured with live keys")
+else:
+    print("⚠️  Stripe not configured - set STRIPE_API_KEY")
 
 # OAuth Setup with environment checks
 oauth = OAuth()
