@@ -105,6 +105,127 @@
 user_problem_statement: "Integrate CURE Social platform into the existing CURE infrastructure. Build a comprehensive academic social networking MVP with posts, comments, likes, follows, academic circles, and integration with existing poster system. Focus on core social features with simplified user migration (add role field, professors self-declare, auto-join Student Network)."
 
 backend:
+  - task: "CURE Social data models and schemas"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Created comprehensive social models: Post, Comment, Follow, Circle, CircleMember, Notification, Like. Updated User model with role, bio, interests, links fields. All models support academic social networking requirements."
+  
+  - task: "Database migration and indexes"
+    implemented: true
+    working: true
+    file: "backend/migrate_social.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Created migration script that: updates existing users with social fields, creates indexes for all social collections (posts, follows, likes, comments, notifications, circle_members), seeds 11 default academic circles (Neuroscience, ML in Medicine, Cancer Research, etc.), auto-joins students to Student Network. Migration completed successfully."
+  
+  - task: "Post creation and management endpoints"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented POST /api/social/posts (create post with text, attachments, tags, visibility), GET /api/social/posts/{post_id} (get single post with author details), DELETE /api/social/posts/{post_id} (delete own post or admin). Auto-extracts #hashtags and @mentions. Enforces 500 char limit."
+  
+  - task: "Feed endpoints (global, following, university, circle)"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented GET /api/social/feed with mode parameter (global, following, university, circle). Supports cursor-based pagination. Enriches posts with author details, like status, follow status. Chronological sorting. Returns post array with cursor and has_more flag."
+  
+  - task: "Engagement endpoints (likes, comments)"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented POST/DELETE /api/social/posts/{post_id}/like (like/unlike), POST /api/social/posts/{post_id}/comments (create comment), GET /api/social/posts/{post_id}/comments (get comments with author details), DELETE /api/social/comments/{comment_id} (delete comment). Auto-creates notifications."
+  
+  - task: "Follow system endpoints"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented POST /api/social/follow/{user_id} (follow user), DELETE /api/social/follow/{user_id} (unfollow), GET /api/social/user/{user_id}/followers (get followers list), GET /api/social/user/{user_id}/following (get following list). Creates notifications on follow."
+  
+  - task: "Circle (academic communities) endpoints"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: true
+          agent: "main"
+          comment: "Implemented GET /api/social/circles (list all circles), POST /api/social/circles (create circle, admin only), POST /api/social/circles/{circle_id}/join (join circle), DELETE /api/social/circles/{circle_id}/leave (leave circle). Seeded 11 default circles including Student Network. Tested: circles endpoint returns 11 circles successfully."
+  
+  - task: "Notification system"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented GET /api/social/notifications (get user notifications with pagination), POST /api/social/notifications/{notification_id}/read (mark as read). Notifications auto-created on like, comment, follow, mention. Enriched with actor details."
+  
+  - task: "Search functionality"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented GET /api/social/search with query parameter and type filter (user, post, all). Searches users by name/email/university, posts by text/tags. Returns unified result array with type, id, title, description, avatar."
+  
+  - task: "User stats and profile update"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented GET /api/social/user/{user_id}/stats (followers, following, posts, circles counts), PATCH /api/social/profile (update bio, interests, role). Profile update allows students to self-declare as professor."
+
+frontend:
   - task: "SendGrid email integration for acceptance notifications"
     implemented: true
     working: true
