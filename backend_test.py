@@ -5,19 +5,15 @@ from datetime import datetime
 from urllib.parse import quote
 
 class CURESocialAPITester:
-    def __init__(self, base_url="https://labsquare.preview.emergentagent.com"):
+    def __init__(self, base_url="https://curesite-production.up.railway.app"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
-        self.admin_token = None
-        self.student_token = None
         self.tests_run = 0
         self.tests_passed = 0
         self.critical_failures = []
         self.test_user_id = None
-        self.test_poster_id = None
-        # Specific poster ID from review request
-        self.quantum_poster_id = "1ef0a4d6-ff70-4d8d-8726-8ef74a0f8a73"
+        self.test_post_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, critical=False):
         """Run a single API test"""
