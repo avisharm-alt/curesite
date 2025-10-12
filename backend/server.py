@@ -576,9 +576,10 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 
 # User Routes
 @api_router.put("/users/profile")
-async def update_profile(user_update: UserCreate, current_user: User = Depends(get_current_user)):
+async def update_profile(user_update: UserUpdate, current_user: User = Depends(get_current_user)):
     update_data = prepare_for_mongo(user_update.dict(exclude_unset=True))
-    await db.users.update_one({"id": current_user.id}, {"$set": update_data})
+    if update_data:  # Only update if there's data to update
+        await db.users.update_one({"id": current_user.id}, {"$set": update_data})
     updated_user = await db.users.find_one({"id": current_user.id})
     return User(**parse_from_mongo(updated_user))
 
