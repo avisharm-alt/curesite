@@ -177,7 +177,9 @@ const ProfilePage = () => {
       setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
     } catch (error) {
       console.error('Error checking payment status:', error);
+      toast.dismiss('payment-check');
       toast.error('Error checking payment status. Please refresh the page.');
+      setCheckingPayment(false);
     }
   };
 
