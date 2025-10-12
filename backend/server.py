@@ -1507,6 +1507,470 @@ async def root():
 async def health_check():
     return {"status": "healthy", "timestamp": datetime.now(timezone.utc)}
 
+# ============================================================================
+# CURE SOCIAL ENDPOINTS
+# ============================================================================
+
+# POST ENDPOINTS
+@api_router.post("/social/posts")
+async def create_post(post_data: PostCreate, current_user: User = Depends(get_current_user)):
+    """Create a new post"""
+    if len(post_data.text) > 500:
+        raise HTTPException(status_code=400, detail="Post text must be 500 characters or less")
+    
+    # Extract tags from text if not provided
+    tags = post_data.tags or []
+    extracted_tags = extract_tags(post_data.text)
+    tags.extend(extracted_tags)
+    tags = list(set(tags))
+    
+    # Create post
+    post = Post(
+        author_id=current_user.id,
+        author_type=current_user.role,
+        text=post_data.text,
+        attachments=post_data.attachments or [],
+        tags=tags,
+        visibility=post_data.visibility or "public"
+    )
+    
+    await db.posts.insert_one(prepare_for_mongo(post.dict()))
+    
+    # Create notifications for mentions
+    mentions = extract_mentions(post_data.text)
+    for mentioned_username in mentions:
+        mentioned_user = await db.users.find_one({"name": mentioned_username})
+        if mentioned_user:
+            await create_notification(mentioned_user["id"], "mention", current_user.id, post.id)
+    
+    return post
+
+@api_router.get("/social/posts/{post_id}")
+async def get_post(post_id: str, request: Request):
+    """Get a single post by ID"""
+    current_user = await get_current_user_optional(request)
+    
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    author = await db.users.find_one({"id": post["author_id"]})
+    
+    # Check if current user liked/following
+    is_liked = False
+    is_following = False
+    if current_user:
+        like = await db.likes.find_one({"post_id": post_id, "user_id": current_user.id})
+        is_liked = like is not None
+        follow = await db.follows.find_one({"follower_id": current_user.id, "followed_id": post["author_id"]})
+        is_following = follow is not None
+    
+    # Increment view count
+    await db.posts.update_one({"id": post_id}, {"$inc": {"metrics.views": 1}})
+    
+    return {
+        **parse_from_mongo(post),
+        "author_name": author.get("name") if author else "Unknown",
+        "author_role": author.get("role") if author else "student",
+        "author_picture": author.get("profile_picture") if author else None,
+        "author_university": author.get("university") if author else None,
+        "is_liked": is_liked,
+        "is_following_author": is_following
+    }
+
+@api_router.delete("/social/posts/{post_id}")
+async def delete_post(post_id: str, current_user: User = Depends(get_current_user)):
+    """Delete a post (author or admin only)"""
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post["author_id"] != current_user.id and current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to delete this post")
+    
+    await db.posts.delete_one({"id": post_id})
+    await db.comments.delete_many({"post_id": post_id})
+    await db.likes.delete_many({"post_id": post_id})
+    
+    return {"message": "Post deleted successfully"}
+
+# FEED ENDPOINTS
+@api_router.get("/social/feed")
+async def get_feed(
+    mode: str = "global",
+    circle_id: Optional[str] = None,
+    cursor: Optional[str] = None,
+    limit: int = 20,
+    request: Request = None
+):
+    """Get feed based on mode: following, global, university, circle"""
+    current_user = await get_current_user_optional(request)
+    query = {"visibility": "public"}
+    
+    if mode == "following":
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Authentication required")
+        follows = await db.follows.find({"follower_id": current_user.id}).to_list(length=1000)
+        followed_ids = [f["followed_id"] for f in follows]
+        if not followed_ids:
+            return {"posts": [], "cursor": None, "has_more": False}
+        query["author_id"] = {"$in": followed_ids}
+    
+    elif mode == "university":
+        if not current_user or not current_user.university:
+            raise HTTPException(status_code=400, detail="University information required")
+        university_users = await db.users.find({"university": current_user.university}).to_list(length=10000)
+        user_ids = [u["id"] for u in university_users]
+        query["author_id"] = {"$in": user_ids}
+    
+    elif mode == "circle":
+        if not circle_id:
+            raise HTTPException(status_code=400, detail="circle_id required")
+        circle = await db.circles.find_one({"id": circle_id})
+        if not circle:
+            raise HTTPException(status_code=404, detail="Circle not found")
+        query["tags"] = {"$in": [circle["slug"], circle["name"].lower()]}
+    
+    if cursor:
+        query["created_at"] = {"$lt": cursor}
+    
+    posts_cursor = db.posts.find(query).sort("created_at", -1).limit(limit + 1)
+    posts = await posts_cursor.to_list(length=limit + 1)
+    
+    has_more = len(posts) > limit
+    if has_more:
+        posts = posts[:limit]
+    
+    # Enrich with author details
+    enriched_posts = []
+    for post in posts:
+        author = await db.users.find_one({"id": post["author_id"]})
+        if author:
+            is_liked = False
+            is_following = False
+            if current_user:
+                like = await db.likes.find_one({"post_id": post["id"], "user_id": current_user.id})
+                is_liked = like is not None
+                follow = await db.follows.find_one({"follower_id": current_user.id, "followed_id": post["author_id"]})
+                is_following = follow is not None
+            
+            enriched_posts.append({
+                **parse_from_mongo(post),
+                "author_name": author.get("name"),
+                "author_role": author.get("role", "student"),
+                "author_picture": author.get("profile_picture"),
+                "author_university": author.get("university"),
+                "is_liked": is_liked,
+                "is_following_author": is_following
+            })
+    
+    next_cursor = posts[-1]["created_at"].isoformat() if posts and has_more else None
+    
+    return {"posts": enriched_posts, "cursor": next_cursor, "has_more": has_more}
+
+# ENGAGEMENT ENDPOINTS
+@api_router.post("/social/posts/{post_id}/like")
+async def like_post(post_id: str, current_user: User = Depends(get_current_user)):
+    """Like a post"""
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    existing_like = await db.likes.find_one({"post_id": post_id, "user_id": current_user.id})
+    if existing_like:
+        return {"message": "Post already liked"}
+    
+    like = Like(post_id=post_id, user_id=current_user.id)
+    await db.likes.insert_one(prepare_for_mongo(like.dict()))
+    await db.posts.update_one({"id": post_id}, {"$inc": {"metrics.likes": 1}})
+    await create_notification(post["author_id"], "like", current_user.id, post_id)
+    
+    return {"message": "Post liked successfully"}
+
+@api_router.delete("/social/posts/{post_id}/like")
+async def unlike_post(post_id: str, current_user: User = Depends(get_current_user)):
+    """Unlike a post"""
+    result = await db.likes.delete_one({"post_id": post_id, "user_id": current_user.id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Like not found")
+    await db.posts.update_one({"id": post_id}, {"$inc": {"metrics.likes": -1}})
+    return {"message": "Post unliked successfully"}
+
+@api_router.post("/social/posts/{post_id}/comments")
+async def create_comment(post_id: str, comment_data: CommentCreate, current_user: User = Depends(get_current_user)):
+    """Create a comment on a post"""
+    post = await db.posts.find_one({"id": post_id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    comment = Comment(
+        post_id=post_id,
+        author_id=current_user.id,
+        text=comment_data.text,
+        parent_comment_id=comment_data.parent_comment_id
+    )
+    
+    await db.comments.insert_one(prepare_for_mongo(comment.dict()))
+    await db.posts.update_one({"id": post_id}, {"$inc": {"metrics.comments": 1}})
+    await create_notification(post["author_id"], "comment", current_user.id, post_id, comment.id)
+    
+    return comment
+
+@api_router.get("/social/posts/{post_id}/comments")
+async def get_comments(post_id: str, cursor: Optional[str] = None, limit: int = 50):
+    """Get comments for a post"""
+    query = {"post_id": post_id}
+    if cursor:
+        query["created_at"] = {"$lt": cursor}
+    
+    comments = await db.comments.find(query).sort("created_at", -1).limit(limit).to_list(length=limit)
+    
+    # Enrich with author details
+    enriched = []
+    for comment in comments:
+        author = await db.users.find_one({"id": comment["author_id"]})
+        if author:
+            enriched.append({
+                **parse_from_mongo(comment),
+                "author_name": author.get("name"),
+                "author_picture": author.get("profile_picture"),
+                "author_role": author.get("role")
+            })
+    
+    return enriched
+
+@api_router.delete("/social/comments/{comment_id}")
+async def delete_comment(comment_id: str, current_user: User = Depends(get_current_user)):
+    """Delete a comment"""
+    comment = await db.comments.find_one({"id": comment_id})
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+    
+    if comment["author_id"] != current_user.id and current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    await db.comments.delete_one({"id": comment_id})
+    await db.posts.update_one({"id": comment["post_id"]}, {"$inc": {"metrics.comments": -1}})
+    return {"message": "Comment deleted successfully"}
+
+# FOLLOW ENDPOINTS
+@api_router.post("/social/follow/{user_id}")
+async def follow_user(user_id: str, current_user: User = Depends(get_current_user)):
+    """Follow a user"""
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot follow yourself")
+    
+    target_user = await db.users.find_one({"id": user_id})
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    existing = await db.follows.find_one({"follower_id": current_user.id, "followed_id": user_id})
+    if existing:
+        return {"message": "Already following"}
+    
+    follow = Follow(follower_id=current_user.id, followed_id=user_id)
+    await db.follows.insert_one(prepare_for_mongo(follow.dict()))
+    await create_notification(user_id, "follow", current_user.id)
+    
+    return {"message": "User followed successfully"}
+
+@api_router.delete("/social/follow/{user_id}")
+async def unfollow_user(user_id: str, current_user: User = Depends(get_current_user)):
+    """Unfollow a user"""
+    result = await db.follows.delete_one({"follower_id": current_user.id, "followed_id": user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Follow not found")
+    return {"message": "User unfollowed successfully"}
+
+@api_router.get("/social/user/{user_id}/followers")
+async def get_followers(user_id: str, limit: int = 50):
+    """Get user's followers"""
+    follows = await db.follows.find({"followed_id": user_id}).limit(limit).to_list(length=limit)
+    follower_ids = [f["follower_id"] for f in follows]
+    users = await db.users.find({"id": {"$in": follower_ids}}).to_list(length=len(follower_ids))
+    return [{"id": u["id"], "name": u.get("name"), "profile_picture": u.get("profile_picture"), "role": u.get("role")} for u in users]
+
+@api_router.get("/social/user/{user_id}/following")
+async def get_following(user_id: str, limit: int = 50):
+    """Get users that this user follows"""
+    follows = await db.follows.find({"follower_id": user_id}).limit(limit).to_list(length=limit)
+    followed_ids = [f["followed_id"] for f in follows]
+    users = await db.users.find({"id": {"$in": followed_ids}}).to_list(length=len(followed_ids))
+    return [{"id": u["id"], "name": u.get("name"), "profile_picture": u.get("profile_picture"), "role": u.get("role")} for u in users]
+
+# CIRCLE ENDPOINTS
+@api_router.get("/social/circles")
+async def get_circles():
+    """Get all circles"""
+    circles = await db.circles.find().to_list(length=100)
+    return [parse_from_mongo(c) for c in circles]
+
+@api_router.post("/social/circles")
+async def create_circle(circle_data: CircleCreate, current_user: User = Depends(get_current_user)):
+    """Create a new circle (admin only)"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can create circles")
+    
+    slug = circle_data.name.lower().replace(" ", "-").replace("_", "-")
+    existing = await db.circles.find_one({"slug": slug})
+    if existing:
+        raise HTTPException(status_code=400, detail="Circle already exists")
+    
+    circle = Circle(
+        name=circle_data.name,
+        slug=slug,
+        description=circle_data.description,
+        owner_type="system"
+    )
+    
+    await db.circles.insert_one(prepare_for_mongo(circle.dict()))
+    return circle
+
+@api_router.post("/social/circles/{circle_id}/join")
+async def join_circle(circle_id: str, current_user: User = Depends(get_current_user)):
+    """Join a circle"""
+    circle = await db.circles.find_one({"id": circle_id})
+    if not circle:
+        raise HTTPException(status_code=404, detail="Circle not found")
+    
+    existing = await db.circle_members.find_one({"circle_id": circle_id, "user_id": current_user.id})
+    if existing:
+        return {"message": "Already a member"}
+    
+    member = CircleMember(circle_id=circle_id, user_id=current_user.id)
+    await db.circle_members.insert_one(prepare_for_mongo(member.dict()))
+    await db.circles.update_one({"id": circle_id}, {"$inc": {"member_count": 1}})
+    
+    return {"message": "Joined circle successfully"}
+
+@api_router.delete("/social/circles/{circle_id}/leave")
+async def leave_circle(circle_id: str, current_user: User = Depends(get_current_user)):
+    """Leave a circle"""
+    result = await db.circle_members.delete_one({"circle_id": circle_id, "user_id": current_user.id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Not a member")
+    await db.circles.update_one({"id": circle_id}, {"$inc": {"member_count": -1}})
+    return {"message": "Left circle successfully"}
+
+# NOTIFICATION ENDPOINTS
+@api_router.get("/social/notifications")
+async def get_notifications(cursor: Optional[str] = None, limit: int = 20, current_user: User = Depends(get_current_user)):
+    """Get user notifications"""
+    query = {"user_id": current_user.id}
+    if cursor:
+        query["created_at"] = {"$lt": cursor}
+    
+    notifications = await db.notifications.find(query).sort("created_at", -1).limit(limit).to_list(length=limit)
+    
+    # Enrich with actor details
+    enriched = []
+    for notif in notifications:
+        actor = await db.users.find_one({"id": notif["actor_id"]})
+        if actor:
+            enriched.append({
+                **parse_from_mongo(notif),
+                "actor_name": actor.get("name"),
+                "actor_picture": actor.get("profile_picture")
+            })
+    
+    return enriched
+
+@api_router.post("/social/notifications/{notification_id}/read")
+async def mark_notification_read(notification_id: str, current_user: User = Depends(get_current_user)):
+    """Mark notification as read"""
+    result = await db.notifications.update_one(
+        {"id": notification_id, "user_id": current_user.id},
+        {"$set": {"read": True}}
+    )
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Notification not found")
+    return {"message": "Notification marked as read"}
+
+# SEARCH ENDPOINT
+@api_router.get("/social/search")
+async def search(q: str, type: str = "all", limit: int = 20):
+    """Search users, posts, and tags"""
+    results = []
+    
+    if type in ["user", "all"]:
+        users = await db.users.find({
+            "$or": [
+                {"name": {"$regex": q, "$options": "i"}},
+                {"email": {"$regex": q, "$options": "i"}},
+                {"university": {"$regex": q, "$options": "i"}}
+            ]
+        }).limit(limit).to_list(length=limit)
+        
+        for user in users:
+            results.append({
+                "type": "user",
+                "id": user["id"],
+                "title": user.get("name"),
+                "description": f"{user.get('role', 'student')} at {user.get('university', 'Unknown')}",
+                "avatar": user.get("profile_picture")
+            })
+    
+    if type in ["post", "all"]:
+        posts = await db.posts.find({
+            "$or": [
+                {"text": {"$regex": q, "$options": "i"}},
+                {"tags": {"$regex": q, "$options": "i"}}
+            ],
+            "visibility": "public"
+        }).sort("created_at", -1).limit(limit).to_list(length=limit)
+        
+        for post in posts:
+            author = await db.users.find_one({"id": post["author_id"]})
+            if author:
+                results.append({
+                    "type": "post",
+                    "id": post["id"],
+                    "title": post["text"][:100],
+                    "description": f"by {author.get('name')}",
+                    "avatar": author.get("profile_picture")
+                })
+    
+    return results
+
+# USER STATS ENDPOINT
+@api_router.get("/social/user/{user_id}/stats")
+async def get_user_stats(user_id: str):
+    """Get user's social statistics"""
+    followers_count = await db.follows.count_documents({"followed_id": user_id})
+    following_count = await db.follows.count_documents({"follower_id": user_id})
+    posts_count = await db.posts.count_documents({"author_id": user_id})
+    circles_count = await db.circle_members.count_documents({"user_id": user_id})
+    
+    return {
+        "followers_count": followers_count,
+        "following_count": following_count,
+        "posts_count": posts_count,
+        "circles_count": circles_count
+    }
+
+# PROFILE UPDATE ENDPOINT
+@api_router.patch("/social/profile")
+async def update_profile(
+    bio: Optional[str] = None,
+    interests: Optional[List[str]] = None,
+    role: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user's social profile"""
+    update_data = {}
+    if bio is not None:
+        update_data["bio"] = bio
+    if interests is not None:
+        update_data["interests"] = interests
+    if role is not None and role in ["student", "professor"]:
+        update_data["role"] = role
+    
+    if update_data:
+        await db.users.update_one({"id": current_user.id}, {"$set": update_data})
+    
+    updated_user = await db.users.find_one({"id": current_user.id})
+    return parse_from_mongo(updated_user)
+
 # Include the router in the main app
 app.include_router(api_router)
 
