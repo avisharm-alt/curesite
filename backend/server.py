@@ -1503,10 +1503,6 @@ async def get_professor_network(research_area: Optional[str] = None, accepting_s
 async def root():
     return {"message": "CURE API - Canadian Undergraduate Research Exchange"}
 
-@api_router.get("/health")
-async def health_check():
-    return {"status": "healthy", "timestamp": datetime.now(timezone.utc)}
-
 # ============================================================================
 # CURE SOCIAL ENDPOINTS
 # ============================================================================
