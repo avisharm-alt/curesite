@@ -408,10 +408,15 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Stripe checkout session creation endpoint"
+    - "Stripe payment status check endpoint"
+    - "Stripe webhook handler for automatic payment verification"
+    - "Payment transactions MongoDB collection"
     - "Display payment status and link in student profile"
-    - "Admin panel payment status display and mark as paid button"
-    - "Payment UI styling and badges"
-  stuck_tasks: []
+    - "Payment status polling after Stripe redirect"
+    - "Main page text change verification"
+  stuck_tasks:
+    - "Display payment status and link in student profile"
   test_all: false
   test_priority: "high_first"
 
