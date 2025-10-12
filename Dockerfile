@@ -12,7 +12,7 @@ WORKDIR /app/backend
 
 # Copy backend requirements and install Python dependencies
 COPY backend/requirements.txt ./requirements.txt
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/ -r requirements.txt
 
 # Copy the backend application
 COPY backend/ ./
