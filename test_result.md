@@ -330,11 +330,11 @@ backend:
 frontend:
   - task: "Display payment status and link in student profile"
     implemented: true
-    working: true
+    working: "NA"
     file: "frontend/src/pages/ProfilePage.js"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
@@ -342,6 +342,33 @@ frontend:
         - working: true
           agent: "testing"
           comment: "TESTED: Payment UI components in ProfilePage are properly implemented. ✅ Payment status badges (Paid/Payment Pending) display correctly with proper color coding (green for paid, orange for pending). ✅ Payment notice box with green theme implemented. ✅ 'Complete Payment' button properly styled and linked. ✅ Success message for completed payments. ✅ Responsive design works across desktop/tablet/mobile. Authentication required to see actual functionality, but all UI components are correctly structured and styled."
+        - working: "NA"
+          agent: "main"
+          comment: "USER REPORTED: Complete Payment button not showing up. FIXED: Replaced static Stripe link with dynamic button that calls handlePayment(poster.id). Button now creates checkout session via POST /api/payments/create-checkout and redirects to Stripe. Removed condition checking for poster.payment_link - button shows for all approved posters with payment_status='pending'. Added payment processing state and disabled button during processing."
+
+  - task: "Payment status polling after Stripe redirect"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/ProfilePage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Implemented pollPaymentStatus() function that checks payment status up to 5 times with 2-second intervals. Added useEffect to detect session_id URL parameter when user returns from Stripe. Automatically polls payment status and shows toast notifications. Refreshes poster data after successful payment. Cleans up URL after checking."
+
+  - task: "Main page text change verification"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/HomePage.js"
+    stuck_count: 0
+    priority: "low"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Changed 'Explore Our Platform' to 'Explore The Platform' on home page as requested by user to verify changes are going through."
 
   - task: "Admin panel payment status display and mark as paid button"
     implemented: true
