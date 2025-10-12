@@ -195,7 +195,6 @@ const App = () => {
               <Route path="/posters" element={<PosterJournalPage />} />
               <Route path="/students" element={<StudentNetworkPage />} />
               <Route path="/professors" element={<ProfessorNetworkPage />} />
-              <Route path="/profiles" element={<ECProfilesPage />} />
               <Route path="/volunteer" element={<VolunteerOpportunitiesPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/submit-poster" element={<SubmitPosterPage />} />
