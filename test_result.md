@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Implement Stripe checkout integration for accepted research posters. When admin approves a poster, system should send acceptance email with payment link. Student sees payment link in profile and completes payment via Stripe. After payment, poster becomes visible on public network."
+user_problem_statement: "Fix Stripe checkout integration for accepted research posters. Replace static payment link with dynamic Stripe checkout sessions using emergentintegrations library. Implement automatic payment verification via webhooks. Student should see 'Complete Payment' button in profile that creates checkout session and redirects to Stripe. After payment, webhook automatically marks poster as paid and makes it visible on public network."
 
 backend:
   - task: "SendGrid email integration for acceptance notifications"
