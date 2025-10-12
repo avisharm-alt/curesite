@@ -213,12 +213,16 @@ const OnboardingPage = () => {
 
               <div className="form-group">
                 <label>University *</label>
-                <input
-                  type="text"
-                  placeholder="e.g., University of Toronto"
+                <select
                   value={formData.university}
                   onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-                />
+                  className="university-select"
+                >
+                  <option value="">Select your university</option>
+                  {CANADIAN_UNIVERSITIES.map(uni => (
+                    <option key={uni} value={uni}>{uni}</option>
+                  ))}
+                </select>
               </div>
 
               {formData.role === 'student' && (
