@@ -19,6 +19,7 @@ import TestConnectionPage from './pages/TestConnectionPage';
 
 // Import hooks and components
 import { AuthProvider, useAuth } from './hooks/useAuth';
+import NotificationBell from './components/NotificationBell';
 
 // Import Lucide React icons
 import { 
