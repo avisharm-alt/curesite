@@ -75,37 +75,41 @@ const ProfessorNetworkPage = () => {
     <div className="professor-card">
       <div className="professor-header">
         <div>
-          <h3 className="professor-name">{professor.user_name}</h3>
+          <h3 className="professor-name">{professor.name}</h3>
           <div className="professor-meta">
-            <span className="professor-university">{professor.user_university}</span>
-            <span className="professor-department">{professor.department}</span>
+            <span className="professor-university">{professor.university}</span>
+            <span className="professor-department">{professor.program}</span>
           </div>
         </div>
-        {professor.accepting_students && (
+        {professor.profile?.accepting_students && (
           <span className="accepting-badge">Accepting Students</span>
         )}
       </div>
       
-      <div className="professor-research">
-        <h4>Research Areas</h4>
-        <div className="research-tags">
-          {professor.research_areas.map((area, index) => (
-            <span key={index} className="research-tag">{area}</span>
-          ))}
+      {professor.profile?.research_areas && (
+        <div className="professor-research">
+          <h4>Research Areas</h4>
+          <div className="research-tags">
+            {professor.profile.research_areas.map((area, index) => (
+              <span key={index} className="research-tag">{area}</span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
       
-      <div className="professor-description">
-        <p>{professor.lab_description}</p>
-      </div>
+      {professor.profile?.lab_description && (
+        <div className="professor-description">
+          <p>{professor.profile.lab_description}</p>
+        </div>
+      )}
       
       <div className="professor-actions">
-        <a href={`mailto:${professor.contact_email}`} className="contact-btn">
+        <a href={`mailto:${professor.email}`} className="contact-btn">
           <Mail size={16} />
           Contact
         </a>
-        {professor.website && (
-          <a href={professor.website} target="_blank" rel="noopener noreferrer" className="website-btn">
+        {professor.profile?.website && (
+          <a href={professor.profile.website} target="_blank" rel="noopener noreferrer" className="website-btn">
             <ExternalLink size={16} />
             Website
           </a>
