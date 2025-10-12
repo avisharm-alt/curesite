@@ -110,6 +110,11 @@ class User(BaseModel):
     year: Optional[int] = None
     user_type: str = "student"  # student, professor, admin
     verified: bool = False
+    # Social fields
+    role: str = "student"  # student, professor, lab (for CURE Social)
+    bio: Optional[str] = None
+    interests: List[str] = []
+    links: Dict[str, str] = {}  # {"website": "...", "twitter": "...", "orcid": "..."}
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class UserCreate(BaseModel):
