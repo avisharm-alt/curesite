@@ -7509,3 +7509,38 @@ a:focus {
     transform: scale(0.9);
   }
 }
+
+/* Hide header and footer during onboarding */
+body.onboarding-active header,
+body.onboarding-active footer,
+body.onboarding-active .nav {
+  display: none !important;
+}
+
+body.onboarding-active .onboarding-page {
+  padding-top: 0;
+}
+
+/* University select styling */
+.university-select {
+  width: 100%;
+  padding: 0.875rem 1rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 0.9375rem;
+  color: #111827;
+  background: #fafafa;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.university-select:focus {
+  outline: none;
+  border-color: var(--cure-green);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+}
+
+.university-select option {
+  padding: 0.5rem;
+}
