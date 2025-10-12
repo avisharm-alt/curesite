@@ -1946,7 +1946,7 @@ async def get_user_stats(user_id: str):
 
 # PROFILE UPDATE ENDPOINT
 @api_router.patch("/social/profile")
-async def update_profile(
+async def update_social_profile(
     bio: Optional[str] = None,
     interests: Optional[List[str]] = None,
     role: Optional[str] = None,
