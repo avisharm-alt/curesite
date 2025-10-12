@@ -160,8 +160,8 @@ const ProfessorNetworkPage = () => {
           <div className="loading">Loading professors...</div>
         ) : (
           <div className="professors-grid">
-            {professors.length > 0 ? (
-              professors.map((professor) => (
+            {filteredProfessors.length > 0 ? (
+              filteredProfessors.map((professor) => (
                 <ProfessorCard key={professor.id} professor={professor} />
               ))
             ) : (
