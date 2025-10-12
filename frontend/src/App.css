@@ -4927,3 +4927,60 @@ a:focus {
     font-size: 0.8125rem;
   }
 }
+
+/* Follow Button Styles */
+.follow-btn-container {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.follow-btn {
+  padding: 0.5rem 1.25rem;
+  border: 2px solid var(--cure-green);
+  background: transparent;
+  color: var(--cure-green-dark);
+  border-radius: var(--radius-lg);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.follow-btn:hover {
+  background: var(--cure-green);
+  color: var(--cure-black);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
+}
+
+.follow-btn.following {
+  background: var(--cure-green);
+  color: var(--cure-black);
+  border-color: var(--cure-green-dark);
+}
+
+.follow-btn.following:hover {
+  background: var(--gray-200);
+  color: var(--gray-700);
+  border-color: var(--gray-300);
+}
+
+.follow-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.university-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 1rem;
+  background: linear-gradient(135deg, var(--cure-green) 0%, var(--cure-green-dark) 100%);
+  color: var(--cure-black);
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin-left: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.3);
+}
