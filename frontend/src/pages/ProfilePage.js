@@ -212,11 +212,11 @@ const ProfilePage = () => {
     );
   }
 
-  if (loading) {
+  if (loading || checkingPayment) {
     return (
       <div className="page">
         <div className="page-content">
-          <div className="loading">Loading your profile...</div>
+          <div className="loading">{checkingPayment ? 'Verifying your payment...' : 'Loading your profile...'}</div>
         </div>
       </div>
     );
