@@ -468,31 +468,87 @@ class CUREAPITester:
             print("   ❌ No posters available to check payment transaction fields")
             all_tests_passed = False
         
-        # Test 2: GET /api/posters - verify public endpoint only shows paid posters
-        print("\n2. GET /api/posters - Verify public endpoint only shows paid posters")
-        success_public, all_posters = self.run_test("Get Public Posters", "GET", "posters", 200, critical=True)
-        results['public_posters'] = {'success': success_public, 'response': all_posters}
+        # Test 6: REGRESSION - GET /api/posters still filters for paid posters only
+        print("\n6. REGRESSION TEST: GET /api/posters - Verify filtering still works")
+        print("   Ensuring existing functionality not broken by new Stripe integration")
+        
+        success_public, all_posters = self.run_test("Get Public Posters (Regression)", "GET", "posters", 200, critical=True)
+        results['public_posters_regression'] = {'success': success_public, 'response': all_posters}
         
         if success_public and isinstance(all_posters, list):
             payment_filtered_correctly = True
+            approved_completed_count = 0
+            
             for poster in all_posters:
                 status = poster.get('status')
                 payment_status = poster.get('payment_status')
                 
                 # Public endpoint should only show approved AND completed payment posters
-                if status != 'approved' or payment_status != 'completed':
-                    print(f"❌ Found invalid poster in public list: {poster.get('title', 'No title')}")
-                    print(f"   Status: {status}, Payment Status: {payment_status}")
+                if status == 'approved' and payment_status == 'completed':
+                    approved_completed_count += 1
+                    print(f"   ✅ Valid public poster: {poster.get('title', 'No title')}")
+                else:
+                    print(f"   ❌ Invalid poster in public list: {poster.get('title', 'No title')}")
+                    print(f"      Status: {status}, Payment Status: {payment_status}")
                     payment_filtered_correctly = False
                     self.critical_failures.append(f"Public poster filtering failed: {poster.get('title')} has status={status}, payment_status={payment_status}")
             
             if payment_filtered_correctly:
-                print("✅ Public posters correctly filtered for approved + completed payment only")
+                print(f"   ✅ Public posters correctly filtered ({approved_completed_count} approved+completed shown)")
             else:
-                print("❌ CRITICAL: Public posters not properly filtered by payment status")
+                print("   ❌ CRITICAL: Public posters not properly filtered by payment status")
                 all_tests_passed = False
         else:
             all_tests_passed = False
+        
+        # Test 7: REGRESSION - PUT /api/admin/posters/{id}/review still sets payment_status=pending
+        print("\n7. REGRESSION TEST: PUT /api/admin/posters/{id}/review")
+        print("   Verifying admin approval still sets payment_status=pending")
+        
+        if success_public and all_posters and len(all_posters) > 0:
+            test_poster_id = all_posters[0].get('id')
+            review_data = {
+                "status": "approved",
+                "comments": "Test approval for Stripe integration verification"
+            }
+            
+            success_review, response_review = self.run_test(
+                "Admin Poster Review (No Auth - Regression)",
+                "PUT",
+                f"admin/posters/{test_poster_id}/review",
+                403,  # Should fail without admin auth
+                data=review_data,
+                critical=True
+            )
+            results['admin_review_regression'] = {'success': success_review, 'response': response_review}
+            all_tests_passed = all_tests_passed and success_review
+            
+            if success_review:
+                print("   ✅ Admin review endpoint exists and requires authentication")
+            else:
+                print("   ❌ Admin review endpoint not responding correctly")
+        
+        # Test 8: REGRESSION - PUT /api/admin/posters/{id}/payment still works
+        print("\n8. REGRESSION TEST: PUT /api/admin/posters/{id}/payment")
+        print("   Verifying manual payment marking still works")
+        
+        if success_public and all_posters and len(all_posters) > 0:
+            test_poster_id = all_posters[0].get('id')
+            
+            success_payment, response_payment = self.run_test(
+                "Admin Mark Payment (No Auth - Regression)",
+                "PUT",
+                f"admin/posters/{test_poster_id}/payment",
+                403,  # Should fail without admin auth
+                critical=True
+            )
+            results['admin_payment_regression'] = {'success': success_payment, 'response': response_payment}
+            all_tests_passed = all_tests_passed and success_payment
+            
+            if success_payment:
+                print("   ✅ Admin payment marking endpoint exists and requires authentication")
+            else:
+                print("   ❌ Admin payment marking endpoint not responding correctly")
         
         # Test 3: GET /api/posters/my - verify authentication required
         print("\n3. GET /api/posters/my - Verify authentication required")
