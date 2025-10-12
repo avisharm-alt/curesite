@@ -386,6 +386,33 @@ const ProfilePage = () => {
           </div>
         </div>
 
+        {/* Social Stats */}
+        {socialStats && (
+          <div className="profile-section">
+            <div className="section-header">
+              <h2>Social Network Stats</h2>
+            </div>
+            <div className="social-stats-grid">
+              <div className="stat-card">
+                <div className="stat-number">{socialStats.posts_count}</div>
+                <div className="stat-label">Posts</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number">{socialStats.followers_count}</div>
+                <div className="stat-label">Followers</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number">{socialStats.following_count}</div>
+                <div className="stat-label">Following</div>
+              </div>
+              <div className="stat-card">
+                <div className="stat-number">{socialStats.circles_count}</div>
+                <div className="stat-label">Circles</div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Network Profile */}
         <NetworkProfileSection 
           networkProfile={myNetworkProfile}
