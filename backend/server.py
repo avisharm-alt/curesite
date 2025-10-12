@@ -434,6 +434,35 @@ def parse_from_mongo(item):
             item['payment_completed_at'] = datetime.fromisoformat(item['payment_completed_at'])
     return item
 
+# ============================================================================
+# CURE SOCIAL HELPER FUNCTIONS
+# ============================================================================
+
+import re
+
+def extract_tags(text: str) -> List[str]:
+    """Extract #hashtags from text"""
+    return list(set(re.findall(r'#(\w+)', text)))
+
+def extract_mentions(text: str) -> List[str]:
+    """Extract @mentions from text"""
+    return list(set(re.findall(r'@(\w+)', text)))
+
+async def create_notification(user_id: str, notif_type: str, actor_id: str, 
+                              post_id: Optional[str] = None, comment_id: Optional[str] = None):
+    """Create a notification for a user"""
+    if user_id == actor_id:  # Don't notify yourself
+        return
+    
+    notification = Notification(
+        user_id=user_id,
+        type=notif_type,
+        actor_id=actor_id,
+        post_id=post_id,
+        comment_id=comment_id
+    )
+    await db.notifications.insert_one(prepare_for_mongo(notification.dict()))
+
 # Authentication Routes
 @api_router.get("/auth/google")
 async def google_auth(request: Request):
