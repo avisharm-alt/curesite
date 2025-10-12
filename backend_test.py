@@ -5,7 +5,7 @@ from datetime import datetime
 from urllib.parse import quote
 
 class CUREAPITester:
-    def __init__(self, base_url="https://9e7953ac-de55-4a07-a7bf-1559aff4d24e.preview.emergentagent.com"):
+    def __init__(self, base_url="https://labsquare.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
@@ -1381,7 +1381,7 @@ class CUREAPITester:
 def main():
     print("🚀 Starting NEW STRIPE PAYMENT INTEGRATION TESTING...")
     print("🚨 Focus: Testing NEW Stripe payment integration with emergentintegrations")
-    print("🌐 Testing URL: https://9e7953ac-de55-4a07-a7bf-1559aff4d24e.preview.emergentagent.com")
+    print("🌐 Testing URL: https://labsquare.preview.emergentagent.com")
     print("=" * 80)
     
     tester = CUREAPITester()
