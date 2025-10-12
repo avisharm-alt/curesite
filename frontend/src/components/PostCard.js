@@ -16,9 +16,39 @@ const PostCard = ({ post, onPostDeleted }) => {
   const [showComments, setShowComments] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [isLiked, setIsLiked] = useState(post.is_liked);
+  const [isFollowing, setIsFollowing] = useState(post.is_following_author);
   const [likeCount, setLikeCount] = useState(post.metrics.likes);
   const [commentCount, setCommentCount] = useState(post.metrics.comments);
   const [liking, setLiking] = useState(false);
+  const [following, setFollowing] = useState(false);
+
+  const handleFollow = async () => {
+    if (following) return;
+    
+    setFollowing(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (isFollowing) {
+        await axios.delete(`${API}/social/follow/${post.author_id}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setIsFollowing(false);
+        toast.success(`Unfollowed ${post.author_name}`);
+      } else {
+        await axios.post(`${API}/social/follow/${post.author_id}`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setIsFollowing(true);
+        toast.success(`Following ${post.author_name}!`);
+      }
+    } catch (error) {
+      console.error('Error toggling follow:', error);
+      toast.error('Failed to update follow status');
+    } finally {
+      setFollowing(false);
+    }
+  };
 
   const handleLike = async () => {
     if (liking) return;
