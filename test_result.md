@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Fix Stripe checkout integration for accepted research posters. Replace static payment link with dynamic Stripe checkout sessions using emergentintegrations library. Implement automatic payment verification via webhooks. Student should see 'Complete Payment' button in profile that creates checkout session and redirects to Stripe. After payment, webhook automatically marks poster as paid and makes it visible on public network."
+user_problem_statement: "Integrate CURE Social platform into the existing CURE infrastructure. Build a comprehensive academic social networking MVP with posts, comments, likes, follows, academic circles, and integration with existing poster system. Focus on core social features with simplified user migration (add role field, professors self-declare, auto-join Student Network)."
 
 backend:
   - task: "SendGrid email integration for acceptance notifications"
