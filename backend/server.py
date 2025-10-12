@@ -266,6 +266,91 @@ class CreateCheckoutRequest(BaseModel):
     poster_id: str
     origin_url: str
 
+# ============================================================================
+# CURE SOCIAL MODELS
+# ============================================================================
+
+class Post(BaseModel):
+    """Social media post for academic discussions"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    author_id: str
+    author_type: str = "student"  # student, professor, lab
+    text: str  # max 500 chars enforced at API level
+    attachments: List[Dict[str, str]] = []  # [{"type": "poster|pdf|image|doi|link", "url": "...", "title": "..."}]
+    tags: List[str] = []  # ["neuroscience", "tms", ...]
+    visibility: str = "public"  # public, university, lab-only
+    metrics: Dict[str, int] = {"likes": 0, "comments": 0, "reposts": 0, "views": 0}
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PostCreate(BaseModel):
+    """Request model for creating a post"""
+    text: str
+    attachments: Optional[List[Dict[str, str]]] = []
+    tags: Optional[List[str]] = []
+    visibility: Optional[str] = "public"
+
+class Comment(BaseModel):
+    """Comment on a post"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    post_id: str
+    author_id: str
+    text: str
+    parent_comment_id: Optional[str] = None  # for nested comments
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CommentCreate(BaseModel):
+    """Request model for creating a comment"""
+    text: str
+    parent_comment_id: Optional[str] = None
+
+class Follow(BaseModel):
+    """Follow relationship between users"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    follower_id: str
+    followed_id: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Circle(BaseModel):
+    """Academic topic community"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str  # "Neuroscience", "Machine Learning in Medicine"
+    slug: str  # "neuroscience", "ml-in-medicine"
+    description: str
+    owner_type: str = "system"  # system or user
+    member_count: int = 0
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class CircleCreate(BaseModel):
+    """Request model for creating a circle"""
+    name: str
+    description: str
+
+class CircleMember(BaseModel):
+    """Membership in a circle"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    circle_id: str
+    user_id: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Notification(BaseModel):
+    """User notification"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    type: str  # like, comment, follow, repost, mention
+    actor_id: str  # user who triggered the notification
+    post_id: Optional[str] = None
+    comment_id: Optional[str] = None
+    read: bool = False
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class Like(BaseModel):
+    """Like on a post"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    post_id: str
+    user_id: str
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 # JWT Functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
