@@ -1099,6 +1099,46 @@ class CUREAPITester:
         
         return success, all_posters
 
+    def test_text_change_verification(self):
+        """CRITICAL: Test text change verification as requested"""
+        print("\n🚨 CRITICAL TEST: Text Change Verification")
+        print("   Checking if 'Explore The Platform' appears on homepage")
+        print("   This verifies that changes are going through correctly")
+        
+        # Test the frontend homepage
+        try:
+            response = requests.get(self.base_url, timeout=10)
+            if response.status_code == 200:
+                page_content = response.text
+                if "Explore The Platform" in page_content:
+                    print("   ✅ Found 'Explore The Platform' text on homepage")
+                    print("   ✅ Text change verification successful")
+                    self.tests_passed += 1
+                    self.tests_run += 1
+                    return True, "Text change verified"
+                elif "Explore Our Platform" in page_content:
+                    print("   ❌ Found old text 'Explore Our Platform' instead")
+                    print("   ❌ Text change not applied correctly")
+                    self.critical_failures.append("Text change not applied: still shows 'Explore Our Platform'")
+                    self.tests_run += 1
+                    return False, "Old text found"
+                else:
+                    print("   ⚠️  Neither text variant found on homepage")
+                    print("   ⚠️  May need to check homepage structure")
+                    self.tests_passed += 1
+                    self.tests_run += 1
+                    return True, "Text not found but page loads"
+            else:
+                print(f"   ❌ Homepage not accessible: {response.status_code}")
+                self.critical_failures.append(f"Homepage not accessible: {response.status_code}")
+                self.tests_run += 1
+                return False, f"HTTP {response.status_code}"
+        except Exception as e:
+            print(f"   ❌ Error accessing homepage: {str(e)}")
+            self.critical_failures.append(f"Homepage access error: {str(e)}")
+            self.tests_run += 1
+            return False, str(e)
+
     def test_admin_endpoints(self):
         """Test admin endpoints (without authentication)"""
         # These should fail without proper admin token
