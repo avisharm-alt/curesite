@@ -114,6 +114,80 @@ const ProfilePage = () => {
     }
   };
 
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+  const handlePayment = async (posterId) => {
+    try {
+      setPaymentProcessing(true);
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      // Get origin URL
+      const originUrl = window.location.origin;
+      
+      // Create checkout session
+      const response = await axios.post(`${API}/payments/create-checkout`, {
+        poster_id: posterId,
+        origin_url: originUrl
+      }, { headers });
+      
+      // Redirect to Stripe checkout
+      if (response.data.url) {
+        window.location.href = response.data.url;
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast.error(error.response?.data?.detail || 'Error initiating payment');
+      setPaymentProcessing(false);
+    }
+  };
+
+  const pollPaymentStatus = async (sessionId, attempts = 0) => {
+    const maxAttempts = 5;
+    const pollInterval = 2000; // 2 seconds
+
+    if (attempts >= maxAttempts) {
+      toast.info('Payment status check timed out. Please refresh the page.');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      const response = await axios.get(`${API}/payments/status/${sessionId}`, { headers });
+      
+      if (response.data.payment_status === 'paid') {
+        toast.success('Payment successful! Your poster is now live on the network.');
+        fetchMyData(); // Refresh data to show updated payment status
+        return;
+      } else if (response.data.status === 'expired') {
+        toast.error('Payment session expired. Please try again.');
+        return;
+      }
+
+      // If payment is still pending, continue polling
+      setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      toast.error('Error checking payment status. Please refresh the page.');
+    }
+  };
+
+  useEffect(() => {
+    // Check if returning from Stripe
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    
+    if (sessionId) {
+      toast.info('Checking payment status...');
+      pollPaymentStatus(sessionId);
+      
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   if (!user) {
     return (
       <div className="page">
