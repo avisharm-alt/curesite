@@ -296,6 +296,27 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         print(f"❌ JWT Error: {e}")
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
+async def get_current_user_optional(request: Request):
+    """Get current user if authenticated, otherwise return None"""
+    try:
+        auth_header = request.headers.get("Authorization")
+        if not auth_header or not auth_header.startswith("Bearer "):
+            return None
+        
+        token = auth_header.split(" ")[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            return None
+        
+        user = await db.users.find_one({"id": user_id})
+        if user is None:
+            return None
+        
+        return User(**user)
+    except:
+        return None
+
 # Helper functions
 def prepare_for_mongo(data):
     if isinstance(data, dict):
