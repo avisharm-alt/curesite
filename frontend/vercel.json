@@ -1,6 +1,8 @@
 {
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/index.html" }
-  ]
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "env": {
+    "REACT_APP_BACKEND_URL": "https://curesite-production.up.railway.app"
+  }
 }
