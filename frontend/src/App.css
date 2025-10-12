@@ -2707,7 +2707,7 @@ a:focus {
 .social-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%);
-  padding-top: 1rem;
+  padding-top: 100px;
 }
 
 .social-container {
@@ -2716,7 +2716,7 @@ a:focus {
   display: grid;
   grid-template-columns: 260px 1fr 320px;
   gap: 1.5rem;
-  padding: 0 1rem;
+  padding: 0 1rem 2rem 1rem;
 }
 
 /* Left Sidebar */
