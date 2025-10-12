@@ -523,15 +523,14 @@ async def review_poster(poster_id: str, review_data: PosterReviewRequest, curren
     # If poster is being approved, set payment requirements
     if review_data.status == "approved":
         update_data["payment_status"] = "pending"
-        update_data["payment_link"] = STRIPE_PAYMENT_LINK
+        # Payment link will be generated when user initiates checkout
         
-        # Log approval for admin to send manual email
+        # Log approval
         user = await db.users.find_one({"id": poster["submitted_by"]})
         if user:
             print(f"✅ Poster approved: '{poster['title']}'")
             print(f"   Student: {user['name']} ({user['email']})")
-            print(f"   Payment link set: {STRIPE_PAYMENT_LINK}")
-            print(f"   ⚠️  Send acceptance email manually to student!")
+            print(f"   💳 Student can now complete payment ($${POSTER_PUBLICATION_FEE})")
     
     await db.poster_submissions.update_one({"id": poster_id}, {"$set": update_data})
     updated_poster = await db.poster_submissions.find_one({"id": poster_id})
