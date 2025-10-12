@@ -382,7 +382,7 @@ const ProfilePage = () => {
                   {poster.status === 'approved' && poster.payment_status === 'pending' && (
                     <div className="payment-notice">
                       <p style={{ marginBottom: '8px', fontSize: '14px', color: '#059669' }}>
-                        🎉 Your poster has been accepted! Complete payment ($25) to publish it on the network.
+                        🎉 Your poster has been accepted! Complete payment ($10) to publish it on the network.
                       </p>
                       <button 
                         onClick={() => handlePayment(poster.id)}
