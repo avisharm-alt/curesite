@@ -193,6 +193,7 @@ const App = () => {
           <main>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/social" element={<SocialPage />} />
               <Route path="/posters" element={<PosterJournalPage />} />
               <Route path="/students" element={<StudentNetworkPage />} />
               <Route path="/professors" element={<ProfessorNetworkPage />} />
