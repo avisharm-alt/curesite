@@ -1379,41 +1379,44 @@ class CUREAPITester:
         return diagnostics
 
 def main():
-    print("🚀 Starting POSTER APPROVAL FLOW TESTING...")
-    print("🚨 Focus: Testing poster approval flow to verify payment integration")
-    print("🌐 Testing URL: https://mongo-stripe.preview.emergentagent.com")
+    print("🚀 Starting NEW STRIPE PAYMENT INTEGRATION TESTING...")
+    print("🚨 Focus: Testing NEW Stripe payment integration with emergentintegrations")
+    print("🌐 Testing URL: https://9e7953ac-de55-4a07-a7bf-1559aff4d24e.preview.emergentagent.com")
     print("=" * 80)
     
     tester = CUREAPITester()
     
-    # SPECIFIC TESTS as requested in review
+    # NEW STRIPE INTEGRATION TESTS as requested in review
     print("\n🚨 REVIEW REQUEST TESTS:")
-    print("   1. Check the review endpoint exists and is accessible")
-    print("      - Test PUT /api/admin/posters/{poster_id}/review")
-    print("      - Verify it requires admin authentication (403 without auth)")
-    print("   2. Verify payment fields are set when approving")
-    print("      - When a poster is approved, check if:")
-    print("        * payment_status is set to 'pending'")
-    print("        * payment_link is set to Stripe URL")
-    print("        * reviewed_at timestamp is added")
-    print("   3. Check email sending (may fail without proper auth, that's OK)")
-    print("      - Verify the endpoint attempts to send email")
-    print("      - Check logs for email sending attempts")
-    print("   4. Test the complete approval flow")
-    print(f"      - Find poster with ID: {tester.quantum_poster_id} (Quantum Computing)")
-    print("      - Try to approve it (will fail without admin auth, but endpoint should exist)")
-    print("      - Check if the endpoint structure is correct")
+    print("   NEW ENDPOINTS TO TEST (Priority: High):")
+    print("   1. POST /api/payments/create-checkout - Creates Stripe checkout session")
+    print("   2. GET /api/payments/status/{session_id} - Check payment status")
+    print("   3. POST /api/webhook/stripe - Stripe webhook handler")
+    print("   4. Payment transactions collection - New MongoDB collection")
+    print("\n   EXISTING ENDPOINTS TO VERIFY (Regression):")
+    print("   - PUT /api/admin/posters/{poster_id}/review - Still sets payment_status=pending")
+    print("   - GET /api/posters - Still filters for approved + completed payment posters")
+    print("   - PUT /api/admin/posters/{poster_id}/payment - Manual payment marking still works")
+    print("\n   CRITICAL VALIDATION:")
+    print("   - Text change verification: 'Explore The Platform' on homepage")
+    print("   - Backend startup: No import errors from emergentintegrations")
+    print("   - No hardcoded Stripe URLs (should use dynamic checkout sessions)")
     
-    # Run the poster approval flow test
-    approval_success, approval_results = tester.test_poster_approval_flow()
+    # Run the NEW Stripe payment integration tests
+    print("\n🔍 NEW STRIPE PAYMENT INTEGRATION TESTS:")
+    stripe_success, stripe_results = tester.test_new_stripe_payment_endpoints()
+    
+    # Run text change verification
+    print("\n🔍 TEXT CHANGE VERIFICATION:")
+    text_success, text_response = tester.test_text_change_verification()
     
     # Also run basic health check
     print("\n🔍 BASIC CONNECTIVITY TESTS:")
     health_success, health_response = tester.test_health_check()
     
-    # Test specific poster lookup
-    print("\n🔍 SPECIFIC POSTER LOOKUP:")
-    poster_success, poster_response = tester.test_specific_poster()
+    # Test regression - existing functionality
+    print("\n🔍 REGRESSION TESTS:")
+    regression_success, regression_results = tester.test_regression_existing_functionality()
     
     # Print final results
     print("\n" + "=" * 80)
