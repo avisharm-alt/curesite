@@ -18,6 +18,7 @@ import jwt
 from passlib.context import CryptContext
 import secrets
 from urllib.parse import quote
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
