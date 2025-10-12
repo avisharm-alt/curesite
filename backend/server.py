@@ -250,7 +250,7 @@ class PaymentTransaction(BaseModel):
     poster_id: str
     user_id: str
     amount: float
-    currency: str = "usd"
+    currency: str = "cad"
     payment_status: str = "pending"  # pending, completed, failed, expired
     checkout_status: str = "initiated"  # initiated, open, complete, expired
     metadata: Dict[str, str] = {}
