@@ -148,7 +148,9 @@ const ProfilePage = () => {
     const pollInterval = 2000; // 2 seconds
 
     if (attempts >= maxAttempts) {
+      toast.dismiss('payment-check');
       toast.info('Payment status check timed out. Please refresh the page.');
+      setCheckingPayment(false);
       return;
     }
 
