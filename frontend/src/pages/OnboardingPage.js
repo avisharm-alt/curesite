@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -6,6 +6,35 @@ import { User, GraduationCap, Users, FileText, Check } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
+
+// Canadian Universities List
+const CANADIAN_UNIVERSITIES = [
+  "University of Toronto",
+  "University of British Columbia",
+  "McGill University",
+  "McMaster University",
+  "University of Alberta",
+  "University of Montreal",
+  "University of Waterloo",
+  "Western University",
+  "Queen's University",
+  "University of Calgary",
+  "Simon Fraser University",
+  "Dalhousie University",
+  "University of Ottawa",
+  "University of Victoria",
+  "York University",
+  "Carleton University",
+  "University of Manitoba",
+  "University of Saskatchewan",
+  "Memorial University",
+  "Ryerson University",
+  "University of Guelph",
+  "Concordia University",
+  "University of Windsor",
+  "Université Laval",
+  "Brock University"
+].sort();
 
 const OnboardingPage = () => {
   const navigate = useNavigate();
@@ -19,6 +48,14 @@ const OnboardingPage = () => {
     wantsToPoster: false
   });
   const [loading, setLoading] = useState(false);
+
+  // Hide header and footer
+  useEffect(() => {
+    document.body.classList.add('onboarding-active');
+    return () => {
+      document.body.classList.remove('onboarding-active');
+    };
+  }, []);
 
   const handleSubmit = async () => {
     // Validate required fields
@@ -37,39 +74,50 @@ const OnboardingPage = () => {
       const token = localStorage.getItem('token');
       
       // Update user profile
-      await axios.put(
-        `${API}/users/profile`,
-        {
-          name: formData.name,
-          university: formData.university,
-          program: formData.program,
-          year: formData.year
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      try {
+        await axios.put(
+          `${API}/users/profile`,
+          {
+            name: formData.name,
+            university: formData.university,
+            program: formData.program,
+            year: formData.year
+          },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (profileError) {
+        console.error('Profile update error:', profileError);
+        toast.error('Failed to update profile. Please try again.');
+        setLoading(false);
+        return;
+      }
 
       // Update social profile with role
-      await axios.patch(
-        `${API}/social/profile`,
-        { role: formData.role },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      try {
+        await axios.patch(
+          `${API}/social/profile`,
+          { role: formData.role },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+      } catch (roleError) {
+        console.error('Role update error:', roleError);
+        // Continue even if role update fails
+      }
 
       toast.success('Profile completed!');
 
       // Redirect based on choices
       if (formData.role === 'student' && formData.wantsToPoster) {
-        navigate('/submit-poster');
+        setTimeout(() => navigate('/submit-poster'), 500);
       } else {
-        navigate('/social');
+        setTimeout(() => navigate('/social'), 500);
       }
 
       // Reload to update auth context
-      window.location.reload();
+      setTimeout(() => window.location.reload(), 600);
     } catch (error) {
       console.error('Error completing profile:', error);
-      toast.error('Failed to complete profile');
-    } finally {
+      toast.error(error.response?.data?.detail || 'Failed to complete profile');
       setLoading(false);
     }
   };
