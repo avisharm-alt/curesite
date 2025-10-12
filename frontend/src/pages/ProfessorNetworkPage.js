@@ -7,35 +7,68 @@ const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const ProfessorNetworkPage = () => {
-  const [professors, setProfessors] = useState(PROFESSORS_DATA);
-  const [loading, setLoading] = useState(false);
+  const [professors, setProfessors] = useState([]);
+  const [filteredProfessors, setFilteredProfessors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showAvailableOnly, setShowAvailableOnly] = useState(true);
 
   useEffect(() => {
+    const fetchProfessors = async () => {
+      try {
+        // Fetch users with role='professor'
+        const usersResponse = await axios.get(`${API}/users`);
+        const professorUsers = usersResponse.data.filter(u => u.role === 'professor');
+        
+        // Fetch professor network profiles
+        const networkResponse = await axios.get(`${API}/professor-network`);
+        
+        // Match users with their network profiles
+        const professorsData = professorUsers.map(user => {
+          const profile = networkResponse.data.find(p => p.user_id === user.id);
+          return {
+            ...user,
+            profile: profile || null
+          };
+        });
+        
+        setProfessors(professorsData);
+        setFilteredProfessors(professorsData);
+      } catch (error) {
+        console.error('Error fetching professors:', error);
+        toast.error('Failed to load professor network');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfessors();
+  }, []);
+
+  useEffect(() => {
     filterProfessors();
-  }, [searchTerm, showAvailableOnly]);
+  }, [searchTerm, showAvailableOnly, professors]);
 
   const filterProfessors = () => {
-    let filtered = PROFESSORS_DATA;
+    let filtered = professors;
     
     // Filter by search term (research areas, name, university, department)
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       filtered = filtered.filter(prof => 
-        prof.user_name.toLowerCase().includes(term) ||
-        prof.user_university.toLowerCase().includes(term) ||
-        prof.department.toLowerCase().includes(term) ||
-        prof.research_areas.some(area => area.toLowerCase().includes(term))
+        prof.name?.toLowerCase().includes(term) ||
+        prof.university?.toLowerCase().includes(term) ||
+        prof.program?.toLowerCase().includes(term) ||
+        prof.profile?.research_areas?.some(area => area.toLowerCase().includes(term))
       );
     }
     
     // Filter by accepting students
     if (showAvailableOnly) {
-      filtered = filtered.filter(prof => prof.accepting_students);
+      filtered = filtered.filter(prof => prof.profile?.accepting_students);
     }
     
-    setProfessors(filtered);
+    setFilteredProfessors(filtered);
   };
 
   const ProfessorCard = ({ professor }) => (
