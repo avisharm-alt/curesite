@@ -379,19 +379,19 @@ const ProfilePage = () => {
                   <p className="poster-abstract">{poster.abstract.length > 150 ? poster.abstract.substring(0, 150) + '...' : poster.abstract}</p>
                   
                   {/* Show payment link for approved but unpaid posters */}
-                  {poster.status === 'approved' && poster.payment_status === 'pending' && poster.payment_link && (
+                  {poster.status === 'approved' && poster.payment_status === 'pending' && (
                     <div className="payment-notice">
                       <p style={{ marginBottom: '8px', fontSize: '14px', color: '#059669' }}>
-                        🎉 Your poster has been accepted! Complete payment to publish it on the network.
+                        🎉 Your poster has been accepted! Complete payment ($25) to publish it on the network.
                       </p>
-                      <a 
-                        href={poster.payment_link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
+                      <button 
+                        onClick={() => handlePayment(poster.id)}
+                        disabled={paymentProcessing}
                         className="payment-link-btn"
+                        style={{ border: 'none', cursor: paymentProcessing ? 'not-allowed' : 'pointer', opacity: paymentProcessing ? 0.6 : 1 }}
                       >
-                        Complete Payment
-                      </a>
+                        {paymentProcessing ? 'Processing...' : 'Complete Payment'}
+                      </button>
                     </div>
                   )}
                   
