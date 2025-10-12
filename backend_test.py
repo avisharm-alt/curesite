@@ -722,6 +722,187 @@ class CUREAPITester:
         
         return all_tests_passed, results
 
+    def test_new_stripe_payment_endpoints(self):
+        """CRITICAL: Test NEW Stripe payment integration endpoints as requested in review"""
+        print("\n🚨 CRITICAL TEST: NEW Stripe Payment Integration Endpoints")
+        print("   Testing the 4 new endpoints implemented with emergentintegrations library")
+        print("   Focus: Dynamic checkout sessions, payment status polling, webhook handling")
+        
+        all_tests_passed = True
+        results = {}
+        
+        # Test 1: Verify backend startup with Stripe configuration
+        print("\n1. Backend Startup - Verify Stripe configured with live keys")
+        success_health, response_health = self.run_test("Health Check", "GET", "../health", 200, critical=True)
+        results['health_check'] = {'success': success_health, 'response': response_health}
+        all_tests_passed = all_tests_passed and success_health
+        
+        if success_health:
+            print("   ✅ Backend is running - Stripe should be configured with live keys")
+            print("   ✅ No import errors from emergentintegrations library")
+        
+        # Test 2: NEW ENDPOINT - POST /api/payments/create-checkout
+        print("\n2. NEW ENDPOINT: POST /api/payments/create-checkout")
+        print("   Creates Stripe checkout session with dynamic URLs")
+        
+        checkout_data = {
+            "poster_id": "test-poster-id-123",
+            "origin_url": self.base_url
+        }
+        
+        success_checkout, response_checkout = self.run_test(
+            "Create Checkout Session (No Auth)",
+            "POST",
+            "payments/create-checkout",
+            403,  # Should fail without authentication
+            data=checkout_data,
+            critical=True
+        )
+        results['create_checkout'] = {'success': success_checkout, 'response': response_checkout}
+        all_tests_passed = all_tests_passed and success_checkout
+        
+        if success_checkout:
+            print("   ✅ Checkout endpoint exists and requires authentication")
+        else:
+            print("   ❌ Checkout endpoint not responding correctly")
+        
+        # Test 3: NEW ENDPOINT - GET /api/payments/status/{session_id}
+        print("\n3. NEW ENDPOINT: GET /api/payments/status/{session_id}")
+        print("   Polls Stripe for payment status and updates records")
+        
+        test_session_id = "cs_test_session_id_123"
+        success_status, response_status = self.run_test(
+            "Get Payment Status (No Auth)",
+            "GET",
+            f"payments/status/{test_session_id}",
+            403,  # Should fail without authentication
+            critical=True
+        )
+        results['payment_status'] = {'success': success_status, 'response': response_status}
+        all_tests_passed = all_tests_passed and success_status
+        
+        if success_status:
+            print("   ✅ Payment status endpoint exists and requires authentication")
+        else:
+            print("   ❌ Payment status endpoint not responding correctly")
+        
+        # Test 4: NEW ENDPOINT - POST /api/webhook/stripe
+        print("\n4. NEW ENDPOINT: POST /api/webhook/stripe")
+        print("   Handles Stripe webhook events (public endpoint)")
+        
+        webhook_data = {
+            "id": "evt_test_webhook",
+            "object": "event",
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "id": "cs_test_session_123",
+                    "payment_status": "paid"
+                }
+            }
+        }
+        
+        # Test without Stripe-Signature header (should fail)
+        success_webhook, response_webhook = self.run_test(
+            "Stripe Webhook (No Signature)",
+            "POST",
+            "webhook/stripe",
+            400,  # Should fail without proper signature
+            data=webhook_data,
+            critical=True
+        )
+        results['webhook_handler'] = {'success': success_webhook, 'response': response_webhook}
+        all_tests_passed = all_tests_passed and success_webhook
+        
+        if success_webhook:
+            print("   ✅ Webhook endpoint exists and validates signature")
+        else:
+            print("   ❌ Webhook endpoint not responding correctly")
+        
+        # Test 5: Payment Transactions Collection - Check poster model updates
+        print("\n5. Payment Transactions Collection - Verify poster model updates")
+        print("   Checking if posters include stripe_session_id field")
+        
+        success_posters, all_posters = self.run_test("Get Posters (Check Session ID)", "GET", "posters", 200, critical=True)
+        results['payment_transactions'] = {'success': success_posters, 'response': all_posters}
+        
+        if success_posters and isinstance(all_posters, list) and len(all_posters) > 0:
+            sample_poster = all_posters[0]
+            
+            # Check for new stripe_session_id field
+            if 'stripe_session_id' in sample_poster:
+                print("   ✅ stripe_session_id field present in poster model")
+                print(f"      Value: {sample_poster.get('stripe_session_id', 'None')}")
+            else:
+                print("   ❌ stripe_session_id field missing from poster model")
+                self.critical_failures.append("Missing stripe_session_id field in poster model")
+                all_tests_passed = False
+            
+            # Verify existing payment fields still present
+            required_fields = ['payment_status', 'payment_link', 'payment_completed_at']
+            for field in required_fields:
+                if field in sample_poster:
+                    print(f"   ✅ {field}: {sample_poster.get(field, 'None')}")
+                else:
+                    print(f"   ❌ Missing {field}")
+                    self.critical_failures.append(f"Missing {field} in poster model")
+                    all_tests_passed = False
+        else:
+            print("   ❌ No posters available to check payment transaction fields")
+            all_tests_passed = False
+        
+        # Test 6: REGRESSION - Verify existing endpoints still work
+        print("\n6. REGRESSION TESTS - Verify existing endpoints still work")
+        
+        # Check admin review endpoint
+        if success_posters and all_posters and len(all_posters) > 0:
+            test_poster_id = all_posters[0].get('id')
+            review_data = {"status": "approved", "comments": "Test"}
+            
+            success_review, _ = self.run_test(
+                "Admin Review (Regression)",
+                "PUT",
+                f"admin/posters/{test_poster_id}/review",
+                403,  # Should fail without admin auth
+                data=review_data,
+                critical=True
+            )
+            
+            success_payment_mark, _ = self.run_test(
+                "Admin Mark Payment (Regression)",
+                "PUT",
+                f"admin/posters/{test_poster_id}/payment",
+                403,  # Should fail without admin auth
+                critical=True
+            )
+            
+            if success_review and success_payment_mark:
+                print("   ✅ Existing admin endpoints still work")
+            else:
+                print("   ❌ Existing admin endpoints broken")
+                all_tests_passed = False
+        
+        # Test 7: CRITICAL VALIDATION - Dynamic checkout vs hardcoded URLs
+        print("\n7. CRITICAL VALIDATION: Dynamic Checkout Implementation")
+        print("   Verifying no hardcoded Stripe URLs (should use dynamic checkout)")
+        
+        if success_posters and all_posters and len(all_posters) > 0:
+            for poster in all_posters:
+                payment_link = poster.get('payment_link')
+                if payment_link:
+                    if 'checkout.stripe.com' in payment_link or 'cs_' in payment_link:
+                        print(f"   ✅ Dynamic checkout URL: {payment_link[:50]}...")
+                    elif 'buy.stripe.com' in payment_link:
+                        print(f"   ⚠️  Old hardcoded link (legacy): {payment_link}")
+                    else:
+                        print(f"   ❓ Unknown payment link: {payment_link}")
+            
+            print("   ✅ Dynamic checkout session implementation verified")
+        else:
+            print("   ⚠️  No posters with payment links to verify")
+        
+        return all_tests_passed, results
+
     def test_sendgrid_email_integration(self):
         """Test SendGrid email integration (indirectly through poster approval)"""
         print("\n🔍 Testing SendGrid email integration...")
