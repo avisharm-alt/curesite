@@ -5,7 +5,7 @@ from datetime import datetime
 from urllib.parse import quote
 
 class CUREAPITester:
-    def __init__(self, base_url="https://mongo-stripe.preview.emergentagent.com"):
+    def __init__(self, base_url="https://9e7953ac-de55-4a07-a7bf-1559aff4d24e.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.token = None
