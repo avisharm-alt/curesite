@@ -14,7 +14,7 @@ WORKDIR /app
 COPY . .
 
 # Install Python dependencies from backend directory
-RUN pip install --no-cache-dir -r backend/requirements.txt
+RUN pip install --no-cache-dir --extra-index-url https://d33sy5i8bnduwe.cloudfront.net/simple/ -r backend/requirements.txt
 
 # Create uploads directory
 RUN mkdir -p uploads
