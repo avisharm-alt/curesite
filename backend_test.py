@@ -4,7 +4,7 @@ import json
 from datetime import datetime
 from urllib.parse import quote
 
-class CUREAPITester:
+class CURESocialAPITester:
     def __init__(self, base_url="https://labsquare.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
