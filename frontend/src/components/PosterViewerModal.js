@@ -29,10 +29,8 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
   };
 
   const fileType = getFileType(poster.poster_url);
-  // Use the direct poster_url with backend prefix
-  const viewerUrl = poster.poster_url.startsWith('http') 
-    ? poster.poster_url 
-    : `${BACKEND_URL}${poster.poster_url}`;
+  // Use the backend view endpoint for proper file serving
+  const viewerUrl = `${API}/posters/${poster.id}/view`;
   
   // Add #toolbar=0 to hide PDF toolbar and ensure it displays
   const pdfViewerUrl = fileType === 'pdf' ? `${viewerUrl}#view=FitH` : viewerUrl;
