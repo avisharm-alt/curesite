@@ -406,7 +406,8 @@ async def get_current_user_optional(request: Request):
             return None
         
         return User(**user)
-    except:
+    except Exception as e:
+        print(f"Error in get_current_user_optional: {e}")
         return None
 
 # Helper functions
