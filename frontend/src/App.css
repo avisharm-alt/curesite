@@ -7225,72 +7225,42 @@ a:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 3.5rem;
+  margin-bottom: 3rem;
   gap: 1rem;
-  position: relative;
 }
 
 .step {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
-  position: relative;
-  z-index: 2;
+  gap: 0.5rem;
 }
 
 .step-number {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: #f3f4f6;
   color: #9ca3af;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 1.125rem;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 3px solid transparent;
-  position: relative;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  transition: all 0.2s;
 }
 
 .step.active .step-number {
-  background: linear-gradient(135deg, var(--cure-green) 0%, #00cc6a 100%);
+  background: var(--cure-green);
   color: #111827;
-  border-color: rgba(0, 255, 136, 0.3);
-  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.3), 0 0 0 8px rgba(0, 255, 136, 0.1);
-  transform: scale(1.1);
-}
-
-.step.active .step-number::after {
-  content: '';
-  position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  border: 2px solid var(--cure-green);
-  opacity: 0.2;
-  animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.2;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0;
-  }
 }
 
 .step span {
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   color: #9ca3af;
-  font-weight: 700;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  transition: all 0.3s;
 }
 
 .step.active span {
@@ -7298,13 +7268,10 @@ a:focus {
 }
 
 .step-line {
-  width: 80px;
-  height: 3px;
+  width: 60px;
+  height: 2px;
   background: #e5e7eb;
-  margin-bottom: 2rem;
-  position: relative;
-  z-index: 1;
-  border-radius: 2px;
+  margin-bottom: 1.5rem;
 }
 
 .onboarding-step {
