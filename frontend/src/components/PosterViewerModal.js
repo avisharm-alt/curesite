@@ -54,7 +54,7 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
         </div>
         
         <div className="poster-modal-body">
-          {loading && (
+          {loading && !error && (
             <div className="poster-loading">
               <div className="loading-spinner"></div>
               <p>Loading poster...</p>
@@ -64,36 +64,45 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
           {error && (
             <div className="poster-error">
               <AlertTriangle size={48} />
-              <h3>Unable to load poster</h3>
-              <p>There was an error loading the poster file.</p>
-              <button onClick={handleDownload} className="download-fallback-btn">
-                <Download size={16} />
-                Download Instead
-              </button>
+              <p>Unable to display poster</p>
+              <div className="error-actions">
+                <button onClick={handleDownload} className="download-btn">
+                  <Download size={20} />
+                  Download Poster
+                </button>
+                <a 
+                  href={viewerUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="open-new-tab-btn"
+                >
+                  Open in New Tab
+                </a>
+              </div>
             </div>
           )}
           
-          {fileType === 'pdf' && (
+          {fileType === 'pdf' && !error && (
             <object
               data={pdfViewerUrl}
               type="application/pdf"
               className="poster-pdf-viewer"
               onLoad={() => setLoading(false)}
+              onError={() => {
+                console.error('PDF failed to load');
+                setLoading(false);
+                setError(true);
+              }}
             >
-              <iframe
+              <embed
                 src={pdfViewerUrl}
+                type="application/pdf"
                 className="poster-pdf-viewer"
-                onLoad={() => setLoading(false)}
-                onError={() => {
-                  setLoading(false);
-                  setError(true);
-                }}
-                title={poster.title}
               />
             </object>
           )}
           
-          {fileType === 'image' && (
+          {fileType === 'image' && !error && (
             <img
               src={viewerUrl}
               alt={poster.title}
