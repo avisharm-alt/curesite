@@ -33,6 +33,9 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
   const viewerUrl = poster.poster_url.startsWith('http') 
     ? poster.poster_url 
     : `${BACKEND_URL}${poster.poster_url}`;
+  
+  // Add #toolbar=0 to hide PDF toolbar and ensure it displays
+  const pdfViewerUrl = fileType === 'pdf' ? `${viewerUrl}#view=FitH` : viewerUrl;
 
   return (
     <div className="poster-modal-overlay" onClick={onClose}>
