@@ -1,114 +1,117 @@
 <analysis>
-The AI engineer successfully took the CURE project from 0 to 1, iteratively building a full-stack React-FastAPI-MongoDB application. Initial development focused on an MVP with a single-page layout for Poster Journal, Student/Professor Networks, EC Profiles, and Volunteer Opportunities, incorporating Google OAuth for authentication and a Kraken.com-inspired design. Subsequent iterations addressed user feedback, refactoring into separate pages, implementing My Profile with editing, and fixing numerous bugs related to MongoDB ObjectId serialization, file upload ( not saving), and view/download functionality via distinct backend endpoints. The latest work expanded admin capabilities for managing network content. Google OAuth issues were a recurring challenge, primarily due to console configuration.
+The previous AI engineer successfully initiated the development of CURE Social, an academic micro-network, based on a detailed product blueprint. The work began with understanding the existing React/FastAPI/MongoDB codebase and then iteratively implementing backend models and API endpoints for social features (posts, comments, follows, circles). Key challenges included resolving  installation, managing circular imports by consolidating social code into , and fixing duplicate API routes. Frontend development involved creating numerous new components (, , , , ) and integrating them into the existing React application. A significant portion of the work involved iterative UI/UX refinement based on user feedback, including fixing design consistency, layout issues, and text visibility. The engineer also tackled critical functional bugs, such as social feed authentication, professor network population, and a persistent issue with poster viewing, which required multiple rounds of debugging and correction. The work concluded with an attempt to fix the poster viewing functionality, which was still reported as broken.
 </analysis>
 
 <product_requirements>
-The user requested a modern, elegant website for the CURE Project, a Canadian Undergraduate Research Exchange platform. The initial MVP included:
-- **Poster Journal/Collection:** For students to submit and view research posters.
-- **Network of Undergraduate Students:** To connect students interested in research.
-- **Professor Network:** For outreach and connections.
-- **Collection of EC profile/stats:** For students accepted to Canadian Med Schools.
-- **Database for med related volunteer opportunities.**
-Design was to be based on the provided CURE logo, prominently displayed, and inspired by kraken.com's aesthetic, matching CURE's black, white, and green colors.
+The goal is to build CURE Social, a verified, research-first social network for academia (students, professors, labs). It aims to replace general social media by offering a politics-free platform for academic identity and utility.
 
-Key enhancements and fixes requested and implemented include:
-- Refactoring from a single-page layout to separate pages for each feature.
-- Implementing a My Profile section for users to view their poster submissions, connections, and edit their research interests, email, program, and institution (post-login).
-- Removing images from feature pages (Poster Journal, Student Network, etc.) for a cleaner design, keeping the hero image on the homepage.
-- Adding a Delete Account option on the profile page.
-- Developing a poster submission page with file upload (PDF/image support).
-- Creating an admin control system () to review, approve/reject, and delete posters.
-- Implementing a View Poster modal popup instead of direct download.
-- Adding admin capabilities to add/remove professors, volunteer opportunities, and EC profiles.
+**MVP Scope (8-Week Build):**
+1.  **Shared Foundation:** Hybrid model with shared login, single navigation, shared auth, profile, and university fields.
+2.  **User Migration:** Add  to existing users (default student); professors can self-declare their role in settings. Students auto-join a Student Network circle on first login. No initial verification logic.
+3.  **Core Social Features:** Posts, comments, likes, follows, and a unified feed (following, global, university, circle).
+4.  **Academic Circles:** Topic-based communities (e.g., Neuroscience).
+5.  **Poster Integration:** Share to Social button for approved posters, creating a post with poster attachment.
+6.  **Backend:** Minimal schema changes for  (add role, bio, university, program, year). New collections: , , , , , , ,  (deferred), . New  endpoints.
+7.  **Frontend:** New , , , , , , , . Design should match CURE aesthetic.
+8.  **Search & Notifications:** MongoDB Atlas full-text search. In-app notifications only.
+9.  **Professor Network:** Initially professors self-declare, auto-added to network.
+10. **Poster Viewing:** Ability to properly view posters from the journal.
+
+**User Feedback & Refinements:**
+*   Initial design and layout improvements for Social section.
+*   Fix text visibility in input fields.
+*   Address header overlap with global feed.
+*   Implement follow functionality for university feeds and display university titles.
+*   Redesign Social to match overall CURE aesthetic (multiple iterations from green/white to dark theme, then to a clean, modern design).
+*   Implement an onboarding flow for new Google sign-ins (user info, role, poster submission prompt for students).
+*   Ensure Professor Network dynamically fetches data (not hardcoded).
+*   Fix profile completion failures during onboarding.
+*   Hide header/footer during onboarding.
+*   Convert university input to a dropdown.
+*   Resolve social feed authentication issues (logged-in users seeing Please log in).
+*   Fix persistent poster viewing issues.
 </product_requirements>
 
 <key_technical_concepts>
-- **FastAPI:** Python web framework for backend APIs.
-- **React:** JavaScript library for building the frontend UI.
-- **MongoDB:** NoSQL database for data storage, accessed via  (async client).
-- **Google OAuth:** User authentication via Google for university logins.
-- **Shadcn UI & Tailwind CSS:** Frontend component library and utility-first CSS framework for styling.
-- **Pydantic:** Data validation and serialization for FastAPI models.
-- **UUIDs:** Used for IDs instead of MongoDB's ObjectIDs for JSON serialization.
-- **File Upload/Serving:** Backend handles file storage (), frontend handles submission and displays.
+-   **FastAPI:** Python web framework for backend API.
+-   **MongoDB Atlas:** NoSQL database for data storage, including new social collections.
+-   **React + Vite:** Frontend framework for building UI components.
+-   **Tailwind CSS:** Utility-first CSS framework for styling.
+-   **Google OAuth:** Authentication method.
+-   **Pydantic:** Data validation and settings management (Python).
+-   **JWT:** JSON Web Tokens for secure session management.
+-   **Supervisor:** Process control system for managing frontend/backend services.
 </key_technical_concepts>
 
 <code_architecture>
-The application follows a standard full-stack architecture with a React frontend, FastAPI backend, and MongoDB database.
 
-
-
-- ****:
-    - **Importance**: This is the core of the backend, containing all FastAPI routes, MongoDB interactions, Google OAuth logic, user and role management, poster submission/review/file serving, and network management.
-    - **Changes**:
-        - Initial implementation of all MVP features (users, posters, networks, EC profiles, volunteer opportunities).
-        - Google OAuth authentication endpoints (, ).
-        - Fixed  serialization issues by ensuring  usage and proper Pydantic model handling.
-        - Added  and  endpoints for profile management.
-        - Added  endpoint for account deletion.
-        - Implemented  for file uploads.
-        - Created separate  endpoint to serve files inline for modal viewing.
-        - Modified  Pydantic model to include .
-        - Expanded admin endpoints for managing , ,  (CRUD operations).
-        - Ensured  has admin privileges.
-
-- ****:
-    - **Importance**: Stores environment variables like  and Google OAuth , .
-    - **Changes**: Updated to include Google OAuth credentials after user provided them.
-
-- ****:
-    - **Importance**: The main React component, responsible for overall application structure, routing, navigation, state management, and API calls.
-    - **Changes**:
-        - Initial monolithic structure with all sections.
-        - Refactored to implement  for separate pages.
-        - Integrated Google OAuth sign-in and logout functionality.
-        - Added navigation links for all main sections and My Profile.
-        - Incorporated  for inline poster viewing.
-        - Contains logic for fetching and displaying data for various pages (Posters, Students, Professors, EC Profiles, Volunteer Opps).
-
-- ****:
-    - **Importance**: Global CSS styles for the application, including Tailwind CSS imports and custom styles.
-    - **Changes**:
-        - Initial styling inspired by Kraken.com with CURE branding.
-        - Updated to support the new page-based layout and removed image-specific styles for feature pages.
-        - Added styles for profile page, admin panel, poster submission form, and the poster viewer modal.
-
-- ** (and potentially new components like , , , )**:
-    - **Importance**: Contains reusable UI components, with Shadcn UI components as the base.
-    - **Changes**:
-        - : Created for displaying and editing user profiles.
-        - : Created for admin to manage posters, professors, students, EC profiles, and volunteer opportunities.
-        - : Created to display PDF/image posters in a popup.
-        - : Created for the poster submission form.
-        - Other existing Shadcn components were utilized and styled as needed.
-
-- ****:
-    - **Importance**: A new directory created to securely store uploaded poster files.
-    - **Changes**: Created this directory to handle file persistence.
-
-- ** and **:
-    - **Importance**: Utility scripts for debugging and manually setting up admin access when Google OAuth was problematic.
-    - **Changes**: New scripts created for one-off tasks.
-
-- ****:
-    - **Importance**: A utility script created to resolve data inconsistency where uploaded files were not linked to poster records in MongoDB.
-    - **Changes**: New script created to update  for existing posters.
+-   ****: The core FastAPI application.
+    -   **Importance:** Central hub for all backend logic, models, and API endpoints.
+    -   **Changes:** Heavily modified to incorporate CURE Social. New Pydantic models (e.g., , , , , , , ) were added directly. All social API endpoints (, , , etc.) were integrated directly into this file. Helper functions for social features and optional authentication were also added.  model was replaced by  for profile patching. Logic for auto-creating ProfessorNetworkProfile on role update was added.
+-   ****: A one-off script.
+    -   **Importance:** Handles initial data migration and seeding.
+    -   **Changes:** Created to seed default academic circles into the MongoDB  collection and update existing users with default  fields.
+-   ****: Main React application file.
+    -   **Importance:** Defines global layout, navigation, and routing.
+    -   **Changes:** Updated to include the new  route, integrate social components into the navigation bar, and manage conditional rendering for onboarding.
+-   ****: Global CSS file.
+    -   **Importance:** Contains all application-wide styling definitions.
+    -   **Changes:** Significant additions and modifications to style all new social components and align with various design iterations of the CURE aesthetic.
+-   ****: The main interface for CURE Social.
+    -   **Importance:** Displays the social feed (following, global, university, circles modes) and handles interactions.
+    -   **Changes:** Created from scratch. Implemented UI for different feed modes, integrated PostComposer, PostCard, CommentThread, and CircleList components. Logic for fetching and displaying posts, as well as authentication handling, was added. Iteratively redesigned for layout, text visibility, and aesthetic matching.
+-   ****: New user onboarding flow.
+    -   **Importance:** Guides new users to complete their profile upon first login.
+    -   **Changes:** Created from scratch. Includes forms for user details, role selection (Student/Professor), and a student-only poster submission prompt. University input was changed to a dropdown. Implemented profile completion logic and error handling.
+-   ****: User profile display.
+    -   **Importance:** Shows user information and their content.
+    -   **Changes:** Modified to display social statistics (likes, followers, etc.) and added a Share to Social button for approved posters.
+-   ****: Displays a list of professors.
+    -   **Importance:** Allows users to view and discover professors.
+    -   **Changes:** Modified to fetch actual professor data from the backend instead of using hardcoded values, ensuring only real professors are displayed.
+-   ****: Page for submitting academic posters.
+    -   **Importance:** Allows users to upload and submit posters.
+    -   **Changes:** Added a Share to Social button upon successful poster submission, enabling easy cross-posting.
+-   ****: Component for creating new posts.
+    -   **Importance:** Provides the UI for users to draft and publish social posts.
+    -   **Changes:** Created from scratch. Includes text input, attachment handling, tag input, and visibility selection.
+-   ****: Component for displaying individual social posts.
+    -   **Importance:** Renders posts within the social feed, including author, content, and engagement metrics.
+    -   **Changes:** Created from scratch. Includes logic for displaying post text, attachments, metrics (likes, comments), and actions (like, repost, comment). A follow button was added, along with its functionality.
+-   ****: Component for in-app notifications.
+    -   **Importance:** Provides a visual indicator for new notifications and access to the notification panel.
+    -   **Changes:** Created from scratch and integrated into the global header.
+-   ****: Modal for viewing poster PDFs or images.
+    -   **Importance:** Displays the content of academic posters.
+    -   **Changes:** Created to embed poster content. Debugged and updated multiple times to correctly handle PDF viewing, ensure proper URL construction (using the backend  endpoint), and improve error handling with fallback options.
+-   ****: Custom hook for authentication.
+    -   **Importance:** Manages user authentication state and related logic.
+    -   **Changes:** Modified to check if a user's profile is complete after Google OAuth and redirect them to the  if necessary.
 </code_architecture>
 
 <pending_tasks>
-- **Google OAuth Integration:** The Google OAuth setup still requires the user to properly configure their Google Cloud Console for the  and . The AI engineer has provided detailed instructions multiple times, but the user reported it's still not fully working.
+-   Re-introduce professor verification (domain or admin-based).
+-   Implement Lab profiles + openings module.
+-   Develop University-specific feeds (beyond basic filtering).
+-   Integrate Email digests for notifications.
+-   Implement AI auto-tagging/summary features.
+-   Develop analytics dashboards.
 </pending_tasks>
 
 <current_work>
-Immediately prior to this summary request, the AI engineer was tasked with implementing comprehensive admin management for the Prof Network, Volunteer Opportunities, and EC Profiles sections. This involved:
+The immediate focus before this summary request was on debugging and fixing the persistent issue with **poster viewing** in the  component.
+The AI engineer identified that the  was incorrectly attempting to use a direct  (which likely points to an internal file path or a non-renderable URL) instead of leveraging the dedicated backend endpoint () designed for serving poster content.
 
-1.  **Backend Enhancements**: Expanding  to include CRUD endpoints for managing these entities (professors, volunteer opportunities, EC profiles).
-2.  **Frontend Admin Panel Updates**: Modifying  and potentially creating new components to introduce a tabbed interface within the  (e.g., , , ). These tabs contain forms and lists for adding, editing, and removing entries.
-3.  **UI/UX**: Adding necessary modal components, handler functions, and CSS styles () to support these new admin operations, ensuring a consistent design.
+The previous action was:
+-   **File Edited**: 
+    -   The component was updated to correctly construct the viewer URL using the  constant and the backend's  endpoint.
+    -   Improved error handling and added a direct link option within the modal for robustness.
+-   **File Edited**: 
+    -   New CSS styles were added to support the improved poster viewer, specifically for new buttons.
 
-The services were restarted after these changes. The last user interaction was asking how to deploy using Hostinger, to which the AI deferred to Emergent's deployment feature. Following this, the user explicitly requested to boot up the cure project website and have it fully working with the google login and everything right now. This indicates that, despite previous efforts, the Google OAuth is still not fully functional from the user's perspective, and the AI engineer is about to re-investigate and fix this critical issue.
+At the end of the trajectory, the frontend was being restarted to apply these changes and test the fix.
 </current_work>
 
 <optional_next_step>
-Investigate and resolve the outstanding Google OAuth login issues to ensure the website is fully operational.
+Restart the frontend and then verify that poster viewing functionality is working correctly.
 </optional_next_step>
