@@ -7481,27 +7481,29 @@ a:focus {
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 
 .form-group label {
   display: block;
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: 0.9375rem;
+  font-weight: 700;
   color: #374151;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.625rem;
+  letter-spacing: 0.3px;
 }
 
 .form-group input,
 .form-group select {
   width: 100%;
-  padding: 0.875rem 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  font-size: 0.9375rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 14px;
+  font-size: 1rem;
   color: #111827;
   background: #fafafa;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
 }
 
 .form-group input:focus,
@@ -7509,7 +7511,14 @@ a:focus {
   outline: none;
   border-color: var(--cure-green);
   background: white;
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+  box-shadow: 0 0 0 4px rgba(0, 255, 136, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+.form-group input:hover,
+.form-group select:hover {
+  border-color: #d1d5db;
+  background: white;
 }
 
 .quick-action-card {
