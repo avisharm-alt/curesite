@@ -7470,29 +7470,30 @@ a:focus {
 
 .button-group {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-top: 2rem;
 }
 
 .onboarding-btn {
   flex: 1;
-  padding: 0.875rem 1.5rem;
-  border: none;
-  border-radius: 8px;
+  padding: 0.75rem 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   font-size: 0.9375rem;
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .onboarding-btn.primary {
-  background: var(--cure-green);
-  color: #111827;
+  background: #111827;
+  color: white;
+  border-color: #111827;
 }
 
 .onboarding-btn.primary:hover:not(:disabled) {
-  background: #00cc6a;
-  transform: translateY(-1px);
+  background: #000000;
+  border-color: #000000;
 }
 
 .onboarding-btn.primary:disabled {
@@ -7501,12 +7502,14 @@ a:focus {
 }
 
 .onboarding-btn.secondary {
-  background: #f3f4f6;
-  color: #374151;
+  background: white;
+  color: #6b7280;
+  border-color: #e5e7eb;
 }
 
 .onboarding-btn.secondary:hover {
-  background: #e5e7eb;
+  border-color: #9ca3af;
+  color: #111827;
 }
 
 @media (max-width: 640px) {
