@@ -7364,13 +7364,13 @@ a:focus {
 }
 
 .onboarding-step {
-  animation: fadeIn 0.3s ease;
+  animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes fadeIn {
+@keyframes slideIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -7379,11 +7379,12 @@ a:focus {
 }
 
 .onboarding-step h2 {
-  font-size: 1.75rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 800;
   color: #111827;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.75rem;
   text-align: center;
+  letter-spacing: -0.02em;
 }
 
 .step-description {
