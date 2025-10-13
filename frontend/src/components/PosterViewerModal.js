@@ -76,16 +76,23 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
           )}
           
           {fileType === 'pdf' && (
-            <iframe
-              src={viewerUrl}
+            <object
+              data={pdfViewerUrl}
+              type="application/pdf"
               className="poster-pdf-viewer"
               onLoad={() => setLoading(false)}
-              onError={() => {
-                setLoading(false);
-                setError(true);
-              }}
-              title={poster.title}
-            />
+            >
+              <iframe
+                src={pdfViewerUrl}
+                className="poster-pdf-viewer"
+                onLoad={() => setLoading(false)}
+                onError={() => {
+                  setLoading(false);
+                  setError(true);
+                }}
+                title={poster.title}
+              />
+            </object>
           )}
           
           {fileType === 'image' && (
