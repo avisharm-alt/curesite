@@ -662,6 +662,21 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+  - task: "Poster viewing functionality in PosterViewerModal"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/components/PosterViewerModal.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "USER REPORTED: Poster viewing was broken. Modal was attempting to use direct poster_url instead of backend endpoint."
+        - working: "NA"
+          agent: "main"
+          comment: "FIXED: Updated PosterViewerModal to use correct backend endpoint /api/posters/{poster_id}/view instead of direct poster_url. Improved error handling with direct link fallback. Added proper URL construction using API constant. Frontend restarted, ready for testing."
+
 agent_communication:
     - agent: "main"
       message: "Implemented complete Stripe payment integration for accepted posters. Flow: 1) Admin reviews poster and approves it 2) System sends acceptance email via SendGrid with payment link 3) Student sees payment status and link in profile 4) Student completes payment via Stripe 5) Admin manually marks as paid 6) Poster becomes visible on public network. All backend endpoints created, frontend UI updated with payment badges and buttons."
