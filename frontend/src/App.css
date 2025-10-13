@@ -7515,7 +7515,6 @@ a:focus {
 @media (max-width: 640px) {
   .onboarding-card {
     padding: 2rem 1.5rem;
-    border-radius: 12px;
   }
 
   .account-type-grid {
@@ -7541,21 +7540,19 @@ body.onboarding-active .onboarding-page {
 /* University select styling */
 .university-select {
   width: 100%;
-  padding: 0.75rem 1rem;
+  padding: 0.625rem 0.75rem;
   border: 1px solid #e5e7eb;
-  border-radius: 8px;
+  border-radius: 0;
   font-size: 0.9375rem;
   color: #111827;
   background: white;
-  transition: all 0.2s;
+  transition: border-color 0.2s;
   cursor: pointer;
 }
 
 .university-select:focus {
   outline: none;
-  border-color: var(--cure-green);
-  background: white;
-  box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.1);
+  border-color: #111827;
 }
 
 .university-select option {
