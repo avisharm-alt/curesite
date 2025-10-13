@@ -1602,13 +1602,14 @@ async def delete_post(post_id: str, current_user: User = Depends(get_current_use
 # FEED ENDPOINTS
 @api_router.get("/social/feed")
 async def get_feed(
+    request: Request,
     mode: str = "global",
     circle_id: Optional[str] = None,
     cursor: Optional[str] = None,
-    limit: int = 20,
-    current_user: Optional[User] = Depends(lambda request: get_current_user_optional(request))
+    limit: int = 20
 ):
     """Get feed based on mode: following, global, university, circle"""
+    current_user = await get_current_user_optional(request)
     query = {"visibility": "public"}
     
     if mode == "following":
