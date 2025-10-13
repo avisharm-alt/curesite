@@ -7544,3 +7544,54 @@ body.onboarding-active .onboarding-page {
 .university-select option {
   padding: 0.5rem;
 }
+
+/* Poster viewer error actions */
+.error-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+}
+
+.open-new-tab-btn {
+  padding: 0.75rem 1.5rem;
+  background: var(--cure-green);
+  color: #111827;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.open-new-tab-btn:hover {
+  background: #00cc6a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.25);
+}
+
+.poster-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  color: #6b7280;
+}
+
+.poster-error svg {
+  color: #f59e0b;
+  margin-bottom: 1rem;
+}
+
+.poster-error p {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
