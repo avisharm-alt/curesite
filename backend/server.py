@@ -1605,15 +1605,14 @@ async def get_feed(
     circle_id: Optional[str] = None,
     cursor: Optional[str] = None,
     limit: int = 20,
-    request: Request = None
+    current_user: Optional[User] = Depends(lambda request: get_current_user_optional(request))
 ):
     """Get feed based on mode: following, global, university, circle"""
-    current_user = await get_current_user_optional(request)
     query = {"visibility": "public"}
     
     if mode == "following":
         if not current_user:
-            raise HTTPException(status_code=401, detail="Authentication required")
+            raise HTTPException(status_code=401, detail="Authentication required for following feed")
         follows = await db.follows.find({"follower_id": current_user.id}).to_list(length=1000)
         followed_ids = [f["followed_id"] for f in follows]
         if not followed_ids:
@@ -1621,7 +1620,9 @@ async def get_feed(
         query["author_id"] = {"$in": followed_ids}
     
     elif mode == "university":
-        if not current_user or not current_user.university:
+        if not current_user:
+            raise HTTPException(status_code=401, detail="Authentication required for university feed")
+        if not current_user.university:
             raise HTTPException(status_code=400, detail="University information required")
         university_users = await db.users.find({"university": current_user.university}).to_list(length=10000)
         user_ids = [u["id"] for u in university_users]
