@@ -7588,44 +7588,73 @@ a:focus {
 
 .button-group {
   display: flex;
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
 }
 
 .onboarding-btn {
   flex: 1;
-  padding: 0.875rem 1.5rem;
+  padding: 1.125rem 2rem;
   border: none;
-  border-radius: 12px;
-  font-size: 0.9375rem;
-  font-weight: 600;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+
+.onboarding-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.onboarding-btn:hover::before {
+  width: 300px;
+  height: 300px;
 }
 
 .onboarding-btn.primary {
-  background: var(--cure-green);
+  background: linear-gradient(135deg, var(--cure-green) 0%, #00cc6a 100%);
   color: #111827;
+  box-shadow: 0 8px 24px rgba(0, 255, 136, 0.25);
 }
 
 .onboarding-btn.primary:hover:not(:disabled) {
-  background: #00cc6a;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 255, 136, 0.35);
+}
+
+.onboarding-btn.primary:active:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.25);
 }
 
 .onboarding-btn.primary:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
 }
 
 .onboarding-btn.secondary {
   background: #f3f4f6;
   color: #374151;
+  font-weight: 700;
 }
 
 .onboarding-btn.secondary:hover {
   background: #e5e7eb;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 640px) {
