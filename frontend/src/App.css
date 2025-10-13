@@ -7706,10 +7706,6 @@ body.onboarding-active .onboarding-page {
   background: #fafafa;
   transition: all 0.3s;
   font-weight: 500;
-}
-  color: #111827;
-  background: #fafafa;
-  transition: all 0.2s;
   cursor: pointer;
 }
 
