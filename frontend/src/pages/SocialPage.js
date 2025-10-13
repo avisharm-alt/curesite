@@ -58,6 +58,9 @@ const SocialPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
+      console.log('Loading feed with token:', token ? 'Present' : 'Missing');
+      console.log('Mode:', activeTab);
+      
       const params = {
         mode: activeTab,
         limit: 20
@@ -86,6 +89,7 @@ const SocialPage = () => {
       setHasMore(response.data.has_more);
     } catch (error) {
       console.error('Error loading feed:', error);
+      console.error('Error response:', error.response?.data);
       if (error.response?.status === 401) {
         toast.error('Please log in to view this feed');
       } else {
