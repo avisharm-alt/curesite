@@ -7413,12 +7413,12 @@ a:focus {
 
 .quick-action-card {
   position: relative;
-  padding: 1.5rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: 1rem;
+  transition: border-color 0.2s;
+  margin-bottom: 0.75rem;
   display: flex;
   gap: 1rem;
   align-items: flex-start;
@@ -7426,30 +7426,29 @@ a:focus {
 }
 
 .quick-action-card:hover {
-  border-color: #d1d5db;
-  transform: translateY(-2px);
+  border-color: #9ca3af;
 }
 
 .quick-action-card.selected {
-  border-color: var(--cure-green);
-  background: #f9fafb;
+  border-color: #111827;
+  background: white;
 }
 
 .quick-action-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  background: #f3f4f6;
+  width: 48px;
+  height: 48px;
+  border-radius: 0;
+  background: #f9fafb;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #9ca3af;
+  color: #d1d5db;
 }
 
 .quick-action-card.selected .quick-action-icon {
-  background: #e5e7eb;
-  color: var(--cure-green);
+  background: #111827;
+  color: white;
 }
 
 .quick-action-content {
@@ -7457,15 +7456,15 @@ a:focus {
 }
 
 .quick-action-content h3 {
-  font-size: 1.125rem;
-  font-weight: 600;
+  font-size: 1rem;
+  font-weight: 500;
   color: #111827;
   margin-bottom: 0.25rem;
 }
 
 .quick-action-content p {
-  font-size: 0.875rem;
-  color: #6b7280;
+  font-size: 0.8125rem;
+  color: #9ca3af;
   line-height: 1.5;
 }
 
