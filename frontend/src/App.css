@@ -2741,7 +2741,7 @@ a:focus {
 
 .social-nav-title {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 500;
   margin: 1.5rem 0 0.75rem;
   color: #536471;
   text-transform: uppercase;
@@ -2757,7 +2757,7 @@ a:focus {
   border: none;
   background: transparent;
   color: #0f1419;
-  font-size: 1.25rem;
+  font-size: 1rem;
   font-weight: 400;
   border-radius: 28px;
   cursor: pointer;
@@ -2772,7 +2772,7 @@ a:focus {
 .social-nav-item.active {
   background: transparent;
   color: #0f1419;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .circle-name {
