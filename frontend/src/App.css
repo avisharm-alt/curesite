@@ -2709,7 +2709,7 @@ a:focus {
 /* Social Page Layout */
 .social-page {
   min-height: 100vh;
-  background: #f8fafb;
+  background: #0f0f0f;
   padding-top: 90px;
 }
 
@@ -2730,20 +2730,20 @@ a:focus {
 }
 
 .social-nav {
-  background: white;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 0.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   margin-bottom: 1.5rem;
 }
 
 .social-nav-title {
-  font-size: 0.75rem;
-  font-weight: 700;
+  font-size: 0.6875rem;
+  font-weight: 500;
   margin: 1rem 1rem 0.5rem;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .social-nav-item {
@@ -2754,9 +2754,9 @@ a:focus {
   padding: 0.75rem 1rem;
   border: none;
   background: transparent;
-  color: #374151;
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 400;
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -2764,14 +2764,14 @@ a:focus {
 }
 
 .social-nav-item:hover {
-  background: #f3f4f6;
-  color: #111827;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 1);
 }
 
 .social-nav-item.active {
   background: var(--cure-green);
-  color: #111827;
-  font-weight: 600;
+  color: #0f0f0f;
+  font-weight: 500;
 }
 
 .circle-name {
@@ -2784,8 +2784,8 @@ a:focus {
 
 .circle-count {
   font-size: 0.75rem;
-  color: #9ca3af;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
 }
 
 /* Main Feed */
@@ -2795,17 +2795,17 @@ a:focus {
 }
 
 .social-header {
-  background: white;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 2rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .social-title {
   font-size: 1.75rem;
-  font-weight: 700;
-  color: #111827;
+  font-weight: 600;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -2819,9 +2819,10 @@ a:focus {
 
 .circle-description {
   margin-top: 0.75rem;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.9375rem;
   line-height: 1.6;
+  font-weight: 400;
 }
 
 .social-feed {
@@ -2832,18 +2833,17 @@ a:focus {
 
 /* Post Composer */
 .post-composer {
-  background: white;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  border: 2px solid transparent;
   transition: all 0.2s ease;
 }
 
 .post-composer:focus-within {
-  border-color: var(--cure-green);
-  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.15);
+  border-color: rgba(0, 255, 136, 0.4);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .composer-header {
