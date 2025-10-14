@@ -107,11 +107,11 @@ body {
 }
 
 .nav-link {
-  color: #374151;
+  color: var(--cure-white);
   text-decoration: none;
   font-weight: 500;
   font-size: 0.95rem;
-  transition: color 0.2s ease;
+  transition: color 0.3s ease;
   position: relative;
 }
 
@@ -127,7 +127,7 @@ body {
   width: 0;
   height: 2px;
   background: var(--cure-green);
-  transition: width 0.2s ease;
+  transition: width 0.3s ease;
 }
 
 .nav-link:hover::after,
