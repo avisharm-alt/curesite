@@ -3275,11 +3275,10 @@ a:focus {
 
 .post-actions {
   display: flex;
-  gap: 0;
-  padding-top: 0.5rem;
+  gap: 1rem;
+  padding-top: 0.75rem;
   border-top: none;
-  justify-content: space-between;
-  max-width: 425px;
+  justify-content: flex-start;
   margin-left: 48px;
 }
 
