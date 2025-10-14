@@ -2987,7 +2987,7 @@ a:focus {
   border: none;
   border-radius: 20px;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
 }
