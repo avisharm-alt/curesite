@@ -2709,7 +2709,7 @@ a:focus {
 /* Social Page Layout */
 .social-page {
   min-height: 100vh;
-  background: #000000;
+  background: #ffffff;
   padding-top: 90px;
 }
 
@@ -2717,16 +2717,18 @@ a:focus {
   max-width: 1200px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: 240px 1fr;
-  gap: 2rem;
-  padding: 0 1.5rem 3rem;
+  grid-template-columns: 260px 1fr 320px;
+  gap: 0;
+  padding: 0;
 }
 
 /* Left Sidebar */
 .social-sidebar-left {
   position: sticky;
-  top: 100px;
+  top: 90px;
   height: fit-content;
+  padding: 1rem 1.5rem;
+  border-right: 1px solid #eff3f4;
 }
 
 .social-nav {
@@ -2738,10 +2740,10 @@ a:focus {
 }
 
 .social-nav-title {
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   font-weight: 600;
-  margin: 1rem 0 0.75rem;
-  color: #71767b;
+  margin: 1.5rem 0 0.75rem;
+  color: #536471;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -2749,38 +2751,28 @@ a:focus {
 .social-nav-item {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   width: 100%;
-  padding: 0.875rem 1rem;
+  padding: 0.75rem 1rem;
   border: none;
   background: transparent;
-  color: #e7e9ea;
-  font-size: 1rem;
+  color: #0f1419;
+  font-size: 1.25rem;
   font-weight: 400;
-  border-radius: 24px;
+  border-radius: 28px;
   cursor: pointer;
   transition: background-color 0.2s;
   margin-bottom: 0.25rem;
 }
 
 .social-nav-item:hover {
-  background: #16181c;
+  background: #f7f9f9;
 }
 
 .social-nav-item.active {
   background: transparent;
-  color: #ffffff;
+  color: #0f1419;
   font-weight: 700;
-}
-
-.social-nav-item.active::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--cure-green);
-  border-radius: 2px;
 }
 
 .circle-name {
@@ -2789,40 +2781,40 @@ a:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 1rem;
 }
 
 .circle-count {
-  font-size: 0.875rem;
-  color: #71767b;
+  font-size: 0.9375rem;
+  color: #536471;
   font-weight: 400;
 }
 
 /* Main Feed */
 .social-main {
   min-height: 100vh;
-  max-width: 680px;
-  border-left: 1px solid #2f3336;
-  border-right: 1px solid #2f3336;
+  max-width: 600px;
+  border-left: 1px solid #eff3f4;
+  border-right: 1px solid #eff3f4;
 }
 
 .social-header {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.85);
   border: none;
-  border-bottom: 1px solid #2f3336;
+  border-bottom: 1px solid #eff3f4;
   border-radius: 0;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1rem;
   margin-bottom: 0;
   position: sticky;
   top: 80px;
   backdrop-filter: blur(12px);
-  background: rgba(0, 0, 0, 0.65);
   z-index: 10;
 }
 
 .social-title {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #e7e9ea;
+  color: #0f1419;
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -2832,13 +2824,15 @@ a:focus {
 
 .social-title svg {
   color: var(--cure-green);
+  width: 20px;
+  height: 20px;
 }
 
 .circle-description {
   margin-top: 0.5rem;
-  color: #71767b;
+  color: #536471;
   font-size: 0.9375rem;
-  line-height: 1.5;
+  line-height: 1.4;
   font-weight: 400;
 }
 
@@ -2852,15 +2846,15 @@ a:focus {
 .post-composer {
   background: transparent;
   border: none;
-  border-bottom: 1px solid #2f3336;
+  border-bottom: 1px solid #eff3f4;
   border-radius: 0;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1rem;
   margin-bottom: 0;
   transition: none;
 }
 
 .post-composer:focus-within {
-  border-color: #2f3336;
+  border-color: #eff3f4;
   background: transparent;
 }
 
