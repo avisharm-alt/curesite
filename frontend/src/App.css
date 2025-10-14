@@ -2803,10 +2803,10 @@ a:focus {
   border: none;
   border-bottom: 1px solid #eff3f4;
   border-radius: 0;
-  padding: 1rem 1rem;
+  padding: 1.5rem 1rem;
   margin-bottom: 0;
   position: sticky;
-  top: 80px;
+  top: 90px;
   backdrop-filter: blur(12px);
   z-index: 10;
 }
