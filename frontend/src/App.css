@@ -4586,7 +4586,7 @@ a:focus {
   background: linear-gradient(135deg, var(--cure-green) 0%, var(--cure-green-dark) 100%);
   color: var(--cure-black);
   font-weight: 700;
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .circle-name {
@@ -4746,7 +4746,7 @@ a:focus {
 
 .tag-badge:hover {
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .tag-remove {
@@ -4808,7 +4808,7 @@ a:focus {
 .tag-add-btn:hover {
   background: var(--cure-green-dark);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .tag-cancel-btn {
@@ -4905,7 +4905,7 @@ a:focus {
   font-size: 0.9375rem;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .composer-submit-btn:hover:not(:disabled) {
@@ -5091,7 +5091,7 @@ a:focus {
   background: var(--cure-green);
   color: var(--cure-black);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .post-actions {
@@ -5195,7 +5195,7 @@ a:focus {
   justify-content: center;
   width: 42px;
   height: 42px;
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .comment-submit-btn:hover:not(:disabled) {
@@ -5418,7 +5418,7 @@ a:focus {
 .load-more-btn:hover:not(:disabled) {
   background: #f0fdf4;
   transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 .load-more-btn:disabled {
@@ -6867,7 +6867,7 @@ a:focus {
   background: var(--cure-green);
   color: var(--cure-black);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(0, 255, 136, 0.2);
+  box-shadow: 0 4px 12px rgba(0, 255, 136, 0.3);
 }
 
 @media (max-width: 640px) {
