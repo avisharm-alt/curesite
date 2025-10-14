@@ -485,12 +485,11 @@ body {
 .profile-card,
 .opportunity-card,
 .stat-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
   padding: var(--spacing-xl);
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
+  transition: all 0.2s ease;
 }
 
 .poster-card:hover,
@@ -498,8 +497,8 @@ body {
 .professor-card:hover,
 .profile-card:hover,
 .opportunity-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-color: var(--cure-green);
 }
 
