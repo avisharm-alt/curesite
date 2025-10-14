@@ -7225,8 +7225,8 @@ a:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 2.5rem;
-  gap: 0.75rem;
+  margin-bottom: 3rem;
+  gap: 1rem;
 }
 
 .step {
@@ -7237,41 +7237,39 @@ a:focus {
 }
 
 .step-number {
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: white;
-  color: #d1d5db;
-  border: 1px solid #e5e7eb;
+  background: #f3f4f6;
+  color: #9ca3af;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 500;
-  font-size: 0.875rem;
+  font-weight: 600;
+  font-size: 0.9375rem;
   transition: all 0.2s;
 }
 
 .step.active .step-number {
-  background: #111827;
-  color: white;
-  border-color: #111827;
+  background: var(--cure-green);
+  color: #111827;
 }
 
 .step span {
-  font-size: 0.75rem;
-  color: #d1d5db;
-  font-weight: 400;
+  font-size: 0.8125rem;
+  color: #9ca3af;
+  font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .step.active span {
-  color: #6b7280;
+  color: #111827;
 }
 
 .step-line {
-  width: 40px;
-  height: 1px;
+  width: 60px;
+  height: 2px;
   background: #e5e7eb;
   margin-bottom: 1.5rem;
 }
