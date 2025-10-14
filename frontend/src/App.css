@@ -3247,26 +3247,26 @@ a:focus {
   align-items: center;
   gap: 0.5rem;
   padding: 0.625rem 1rem;
-  background: #f0fdf4;
-  border: 1px solid #d1fae5;
+  background: rgba(0, 255, 136, 0.1);
+  border: 1px solid rgba(0, 255, 136, 0.2);
   border-radius: 10px;
-  color: #047857;
+  color: var(--cure-green);
   text-decoration: none;
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 400;
   transition: all 0.15s;
 }
 
 .attachment-link:hover {
-  background: #dcfce7;
-  border-color: #a7f3d0;
+  background: rgba(0, 255, 136, 0.15);
+  border-color: rgba(0, 255, 136, 0.3);
 }
 
 .post-actions {
   display: flex;
   gap: 0.5rem;
   padding-top: 1rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .action-btn {
@@ -3276,33 +3276,33 @@ a:focus {
   padding: 0.625rem 1rem;
   border: none;
   background: transparent;
-  color: #6b7280;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 0.875rem;
-  font-weight: 600;
+  font-weight: 400;
   cursor: pointer;
   border-radius: 10px;
   transition: all 0.15s;
 }
 
 .action-btn:hover {
-  background: #f9fafb;
-  color: #374151;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .action-btn.active {
-  color: #047857;
-  background: #f0fdf4;
+  color: var(--cure-green);
+  background: rgba(0, 255, 136, 0.1);
 }
 
 .action-btn.liked {
-  color: #dc2626;
+  color: #f87171;
 }
 
 /* Comment Thread */
 .comment-thread {
   margin-top: 1.25rem;
   padding-top: 1.25rem;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .comment-input-form {
@@ -3328,22 +3328,22 @@ a:focus {
 .comment-input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   font-size: 0.875rem;
   transition: all 0.15s;
-  color: #111827;
-  background: #fafafa;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .comment-input::placeholder {
-  color: #9ca3af;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 .comment-input:focus {
   outline: none;
-  border-color: var(--cure-green);
-  background: white;
+  border-color: rgba(0, 255, 136, 0.4);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .comment-submit-btn {
