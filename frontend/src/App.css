@@ -7320,65 +7320,66 @@ a:focus {
 
 .account-type-card {
   position: relative;
-  padding: 1.5rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0;
+  padding: 2rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
   text-align: center;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
   background: white;
 }
 
 .account-type-card:hover {
-  border-color: #9ca3af;
+  border-color: #d1d5db;
+  transform: translateY(-2px);
 }
 
 .account-type-card.selected {
-  border-color: #111827;
-  background: white;
+  border-color: var(--cure-green);
+  background: #f9fafb;
 }
 
 .account-type-card svg {
-  color: #d1d5db;
+  color: #9ca3af;
   margin-bottom: 1rem;
 }
 
 .account-type-card.selected svg {
-  color: #111827;
+  color: var(--cure-green);
 }
 
 .account-type-card h3 {
-  font-size: 1rem;
-  font-weight: 500;
+  font-size: 1.125rem;
+  font-weight: 600;
   color: #111827;
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.5rem;
 }
 
 .account-type-card p {
-  font-size: 0.8125rem;
-  color: #9ca3af;
+  font-size: 0.875rem;
+  color: #6b7280;
   line-height: 1.5;
 }
 
 .selected-badge {
   position: absolute;
-  top: 0.75rem;
-  right: 0.75rem;
-  width: 20px;
-  height: 20px;
+  top: 1rem;
+  right: 1rem;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background: #111827;
+  background: var(--cure-green);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: #111827;
 }
 
 .selected-badge svg {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   margin: 0;
-  color: white;
+  color: #111827;
 }
 
 .form-group {
