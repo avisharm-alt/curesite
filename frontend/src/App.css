@@ -3215,7 +3215,7 @@ a:focus {
   background: transparent;
   color: #0f1419;
   font-size: 0.9375rem;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: background-color 0.2s;
   text-align: left;
