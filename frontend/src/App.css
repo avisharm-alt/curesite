@@ -299,7 +299,7 @@ body {
 
 /* HERO SECTION */
 .hero {
-  padding: var(--spacing-3xl) var(--spacing-xl);
+  padding: 8rem var(--spacing-xl) var(--spacing-3xl);
   max-width: 1400px;
   margin: 0 auto;
 }
@@ -307,15 +307,16 @@ body {
 /* FEATURES OVERVIEW */
 .features-overview {
   padding: var(--spacing-3xl) 0;
-  background: rgba(255, 255, 255, 0.02);
+  background: transparent;
 }
 
 .section-title {
   text-align: center;
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2.25rem;
+  font-weight: 600;
   margin-bottom: var(--spacing-3xl);
-  color: var(--cure-white);
+  color: #ffffff;
+  letter-spacing: -0.02em;
 }
 
 .features-grid {
@@ -325,27 +326,26 @@ body {
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
   padding: var(--spacing-2xl);
   text-align: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
 }
 
 .feature-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-xl);
-  border-color: var(--cure-green);
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .feature-card .feature-icon {
   background: var(--cure-green);
-  color: var(--cure-black);
+  color: #0f0f0f;
   padding: var(--spacing-lg);
-  border-radius: var(--radius-lg);
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -353,15 +353,17 @@ body {
 }
 
 .feature-card h3 {
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   font-weight: 600;
   margin-bottom: var(--spacing-md);
-  color: var(--cure-white);
+  color: #ffffff;
+  letter-spacing: -0.01em;
 }
 
 .feature-card p {
-  color: var(--gray-300);
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.6;
+  font-size: 0.9375rem;
 }
 
 .hero-content {
@@ -373,9 +375,10 @@ body {
 
 .hero-title {
   font-size: 3.5rem;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1.1;
   margin-bottom: var(--spacing-lg);
+  letter-spacing: -0.03em;
 }
 
 .accent-text {
@@ -383,10 +386,11 @@ body {
 }
 
 .hero-description {
-  font-size: 1.25rem;
-  color: var(--gray-300);
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: var(--spacing-2xl);
   line-height: 1.7;
+  font-weight: 400;
 }
 
 .hero-buttons {
@@ -396,38 +400,37 @@ body {
 
 .cta-primary {
   background: var(--cure-green);
-  color: var(--cure-black);
+  color: #0f0f0f;
   border: none;
-  padding: var(--spacing-lg) var(--spacing-2xl);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 1.1rem;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .cta-primary:hover {
-  background: var(--cure-green-dark);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-xl);
+  background: var(--cure-green-light);
+  transform: translateY(-1px);
 }
 
 .cta-secondary {
   background: transparent;
-  color: var(--cure-white);
-  border: 2px solid var(--cure-white);
-  padding: var(--spacing-lg) var(--spacing-2xl);
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .cta-secondary:hover {
-  background: var(--cure-white);
-  color: var(--cure-black);
-  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
 }
 
 .hero-image {
@@ -438,16 +441,16 @@ body {
   width: 100%;
   height: 400px;
   object-fit: cover;
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-xl);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .section-img {
   width: 100%;
   height: 300px;
   object-fit: cover;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* LOADING STATES */
