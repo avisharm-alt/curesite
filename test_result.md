@@ -676,15 +676,18 @@ frontend:
 
   - task: "Fix article payment webhook handler"
     implemented: true
-    working: "NA"
+    working: true
     file: "backend/server.py"
     stuck_count: 0
     priority: "critical"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "USER REPORTED: After successful payment, article didn't appear on site. ROOT CAUSE: Webhook handler was checking for transaction['type'] and transaction['item_id'] fields which don't exist. PaymentTransaction model uses 'poster_id' field for both posters and articles, with type stored in metadata. FIX: Updated webhook handler to: 1) Check metadata.type to determine if journal_article or poster, 2) Use transaction['poster_id'] for item ID (field name is same for both), 3) Update payment_status field correctly (was using 'status' instead of 'payment_status'). Now webhook properly marks articles as payment_status='completed' and sets payment_completed_at timestamp."
+          comment: "USER REPORTED: After successful payment, article didn't appear on site. ROOT CAUSE: Webhook handler was checking for transaction['type'] and transaction['item_id'] fields which don't exist. PaymentTransaction model uses 'poster_id' field for both posters and articles, with type stored in metadata. FIX: Updated webhook handler to: 1) Check metadata.type to determine if journal_article vs poster, 2) Use transaction['poster_id'] for item ID (field name is same for both), 3) Update payment_status field correctly (was using 'status' instead of 'payment_status'). Now webhook properly marks articles as payment_status='completed' and sets payment_completed_at timestamp."
+        - working: true
+          agent: "testing"
+          comment: "COMPREHENSIVE WEBHOOK FIX TESTING COMPLETED (16/16 tests passed - 100% success rate): ✅ WEBHOOK ENDPOINT WORKING: POST /api/webhook/stripe properly validates Stripe signatures (400 without signature, 200 with valid payload). ✅ ARTICLE PAYMENT FLOW: Article creation protected (403 without auth), public articles endpoint filters correctly (only published + completed payment visible), admin review/payment endpoints properly protected. ✅ WEBHOOK SIMULATION SUCCESSFUL: Tested both article and poster webhook events - both processed successfully with 200 responses. ✅ REGRESSION TESTS PASSED: Poster payment functionality unaffected (1 approved+paid poster visible). ✅ PAYMENT MODEL COMPATIBILITY: Both article and poster checkout endpoints exist and properly protected. ✅ WEBHOOK FIX VERIFIED: Uses metadata.type to identify payment type, uses transaction['poster_id'] for item ID, updates payment_status correctly. The webhook handler fix successfully resolves the reported issue where articles didn't appear after payment completion."
 
 metadata:
   created_by: "main_agent"
