@@ -1115,27 +1115,36 @@ async def stripe_webhook(request: Request):
             
             # Get transaction
             transaction = await db.payment_transactions.find_one({"session_id": session_id})
-            if transaction and transaction["payment_status"] != "completed":
+            if transaction:
                 # Update transaction
                 await db.payment_transactions.update_one(
                     {"session_id": session_id},
                     {"$set": {
-                        "payment_status": "completed",
-                        "checkout_status": "complete",
+                        "status": "completed",
                         "completed_at": datetime.now(timezone.utc).isoformat()
                     }}
                 )
                 
-                # Update poster
-                await db.poster_submissions.update_one(
-                    {"id": transaction["poster_id"]},
-                    {"$set": {
-                        "payment_status": "completed",
-                        "payment_completed_at": datetime.now(timezone.utc).isoformat()
-                    }}
-                )
+                # Update the corresponding item (poster or article)
+                if transaction["type"] == "poster":
+                    await db.poster_submissions.update_one(
+                        {"id": transaction["item_id"]},
+                        {"$set": {
+                            "payment_status": "completed",
+                            "payment_completed_at": datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                    print(f"🎉 Webhook: Payment completed for poster {transaction['item_id']}")
                 
-                print(f"🎉 Webhook: Payment completed for poster {transaction['poster_id']}")
+                elif transaction["type"] == "journal_article":
+                    await db.journal_articles.update_one(
+                        {"id": transaction["item_id"]},
+                        {"$set": {
+                            "payment_status": "completed",
+                            "payment_completed_at": datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                    print(f"🎉 Webhook: Payment completed for article {transaction['item_id']}")
         
         return {"status": "success"}
     
