@@ -81,7 +81,9 @@ class CURESocialAPITester:
 
     def test_health_check(self):
         """Test health check endpoint"""
-        return self.run_test("Health Check", "GET", "health", 200, critical=True)
+        # Health endpoint is at root level, not under /api
+        url = f"{self.base_url}/health"
+        return self.run_test("Health Check", "GET", url, 200, critical=True)
 
     def test_circles_endpoint(self):
         """Test circles endpoint - should return 11 circles"""
