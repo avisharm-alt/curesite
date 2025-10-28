@@ -151,6 +151,7 @@ const AdminPanelPage = () => {
                   articles={articles} 
                   onReview={handleArticleReview}
                   onMarkPayment={handleMarkArticlePaymentCompleted}
+                  onDelete={handleArticleDelete}
                 />
               )}
               {activeTab === 'volunteer' && (
