@@ -674,7 +674,7 @@ frontend:
           agent: "main"
           comment: "USER REQUESTED: Change article submission from modal to full page like SubmitPosterPage. IMPLEMENTED: Created new SubmitArticlePage.js similar to SubmitPosterPage with full form fields (title, authors, article type dropdown, abstract textarea, keywords, university dropdown, program). Added route to App.js. Updated CureJournalPage to navigate to /submit-article instead of showing modal. Form uses consistent styling with poster submission. Removed all modal-related code from CureJournalPage."
 
-  - task: "Fix article payment checkout Stripe error"
+  - task: "Fix article payment webhook handler"
     implemented: true
     working: "NA"
     file: "backend/server.py"
@@ -684,7 +684,7 @@ frontend:
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "USER REPORTED BUG: 'Failed to create checkout: StripeCheckout.create_checkout_session() got an unexpected keyword argument amount'. ROOT CAUSE: Article checkout endpoint was passing parameters directly to create_checkout_session() instead of using CheckoutSessionRequest object. FIX: Updated POST /journal/articles/{article_id}/create-checkout to match poster checkout pattern - now uses CheckoutSessionRequest with proper parameters (amount, currency, success_url, cancel_url, metadata). Also creates PaymentTransaction record using Pydantic model. Cleaned up duplicate return statements and orphaned try-except block. Article payment should now work correctly."
+          comment: "USER REPORTED: After successful payment, article didn't appear on site. ROOT CAUSE: Webhook handler was checking for transaction['type'] and transaction['item_id'] fields which don't exist. PaymentTransaction model uses 'poster_id' field for both posters and articles, with type stored in metadata. FIX: Updated webhook handler to: 1) Check metadata.type to determine if journal_article or poster, 2) Use transaction['poster_id'] for item ID (field name is same for both), 3) Update payment_status field correctly (was using 'status' instead of 'payment_status'). Now webhook properly marks articles as payment_status='completed' and sets payment_completed_at timestamp."
 
 metadata:
   created_by: "main_agent"
