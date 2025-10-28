@@ -115,6 +115,12 @@ const AdminPanelPage = () => {
             Poster Management
           </button>
           <button
+            onClick={() => setActiveTab('articles')}
+            className={`admin-tab ${activeTab === 'articles' ? 'active' : ''}`}
+          >
+            CURE Journal
+          </button>
+          <button
             onClick={() => setActiveTab('volunteer')}
             className={`admin-tab ${activeTab === 'volunteer' ? 'active' : ''}`}
           >
