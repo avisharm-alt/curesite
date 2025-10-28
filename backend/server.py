@@ -1218,31 +1218,35 @@ async def stripe_webhook(request: Request):
                 await db.payment_transactions.update_one(
                     {"session_id": session_id},
                     {"$set": {
-                        "status": "completed",
+                        "payment_status": "completed",
                         "completed_at": datetime.now(timezone.utc).isoformat()
                     }}
                 )
                 
-                # Update the corresponding item (poster or article)
-                if transaction["type"] == "poster":
-                    await db.poster_submissions.update_one(
-                        {"id": transaction["item_id"]},
-                        {"$set": {
-                            "payment_status": "completed",
-                            "payment_completed_at": datetime.now(timezone.utc).isoformat()
-                        }}
-                    )
-                    print(f"🎉 Webhook: Payment completed for poster {transaction['item_id']}")
+                # Determine if this is a poster or article payment based on metadata
+                item_type = transaction.get("metadata", {}).get("type", "poster")
+                item_id = transaction.get("poster_id")  # Field is named poster_id for both
                 
-                elif transaction["type"] == "journal_article":
+                if item_type == "journal_article":
+                    # Update article payment status
                     await db.journal_articles.update_one(
-                        {"id": transaction["item_id"]},
+                        {"id": item_id},
                         {"$set": {
                             "payment_status": "completed",
                             "payment_completed_at": datetime.now(timezone.utc).isoformat()
                         }}
                     )
-                    print(f"🎉 Webhook: Payment completed for article {transaction['item_id']}")
+                    print(f"🎉 Webhook: Payment completed for article {item_id}")
+                else:
+                    # Update poster payment status
+                    await db.poster_submissions.update_one(
+                        {"id": item_id},
+                        {"$set": {
+                            "payment_status": "completed",
+                            "payment_completed_at": datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                    print(f"🎉 Webhook: Payment completed for poster {item_id}")
         
         return {"status": "success"}
     
