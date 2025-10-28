@@ -34,12 +34,28 @@ const HomePage = () => {
               </button>
             </div>
           </div>
-          <div className="hero-image">
-            <img 
-              src="https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzl8MHwxfHNlYXJjaHwxfHxtZWRpY2FsJTIwcmVzZWFyY2h8ZW58MHx8fHwxNzU3OTkwMjE1fDA&ixlib=rb-4.1.0&q=85"
-              alt="Medical Research"
-              className="hero-img"
-            />
+          <div className="partner-universities">
+            <h3 className="partner-title">Trusted by Students at</h3>
+            <div className="university-logos">
+              <div className="university-logo">
+                <div className="logo-text">Western University</div>
+              </div>
+              <div className="university-logo">
+                <div className="logo-text">University of Toronto</div>
+              </div>
+              <div className="university-logo">
+                <div className="logo-text">McMaster University</div>
+              </div>
+              <div className="university-logo">
+                <div className="logo-text">University of Waterloo</div>
+              </div>
+              <div className="university-logo">
+                <div className="logo-text">Queen's University</div>
+              </div>
+              <div className="university-logo">
+                <div className="logo-text">uOttawa</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
