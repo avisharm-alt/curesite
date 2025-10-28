@@ -61,28 +61,6 @@ const CureJournalPage = () => {
           </div>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="journal-filters">
-          <button 
-            className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-            onClick={() => setFilter('all')}
-          >
-            All Articles
-          </button>
-          <button 
-            className={`filter-btn ${filter === 'published' ? 'active' : ''}`}
-            onClick={() => setFilter('published')}
-          >
-            Published
-          </button>
-          <button 
-            className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
-            onClick={() => setFilter('pending')}
-          >
-            Under Review
-          </button>
-        </div>
-
         {/* Articles Grid */}
         {loading ? (
           <div className="loading-state">Loading articles...</div>
