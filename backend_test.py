@@ -569,7 +569,7 @@ class CURESocialAPITester:
             "POST /api/journal/articles (No Auth)",
             "POST",
             "journal/articles",
-            401,  # Should require authentication
+            403,  # FastAPI returns 403 for authentication errors
             data=article_data,
             critical=True
         )
