@@ -53,6 +53,12 @@ const AdminPanelPage = () => {
           console.log('Posters response:', postersRes.data);
           setPosters(Array.isArray(postersRes.data) ? postersRes.data : []);
           break;
+        case 'articles':
+          console.log('Fetching articles from:', `${API}/admin/journal/articles`);
+          const articlesRes = await axios.get(`${API}/admin/journal/articles`, { headers });
+          console.log('Articles response:', articlesRes.data);
+          setArticles(Array.isArray(articlesRes.data) ? articlesRes.data : []);
+          break;
         case 'volunteer':
           const volRes = await axios.get(`${API}/admin/volunteer-opportunities`, { headers });
           setVolunteerOpps(Array.isArray(volRes.data) ? volRes.data : []);
