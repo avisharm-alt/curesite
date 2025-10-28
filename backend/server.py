@@ -973,12 +973,27 @@ async def review_article(article_id: str, review_data: JournalArticleReviewReque
     if review_data.status == "published":
         update_data["payment_status"] = "pending"
         
-        # Log approval
+        # Get user details for email
         user = await db.users.find_one({"id": article["submitted_by"]})
         if user:
             print(f"✅ Article approved: '{article['title']}'")
             print(f"   Author: {user['name']} ({user['email']})")
             print(f"   💳 Author can now complete payment ($${POSTER_PUBLICATION_FEE})")
+            
+            # Send acceptance email
+            try:
+                email_sent = await send_article_acceptance_email(
+                    user["email"],
+                    user["name"],
+                    article["title"],
+                    article_id
+                )
+                if email_sent:
+                    print(f"   ✉️  Acceptance email sent to {user['email']}")
+                else:
+                    print(f"   ⚠️  Failed to send acceptance email")
+            except Exception as e:
+                print(f"   ❌ Email error: {e}")
     
     await db.journal_articles.update_one({"id": article_id}, {"$set": update_data})
     return {"message": f"Article {review_data.status}", "article_id": article_id}
