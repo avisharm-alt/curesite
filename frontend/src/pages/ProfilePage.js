@@ -479,6 +479,100 @@ const ProfilePage = () => {
           )}
         </div>
 
+
+        {/* My Article Submissions */}
+        <div className="profile-section">
+          <div className="section-header">
+            <h2>My Article Submissions</h2>
+            <div className="section-actions">
+              <span className="section-count">{myArticles.length} submissions</span>
+              <Link to="/submit-article" className="add-btn">
+                <Plus size={16} />
+                Submit New Article
+              </Link>
+            </div>
+          </div>
+
+          {myArticles.length > 0 ? (
+            <div className="posters-grid">
+              {myArticles.map((article) => (
+                <div key={article.id} className="poster-card compact">
+                  <div className="poster-header">
+                    <h3 className="poster-title">{article.title}</h3>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <span className={`status-badge status-${article.status}`}>
+                        {article.status}
+                      </span>
+                      {article.status === 'published' && (
+                        <span className={`status-badge status-${article.payment_status === 'completed' ? 'paid' : 'payment-pending'}`}>
+                          {article.payment_status === 'completed' ? 'Paid' : 'Payment Pending'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="poster-meta">
+                    <span className="poster-university">{article.university}</span>
+                    <span className="poster-program">{article.program}</span>
+                  </div>
+                  <p className="poster-abstract">{article.abstract.length > 150 ? article.abstract.substring(0, 150) + '...' : article.abstract}</p>
+                  
+                  {/* Show payment link for published but unpaid articles */}
+                  {article.status === 'published' && article.payment_status === 'pending' && (
+                    <div className="payment-notice">
+                      <AlertTriangle size={16} />
+                      <div>
+                        <p style={{ fontWeight: 600, marginBottom: '4px' }}>Payment Required</p>
+                        <p style={{ marginBottom: '8px', fontSize: '14px' }}>
+                          Complete the $10 publication fee to publish your article
+                        </p>
+                        <button
+                          onClick={() => handleArticlePayment(article.id)}
+                          disabled={paymentProcessing}
+                          className="payment-link-btn"
+                          style={{ border: 'none', cursor: paymentProcessing ? 'not-allowed' : 'pointer', opacity: paymentProcessing ? 0.6 : 1 }}
+                        >
+                          {paymentProcessing ? 'Processing...' : 'Complete Payment'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Show success message for completed payments */}
+                  {article.status === 'published' && article.payment_status === 'completed' && (
+                    <div className="payment-success">
+                      <p style={{ marginBottom: '0', fontSize: '14px', color: '#059669' }}>
+                        ✅ Payment completed! Your article is live on CURE Journal.
+                      </p>
+                    </div>
+                  )}
+                  
+                  <div className="poster-footer">
+                    <div className="poster-keywords">
+                      {article.keywords && article.keywords.split(',').slice(0, 3).map((keyword, index) => (
+                        <span key={index} className="keyword-tag small">{keyword.trim()}</span>
+                      ))}
+                      {article.keywords && article.keywords.split(',').length > 3 && (
+                        <span className="keyword-tag small">+{article.keywords.split(',').length - 3} more</span>
+                      )}
+                    </div>
+                    <div className="poster-profile-actions">
+                      <div className="poster-date">
+                        <small>{new Date(article.submitted_at).toLocaleDateString()}</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state compact">
+              <BookOpen size={32} />
+              <h3>No article submissions yet</h3>
+              <p>Submit your first article to CURE Journal!</p>
+            </div>
+          )}
+        </div>
+
         {/* Account Settings */}
         <div className="profile-section danger-section">
           <div className="section-header">
