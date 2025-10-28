@@ -321,7 +321,7 @@ const AdminPanelPage = () => {
 
 
 // Article Management Tab Component
-const ArticleManagementTab = ({ articles, onReview, onMarkPayment }) => (
+const ArticleManagementTab = ({ articles, onReview, onMarkPayment, onDelete }) => (
   <div className="admin-section">
     <h2>CURE Journal Management</h2>
     {articles.length > 0 ? (
@@ -391,6 +391,10 @@ const ArticleManagementTab = ({ articles, onReview, onMarkPayment }) => (
               {article.status === 'published' && article.payment_status === 'completed' && (
                 <span className="published-badge">✓ Published & Paid</span>
               )}
+              <button onClick={() => onDelete(article.id)} className="delete-btn">
+                <Trash2 size={16} />
+                Delete
+              </button>
             </div>
           </div>
         ))}
