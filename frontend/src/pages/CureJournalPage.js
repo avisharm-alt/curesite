@@ -1,27 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { BookOpen, Plus, Calendar, User, Tag, FileText, Download, X } from 'lucide-react';
+import { BookOpen, Plus, Calendar, User, Tag, FileText, Download } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
 const CureJournalPage = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showSubmitModal, setShowSubmitModal] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    authors: '',
-    abstract: '',
-    keywords: '',
-    university: user?.university || '',
-    program: user?.program || '',
-    article_type: 'research'
-  });
 
   useEffect(() => {
     loadArticles();
@@ -46,42 +37,7 @@ const CureJournalPage = () => {
       toast.error('Please log in to submit to CURE Journal');
       return;
     }
-    setShowSubmitModal(true);
-  };
-
-  const handleSubmitArticle = async (e) => {
-    e.preventDefault();
-    
-    if (!formData.title || !formData.authors || !formData.abstract || !formData.university || !formData.program) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const token = localStorage.getItem('token');
-      await axios.post(`${API}/journal/articles`, formData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      toast.success('Article submitted successfully! It will be reviewed by our team.');
-      setShowSubmitModal(false);
-      setFormData({
-        title: '',
-        authors: '',
-        abstract: '',
-        keywords: '',
-        university: user?.university || '',
-        program: user?.program || '',
-        article_type: 'research'
-      });
-      loadArticles();
-    } catch (error) {
-      console.error('Error submitting article:', error);
-      toast.error(error.response?.data?.detail || 'Failed to submit article');
-    } finally {
-      setSubmitting(false);
-    }
+    navigate('/submit-article');
   };
 
   return (
