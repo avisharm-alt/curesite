@@ -11,6 +11,7 @@ const AdminPanelPage = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('posters');
   const [posters, setPosters] = useState([]);
+  const [articles, setArticles] = useState([]);
   const [volunteerOpps, setVolunteerOpps] = useState([]);
   const [loading, setLoading] = useState(false);
 
