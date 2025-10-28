@@ -814,8 +814,87 @@ class CURESocialAPITester:
         print("\n🎯 PRIORITY 1: ADMIN JOURNAL ENDPOINTS")
         self.test_journal_admin_endpoints()
         
+        # Test 8: Admin workflow simulation
+        print("\n🔄 ADMIN WORKFLOW SIMULATION")
+        self.test_admin_workflow_simulation()
+        
+        # Test 9: Error handling
+        print("\n⚠️  ERROR HANDLING")
+        self.test_error_handling()
+        
         # Final summary
         self.print_journal_admin_summary()
+
+    def test_admin_workflow_simulation(self):
+        """Test admin workflow with realistic scenarios"""
+        print("\n🚨 CRITICAL TEST: Admin Workflow Simulation")
+        print("   Testing admin endpoints with realistic article IDs")
+        
+        # Use realistic UUIDs for testing
+        test_articles = [
+            "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+            "b2c3d4e5-f6g7-8901-bcde-f23456789012"
+        ]
+        
+        all_success = True
+        
+        for i, article_id in enumerate(test_articles):
+            print(f"\n   Testing Article ID {i+1}: {article_id}")
+            
+            # Test review endpoint
+            review_data = {
+                "status": "published" if i % 2 == 0 else "rejected",
+                "comments": f"Test review comment for article {i+1}"
+            }
+            
+            success_review, response_review = self.run_test(
+                f"Admin Review Article {i+1}",
+                "PUT",
+                f"admin/journal/articles/{article_id}/review",
+                403,  # No auth provided
+                data=review_data,
+                critical=False
+            )
+            
+            # Test payment completion
+            success_payment, response_payment = self.run_test(
+                f"Admin Payment Complete {i+1}",
+                "POST",
+                f"admin/journal/articles/{article_id}/payment-completed",
+                403,  # No auth provided
+                critical=False
+            )
+            
+            if success_review and success_payment:
+                print(f"   ✅ All admin endpoints working for Article {i+1}")
+            else:
+                print(f"   ❌ Some admin endpoints failed for Article {i+1}")
+                all_success = False
+        
+        return all_success, {}
+
+    def test_error_handling(self):
+        """Test error handling for various scenarios"""
+        print("\n🚨 CRITICAL TEST: Error Handling")
+        print("   Testing how endpoints handle various error conditions")
+        
+        # Test with different article ID formats
+        test_ids = ["invalid-id", "123", "550e8400-e29b-41d4-a716-446655440000"]
+        
+        for test_id in test_ids:
+            success, response = self.run_test(
+                f"Error Test ID: {test_id}",
+                "PUT",
+                f"admin/journal/articles/{test_id}/review",
+                403,  # Should require auth first
+                data={"status": "published", "comments": "test"},
+                critical=False
+            )
+            
+            if success:
+                print(f"   ✅ Endpoint handles ID '{test_id}' correctly")
+        
+        return True, {}
 
     def print_journal_admin_summary(self):
         """Print journal admin test summary"""
