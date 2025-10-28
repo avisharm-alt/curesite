@@ -508,6 +508,37 @@ async def create_notification(user_id: str, notif_type: str, actor_id: str,
     )
     await db.notifications.insert_one(prepare_for_mongo(notification.dict()))
 
+
+async def send_article_acceptance_email(to_email: str, name: str, article_title: str, article_id: str):
+    """Send article acceptance email notification"""
+    # For now, just print. Can be extended with actual email service (SendGrid, etc.)
+    print(f"""
+    ═══════════════════════════════════════════════════════
+    📧 ARTICLE ACCEPTANCE EMAIL
+    ═══════════════════════════════════════════════════════
+    To: {to_email}
+    Subject: Congratulations! Your Article Has Been Accepted
+    
+    Dear {name},
+    
+    We are pleased to inform you that your article "{article_title}" has been 
+    accepted for publication in the CURE Journal!
+    
+    Next Steps:
+    1. Complete the publication fee payment of ${POSTER_PUBLICATION_FEE} CAD
+    2. Your article will be published immediately after payment confirmation
+    3. View your article status in your profile at: {os.getenv('FRONTEND_URL', 'http://localhost:3000')}/profile
+    
+    Article ID: {article_id}
+    
+    Congratulations on this achievement!
+    
+    Best regards,
+    CURE Journal Team
+    ═══════════════════════════════════════════════════════
+    """)
+    return True  # Return True to indicate email was "sent"
+
 # Authentication Routes
 @api_router.get("/auth/google")
 async def google_auth(request: Request):
