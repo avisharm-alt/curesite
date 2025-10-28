@@ -130,6 +130,71 @@ const CureJournalPage = () => {
           </div>
         )}
       </div>
+
+      {/* Article Detail Modal */}
+      {showArticleModal && selectedArticle && (
+        <div className="modal-overlay" onClick={() => setShowArticleModal(false)}>
+          <div className="modal-content article-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>{selectedArticle.title}</h2>
+              <button onClick={() => setShowArticleModal(false)} className="modal-close">
+                <X size={24} />
+              </button>
+            </div>
+            
+            <div className="article-modal-body">
+              <div className="article-meta-row">
+                <div className="meta-item">
+                  <strong>Authors:</strong> {selectedArticle.authors}
+                </div>
+                <div className="meta-item">
+                  <strong>Type:</strong> <span className="article-type-badge">{selectedArticle.article_type}</span>
+                </div>
+              </div>
+
+              <div className="article-meta-row">
+                <div className="meta-item">
+                  <strong>Institution:</strong> {selectedArticle.university}
+                </div>
+                <div className="meta-item">
+                  <strong>Program:</strong> {selectedArticle.program}
+                </div>
+              </div>
+
+              <div className="article-meta-row">
+                <div className="meta-item">
+                  <strong>Published:</strong> {new Date(selectedArticle.submitted_at).toLocaleDateString()}
+                </div>
+              </div>
+
+              {selectedArticle.keywords && (
+                <div className="article-keywords-section">
+                  <strong>Keywords:</strong>
+                  <div className="keywords-list">
+                    {selectedArticle.keywords.split(',').map((keyword, idx) => (
+                      <span key={idx} className="keyword-tag">{keyword.trim()}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="article-abstract-section">
+                <h3>Abstract</h3>
+                <p className="abstract-full-text">{selectedArticle.abstract}</p>
+              </div>
+
+              {selectedArticle.pdf_url && (
+                <div className="article-actions-modal">
+                  <button className="download-pdf-btn">
+                    <Download size={18} />
+                    Download Full Article (PDF)
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
