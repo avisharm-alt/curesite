@@ -622,7 +622,7 @@ class CURESocialAPITester:
             "GET /api/journal/articles/my (No Auth)",
             "GET",
             "journal/articles/my",
-            401,  # Should require authentication
+            403,  # FastAPI returns 403 for authentication errors
             critical=True
         )
         
