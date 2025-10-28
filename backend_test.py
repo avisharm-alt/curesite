@@ -850,14 +850,26 @@ class CURESocialAPITester:
                 print(f"      - ... and {len(self.critical_failures) - 3} more issues")
 
 if __name__ == "__main__":
-    # Use local backend URL since social endpoints are implemented locally
+    # Use local backend URL since endpoints are implemented locally
     base_url = "http://localhost:8001"  # Direct backend URL
     
-    print("🚀 CURE SOCIAL BACKEND API TESTER")
-    print("=" * 50)
-    print(f"Target: {base_url}")
-    print("Focus: Testing 10 social endpoint groups")
-    print("=" * 50)
-    
-    tester = CURESocialAPITester(base_url)
-    tester.run_comprehensive_social_tests()
+    # Check if we should run journal admin tests or social tests
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "journal":
+        print("🚀 CURE JOURNAL ADMIN BACKEND API TESTER")
+        print("=" * 50)
+        print(f"Target: {base_url}")
+        print("Focus: Testing journal admin panel endpoints")
+        print("=" * 50)
+        
+        tester = CURESocialAPITester(base_url)
+        tester.run_journal_admin_tests()
+    else:
+        print("🚀 CURE SOCIAL BACKEND API TESTER")
+        print("=" * 50)
+        print(f"Target: {base_url}")
+        print("Focus: Testing 10 social endpoint groups")
+        print("=" * 50)
+        
+        tester = CURESocialAPITester(base_url)
+        tester.run_comprehensive_social_tests()
