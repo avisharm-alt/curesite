@@ -627,7 +627,7 @@ class CURESocialAPITester:
         )
         
         if success:
-            print("   ✅ My journal articles endpoint properly protected (401 without auth)")
+            print("   ✅ My journal articles endpoint properly protected (403 without auth)")
         else:
             print("   ❌ My journal articles endpoint not responding correctly")
         
