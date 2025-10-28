@@ -674,17 +674,17 @@ frontend:
           agent: "main"
           comment: "USER REQUESTED: Change article submission from modal to full page like SubmitPosterPage. IMPLEMENTED: Created new SubmitArticlePage.js similar to SubmitPosterPage with full form fields (title, authors, article type dropdown, abstract textarea, keywords, university dropdown, program). Added route to App.js. Updated CureJournalPage to navigate to /submit-article instead of showing modal. Form uses consistent styling with poster submission. Removed all modal-related code from CureJournalPage."
 
-  - task: "Remove social references from ProfilePage"
+  - task: "Complete payment and acceptance system for CURE Journal"
     implemented: true
     working: "NA"
-    file: "frontend/src/pages/ProfilePage.js"
+    file: "backend/server.py, frontend/src/pages/SubmitArticlePage.js, frontend/src/pages/ProfilePage.js"
     stuck_count: 0
-    priority: "medium"
+    priority: "high"
     needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "USER REQUESTED: Remove social references from user profile. IMPLEMENTED: Removed socialStats state variable, fetchSocialStats function, handleShareToSocial function. Removed Social Network Stats section from UI (posts count, followers, following, circles). Removed 'Share to Social' button that appeared for paid posters. Cleaned up useEffect to not call fetchSocialStats. Profile now focuses only on core user info and poster submissions."
+          comment: "USER REQUESTED: Implement same payment and acceptance system for CURE Journal as poster journal, plus PDF upload. IMPLEMENTED: 1) Added send_article_acceptance_email() function that prints detailed acceptance email when article is approved. 2) Updated article review endpoint to send acceptance email and set payment_status='pending' on approval. 3) Created POST /journal/articles/upload endpoint for PDF upload (max 10MB). 4) Updated SubmitArticlePage with optional PDF upload field and file handling. 5) Added article payment endpoints already existed (create-checkout, payment-status). 6) Webhook already handles journal_article payment completion. 7) Updated ProfilePage to fetch and display article submissions with payment status badges, payment buttons for pending, and success messages for completed. 8) Added handleArticlePayment() function for Stripe checkout. 9) Only articles with status='published' AND payment_status='completed' show publicly (already implemented). Complete flow: submit article → admin approves → email sent → user pays → article published."
 
 metadata:
   created_by: "main_agent"
