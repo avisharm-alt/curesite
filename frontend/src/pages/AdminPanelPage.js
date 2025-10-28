@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Award, Eye, Download, Trash2, Plus, Edit3, Save, X } from 'lucide-react';
+import { Award, Eye, Download, Trash2, Plus, Edit3, Save, X, CheckCircle, XCircle, DollarSign } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
