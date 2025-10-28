@@ -647,6 +647,18 @@ frontend:
           agent: "testing"
           comment: "TESTED: Payment UI styling is comprehensive and properly implemented. ✅ .status-paid: Green theme (rgba(16, 185, 129, 0.2) background, rgb(16, 185, 129) color/border). ✅ .status-payment-pending: Orange theme (rgba(245, 158, 11, 0.2) background, rgb(245, 158, 11) color/border). ✅ .payment-notice: Green theme (rgb(236, 253, 245) background, rgb(16, 185, 129) border). ✅ .payment-link-btn and .payment-btn: Properly styled with hover effects. ✅ Responsive design works across all viewports. ✅ Accessibility features implemented (focusable elements, proper titles). All payment styling follows design specifications."
 
+  - task: "CURE Journal admin panel integration"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/AdminPanelPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "Created ArticleManagementTab component in AdminPanelPage.js. Component displays journal articles with status badges, payment status, approve/reject buttons for pending articles, and mark payment complete button for published but unpaid articles. Added missing icon imports (CheckCircle, XCircle, DollarSign). Backend endpoints for journal article management already exist at /admin/journal/articles."
+
 metadata:
   created_by: "main_agent"
   version: "2.0"
