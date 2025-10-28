@@ -209,6 +209,27 @@ const ProfilePage = () => {
     }
   }, []);
 
+  const handleArticlePayment = async (articleId) => {
+    try {
+      setPaymentProcessing(true);
+      const token = localStorage.getItem('token');
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      // Create checkout session for article
+      const response = await axios.post(`${API}/journal/articles/${articleId}/create-checkout`, {}, { headers });
+      
+      // Redirect to Stripe checkout
+      if (response.data.checkout_url) {
+        window.location.href = response.data.checkout_url;
+      }
+    } catch (error) {
+      console.error('Article payment error:', error);
+      toast.error(error.response?.data?.detail || 'Error initiating payment');
+      setPaymentProcessing(false);
+    }
+  };
+
+
   if (!user) {
     return (
       <div className="page">
