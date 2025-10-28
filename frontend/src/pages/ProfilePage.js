@@ -410,25 +410,6 @@ const ProfilePage = () => {
                       <p style={{ marginBottom: '0', fontSize: '14px', color: '#059669' }}>
                         ✅ Payment completed! Your poster is live on the network.
                       </p>
-                      <button
-                        onClick={() => handleShareToSocial(poster)}
-                        className="share-social-btn"
-                        style={{
-                          padding: '6px 12px',
-                          background: '#2563eb',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '6px',
-                          fontSize: '13px',
-                          fontWeight: 600,
-                          cursor: 'pointer',
-                          transition: 'all 0.2s'
-                        }}
-                        onMouseOver={(e) => e.target.style.background = '#1d4ed8'}
-                        onMouseOut={(e) => e.target.style.background = '#2563eb'}
-                      >
-                        Share to Social
-                      </button>
                     </div>
                   )}
                   
