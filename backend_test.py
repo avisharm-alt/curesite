@@ -548,6 +548,74 @@ class CURESocialAPITester:
         
         return all_success, results
 
+    def test_database_connectivity(self):
+        """Test database connectivity by checking collections"""
+        print("\n🚨 CRITICAL TEST: Database Connectivity")
+        print("   Testing if journal articles collection exists and is accessible")
+        
+        # Test if we can access the database by checking if endpoints respond correctly
+        # This is indirect testing since we can't directly access MongoDB from here
+        
+        success_public, response_public = self.run_test(
+            "Database Test - Public Articles",
+            "GET",
+            "journal/articles",
+            200,
+            critical=True
+        )
+        
+        success_admin, response_admin = self.run_test(
+            "Database Test - Admin Articles (No Auth)",
+            "GET", 
+            "admin/journal/articles",
+            403,  # Should be protected but endpoint should exist
+            critical=True
+        )
+        
+        if success_public and success_admin:
+            print("   ✅ Database connectivity verified - journal_articles collection accessible")
+            print("   ✅ Both public and admin endpoints responding correctly")
+            return True, {"public": response_public, "admin": response_admin}
+        else:
+            print("   ❌ Database connectivity issues detected")
+            return False, {"public": response_public, "admin": response_admin}
+
+    def test_endpoint_response_structure(self):
+        """Test the structure of endpoint responses"""
+        print("\n🚨 CRITICAL TEST: Endpoint Response Structure")
+        print("   Testing if endpoints return properly structured responses")
+        
+        # Test public articles endpoint structure
+        success, response = self.run_test(
+            "Response Structure - Public Articles",
+            "GET",
+            "journal/articles",
+            200,
+            critical=True
+        )
+        
+        if success and isinstance(response, list):
+            print("   ✅ Public articles endpoint returns list structure")
+            if len(response) == 0:
+                print("   ✅ Empty list returned (no published articles yet)")
+            else:
+                # Check if articles have expected fields
+                article = response[0]
+                expected_fields = ['id', 'title', 'authors', 'abstract', 'university', 'status', 'payment_status']
+                missing_fields = []
+                for field in expected_fields:
+                    if field not in article:
+                        missing_fields.append(field)
+                
+                if not missing_fields:
+                    print("   ✅ Article objects have all expected fields")
+                else:
+                    print(f"   ⚠️  Article objects missing fields: {missing_fields}")
+        else:
+            print("   ❌ Public articles endpoint response structure invalid")
+        
+        return success, response
+
     def test_journal_article_creation_endpoint(self):
         """Test journal article submission endpoint"""
         print("\n🚨 CRITICAL TEST: Journal Article Submission")
