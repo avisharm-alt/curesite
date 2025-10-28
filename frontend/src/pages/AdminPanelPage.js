@@ -228,6 +228,50 @@ const AdminPanelPage = () => {
     }
   }
 
+
+
+  // Article handler functions
+  async function handleArticleReview(articleId, status, comments) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token found');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.put(`${API}/admin/journal/articles/${articleId}/review`, 
+        { status, comments }, 
+        { headers }
+      );
+      
+      toast.success(`Article ${status}!`);
+      fetchData();
+    } catch (error) {
+      console.error('Article review error:', error);
+      toast.error(`Failed to review article: ${error.response?.data?.detail || error.message}`);
+    }
+  }
+
+  async function handleMarkArticlePaymentCompleted(articleId) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token found');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.post(`${API}/admin/journal/articles/${articleId}/payment-completed`, {}, { headers });
+      
+      toast.success('Article payment marked as completed!');
+      fetchData();
+    } catch (error) {
+      console.error('Mark payment error:', error);
+      toast.error(`Failed to mark payment: ${error.response?.data?.detail || error.message}`);
+    }
+  }
+
   async function handleAddVolunteerOpp(opportunityData) {
     try {
       const token = localStorage.getItem('token');
