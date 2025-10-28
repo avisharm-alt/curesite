@@ -273,6 +273,28 @@ const AdminPanelPage = () => {
     }
   }
 
+  async function handleArticleDelete(articleId) {
+    if (!window.confirm('Are you sure you want to delete this article? This action cannot be undone.')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token found');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.delete(`${API}/admin/journal/articles/${articleId}`, { headers });
+      
+      toast.success('Article deleted successfully');
+      fetchData();
+    } catch (error) {
+      console.error('Delete article error:', error);
+      toast.error(`Failed to delete article: ${error.response?.data?.detail || error.message}`);
+    }
+  }
+
+
   async function handleAddVolunteerOpp(opportunityData) {
     try {
       const token = localStorage.getItem('token');
