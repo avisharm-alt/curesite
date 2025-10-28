@@ -146,6 +146,13 @@ const AdminPanelPage = () => {
                   onMarkPayment={handleMarkPaymentCompleted}
                 />
               )}
+              {activeTab === 'articles' && (
+                <ArticleManagementTab 
+                  articles={articles} 
+                  onReview={handleArticleReview}
+                  onMarkPayment={handleMarkArticlePaymentCompleted}
+                />
+              )}
               {activeTab === 'volunteer' && (
                 <VolunteerManagementTab 
                   opportunities={volunteerOpps}
