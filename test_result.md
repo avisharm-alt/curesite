@@ -667,10 +667,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Display payment status and link in student profile"
-    - "Payment status polling after Stripe redirect"
-  stuck_tasks:
-    - "Display payment status and link in student profile"
+    - "CURE Journal admin panel integration"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
