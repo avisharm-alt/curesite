@@ -13,6 +13,7 @@ import ProfessorNetworkPage from './pages/ProfessorNetworkPage';
 import VolunteerOpportunitiesPage from './pages/VolunteerOpportunitiesPage';
 import ProfilePage from './pages/ProfilePage';
 import SubmitPosterPage from './pages/SubmitPosterPage';
+import SubmitArticlePage from './pages/SubmitArticlePage';
 import AdminPanelPage from './pages/AdminPanelPage';
 import DebugPage from './pages/DebugPage';
 import TestConnectionPage from './pages/TestConnectionPage';
