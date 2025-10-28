@@ -450,50 +450,64 @@ body {
   grid-template-columns: repeat(2, 1fr);
   gap: 0;
   width: 100%;
-  max-width: 420px;
+  max-width: 520px;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 1.5rem;
+  border-radius: 20px;
+  padding: 2rem;
   backdrop-filter: blur(10px);
+  position: relative;
+}
+
+/* Create clear cross dividing lines */
+.university-crests::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 2rem;
+  right: 2rem;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateY(-50%);
+}
+
+.university-crests::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 2rem;
+  bottom: 2rem;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  transform: translateX(-50%);
 }
 
 .university-crest {
   width: 100%;
-  height: 120px;
+  height: 160px;
   object-fit: contain;
-  opacity: 0.7;
-  filter: grayscale(100%) brightness(0.9);
+  opacity: 0.75;
+  filter: saturate(0.85) brightness(0.95);
   transition: all 0.4s ease;
-  padding: 1.5rem;
+  padding: 2rem;
   cursor: pointer;
   position: relative;
-}
-
-/* Add subtle dividing lines */
-.university-crest:nth-child(1),
-.university-crest:nth-child(2) {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.university-crest:nth-child(1),
-.university-crest:nth-child(3) {
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 1;
 }
 
 .university-crest:hover {
   opacity: 1;
-  filter: grayscale(0%) brightness(1.1);
-  transform: scale(1.08);
+  filter: saturate(1) brightness(1.05);
+  transform: scale(1.1);
 }
 
 /* UofT crest needs extra scaling since it's smaller */
 .university-crest-uoft {
-  transform: scale(1.25);
+  transform: scale(1.35);
 }
 
 .university-crest-uoft:hover {
-  transform: scale(1.33);
+  transform: scale(1.45);
 }
 
 .hero-image {
