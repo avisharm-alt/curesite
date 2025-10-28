@@ -662,29 +662,29 @@ frontend:
           agent: "testing"
           comment: "COMPREHENSIVE TESTING COMPLETED: All CURE Journal admin panel backend endpoints tested and working perfectly. ✅ GET /api/admin/journal/articles properly protected (403 without admin auth). ✅ PUT /api/admin/journal/articles/{article_id}/review properly protected (403 without admin auth). ✅ POST /api/admin/journal/articles/{article_id}/payment-completed properly protected (403 without admin auth). ✅ All endpoints handle various article ID formats correctly (UUIDs, invalid IDs). ✅ Public journal endpoints working (GET /api/journal/articles returns 200). ✅ User journal endpoints properly protected (POST /api/journal/articles, GET /api/journal/articles/my require auth). ✅ Database connectivity verified - journal_articles collection accessible. ✅ Response structures correct (empty list for no articles). ✅ Error handling working correctly. ✅ Admin workflow simulation successful with realistic article IDs. All 18 tests passed (100% success rate). Backend integration is fully functional and ready for frontend use."
 
-  - task: "Article submission modal in CURE Journal"
+  - task: "Create SubmitArticlePage and update routing"
     implemented: true
     working: "NA"
-    file: "frontend/src/pages/CureJournalPage.js"
+    file: "frontend/src/pages/SubmitArticlePage.js, frontend/src/App.js, frontend/src/pages/CureJournalPage.js"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "Fixed article submission issue. User reported clicking 'Submit Article' was closing the page. ROOT CAUSE: Component was trying to navigate to non-existent '/submit-article' route. FIX: Replaced navigation with inline modal. Users now click 'Submit Article' and a modal opens with form fields (title, authors, university, program, article type, abstract, keywords). Form submits via POST /api/journal/articles and reloads articles on success. Added proper form validation and loading states."
+          comment: "USER REQUESTED: Change article submission from modal to full page like SubmitPosterPage. IMPLEMENTED: Created new SubmitArticlePage.js similar to SubmitPosterPage with full form fields (title, authors, article type dropdown, abstract textarea, keywords, university dropdown, program). Added route to App.js. Updated CureJournalPage to navigate to /submit-article instead of showing modal. Form uses consistent styling with poster submission. Removed all modal-related code from CureJournalPage."
 
-  - task: "Remove onboarding route"
+  - task: "Remove social references from ProfilePage"
     implemented: true
-    working: true
-    file: "frontend/src/App.js"
+    working: "NA"
+    file: "frontend/src/pages/ProfilePage.js"
     stuck_count: 0
-    priority: "low"
-    needs_retesting: false
+    priority: "medium"
+    needs_retesting: true
     status_history:
-        - working: true
+        - working: "NA"
           agent: "main"
-          comment: "Removed onboarding route and OnboardingPage import from App.js as requested by user. Onboarding functionality completely removed from the application."
+          comment: "USER REQUESTED: Remove social references from user profile. IMPLEMENTED: Removed socialStats state variable, fetchSocialStats function, handleShareToSocial function. Removed Social Network Stats section from UI (posts count, followers, following, circles). Removed 'Share to Social' button that appeared for paid posters. Cleaned up useEffect to not call fetchSocialStats. Profile now focuses only on core user info and poster submissions."
 
 metadata:
   created_by: "main_agent"
