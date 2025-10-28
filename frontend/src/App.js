@@ -7,7 +7,7 @@ import './App.css';
 // Import pages
 import HomePage from './pages/HomePage';
 import PosterJournalPage from './pages/PosterJournalPage';
-import SocialPage from './pages/SocialPage';
+import CureJournalPage from './pages/CureJournalPage';
 import StudentNetworkPage from './pages/StudentNetworkPage';
 import ProfessorNetworkPage from './pages/ProfessorNetworkPage';
 import VolunteerOpportunitiesPage from './pages/VolunteerOpportunitiesPage';
