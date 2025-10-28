@@ -82,7 +82,6 @@ const Header = () => {
         <div className="nav-user">
           {user ? (
             <div className="user-menu">
-              <NotificationBell />
               <div className="user-info">
                 <span className="user-name">{user.name}</span>
                 <span className="user-type">{user.user_type}</span>
