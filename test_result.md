@@ -674,17 +674,17 @@ frontend:
           agent: "main"
           comment: "USER REQUESTED: Change article submission from modal to full page like SubmitPosterPage. IMPLEMENTED: Created new SubmitArticlePage.js similar to SubmitPosterPage with full form fields (title, authors, article type dropdown, abstract textarea, keywords, university dropdown, program). Added route to App.js. Updated CureJournalPage to navigate to /submit-article instead of showing modal. Form uses consistent styling with poster submission. Removed all modal-related code from CureJournalPage."
 
-  - task: "Complete payment and acceptance system for CURE Journal"
+  - task: "Article detail modal and admin delete functionality"
     implemented: true
     working: "NA"
-    file: "backend/server.py, frontend/src/pages/SubmitArticlePage.js, frontend/src/pages/ProfilePage.js"
+    file: "frontend/src/pages/CureJournalPage.js, frontend/src/pages/AdminPanelPage.js, backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "USER REQUESTED: Implement same payment and acceptance system for CURE Journal as poster journal, plus PDF upload. IMPLEMENTED: 1) Added send_article_acceptance_email() function that prints detailed acceptance email when article is approved. 2) Updated article review endpoint to send acceptance email and set payment_status='pending' on approval. 3) Created POST /journal/articles/upload endpoint for PDF upload (max 10MB). 4) Updated SubmitArticlePage with optional PDF upload field and file handling. 5) Added article payment endpoints already existed (create-checkout, payment-status). 6) Webhook already handles journal_article payment completion. 7) Updated ProfilePage to fetch and display article submissions with payment status badges, payment buttons for pending, and success messages for completed. 8) Added handleArticlePayment() function for Stripe checkout. 9) Only articles with status='published' AND payment_status='completed' show publicly (already implemented). Complete flow: submit article → admin approves → email sent → user pays → article published."
+          comment: "USER REQUESTED: 1) Make 'Read Abstract' button clickable for published articles. 2) Admin needs delete functionality for article submissions. IMPLEMENTED: 1) Added article detail modal in CureJournalPage with full article information (title, authors, type badge, institution, program, published date, keywords, full abstract, download PDF button if available). Modal opens when clicking 'Read Abstract'. 2) Created DELETE /admin/journal/articles/{article_id} endpoint (admin-only). 3) Added handleArticleDelete() function in AdminPanelPage with confirmation dialog. 4) Added Delete button in ArticleManagementTab that appears for all articles regardless of status. 5) Delete function refreshes article list after successful deletion."
 
 metadata:
   created_by: "main_agent"
