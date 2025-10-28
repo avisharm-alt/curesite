@@ -13,6 +13,8 @@ const CureJournalPage = () => {
   const navigate = useNavigate();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedArticle, setSelectedArticle] = useState(null);
+  const [showArticleModal, setShowArticleModal] = useState(false);
 
   useEffect(() => {
     loadArticles();
@@ -38,6 +40,11 @@ const CureJournalPage = () => {
       return;
     }
     navigate('/submit-article');
+  };
+
+  const handleReadArticle = (article) => {
+    setSelectedArticle(article);
+    setShowArticleModal(true);
   };
 
   return (
