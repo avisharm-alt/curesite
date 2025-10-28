@@ -22,9 +22,8 @@ const CureJournalPage = () => {
   const loadArticles = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/journal/articles`, {
-        params: { status: filter === 'all' ? undefined : filter }
-      });
+      // Only fetch published articles (articles under review won't be visible)
+      const response = await axios.get(`${API}/journal/articles`);
       setArticles(response.data);
     } catch (error) {
       console.error('Error loading articles:', error);
