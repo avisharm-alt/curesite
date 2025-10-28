@@ -7651,3 +7651,263 @@ body.onboarding-active .onboarding-page {
   color: #374151;
   margin-bottom: 0.5rem;
 }
+
+
+/* CURE JOURNAL STYLES */
+.journal-page {
+  min-height: 100vh;
+  background: #0f0f0f;
+  padding-top: 100px;
+}
+
+.journal-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 4rem;
+}
+
+.journal-header {
+  margin-bottom: 3rem;
+}
+
+.journal-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+}
+
+.journal-title-section {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.journal-icon {
+  color: var(--cure-green);
+}
+
+.journal-title {
+  font-size: 2.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.journal-subtitle {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.5rem;
+  font-weight: 400;
+}
+
+.submit-article-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.75rem;
+  background: var(--cure-green);
+  color: #0f0f0f;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.submit-article-btn:hover {
+  background: #00cc6a;
+  transform: translateY(-1px);
+}
+
+.journal-filters {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 3rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filter-btn {
+  padding: 1rem 1.5rem;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.filter-btn:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.filter-btn.active {
+  color: #ffffff;
+  border-bottom-color: var(--cure-green);
+}
+
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 2rem;
+}
+
+.article-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: all 0.3s;
+}
+
+.article-card:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+.article-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.article-status {
+  padding: 0.375rem 0.875rem;
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.status-published {
+  background: rgba(0, 255, 136, 0.15);
+  color: var(--cure-green);
+}
+
+.status-pending {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.status-rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.article-date {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.article-title {
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+.article-authors {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9375rem;
+  margin-bottom: 1rem;
+}
+
+.article-abstract {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.article-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.keyword-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.article-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.view-article-btn,
+.download-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-article-btn:hover,
+.download-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.empty-state,
+.loading-state {
+  text-align: center;
+  padding: 6rem 2rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.empty-state svg {
+  color: rgba(255, 255, 255, 0.3);
+  margin-bottom: 1.5rem;
+}
+
+.empty-state h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
