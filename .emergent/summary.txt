@@ -1,117 +1,74 @@
 <analysis>
-The previous AI engineer successfully initiated the development of CURE Social, an academic micro-network, based on a detailed product blueprint. The work began with understanding the existing React/FastAPI/MongoDB codebase and then iteratively implementing backend models and API endpoints for social features (posts, comments, follows, circles). Key challenges included resolving  installation, managing circular imports by consolidating social code into , and fixing duplicate API routes. Frontend development involved creating numerous new components (, , , , ) and integrating them into the existing React application. A significant portion of the work involved iterative UI/UX refinement based on user feedback, including fixing design consistency, layout issues, and text visibility. The engineer also tackled critical functional bugs, such as social feed authentication, professor network population, and a persistent issue with poster viewing, which required multiple rounds of debugging and correction. The work concluded with an attempt to fix the poster viewing functionality, which was still reported as broken.
+The previous AI engineer successfully launched CURE Social, iteratively refining its UI/UX and fixing bugs like poster viewing. Subsequent user feedback led to numerous design iterations for the onboarding page and overall site aesthetic, culminating in a Sequoia Capital-inspired dark theme that was well-received. A set of CURE logos was also generated. A significant shift occurred when the user requested the removal of all social features, pivoting CURE to an academic publishing platform with a new CURE Journal for abstracts. This involved backend model/endpoint creation and frontend integration. Concurrently, the homepage was redesigned to feature partner university crests. The current task is to complete the backend and frontend for the CURE Journal, specifically by integrating article management into the Admin Panel.
 </analysis>
 
 <product_requirements>
-The goal is to build CURE Social, a verified, research-first social network for academia (students, professors, labs). It aims to replace general social media by offering a politics-free platform for academic identity and utility.
-
-**MVP Scope (8-Week Build):**
-1.  **Shared Foundation:** Hybrid model with shared login, single navigation, shared auth, profile, and university fields.
-2.  **User Migration:** Add  to existing users (default student); professors can self-declare their role in settings. Students auto-join a Student Network circle on first login. No initial verification logic.
-3.  **Core Social Features:** Posts, comments, likes, follows, and a unified feed (following, global, university, circle).
-4.  **Academic Circles:** Topic-based communities (e.g., Neuroscience).
-5.  **Poster Integration:** Share to Social button for approved posters, creating a post with poster attachment.
-6.  **Backend:** Minimal schema changes for  (add role, bio, university, program, year). New collections: , , , , , , ,  (deferred), . New  endpoints.
-7.  **Frontend:** New , , , , , , , . Design should match CURE aesthetic.
-8.  **Search & Notifications:** MongoDB Atlas full-text search. In-app notifications only.
-9.  **Professor Network:** Initially professors self-declare, auto-added to network.
-10. **Poster Viewing:** Ability to properly view posters from the journal.
-
-**User Feedback & Refinements:**
-*   Initial design and layout improvements for Social section.
-*   Fix text visibility in input fields.
-*   Address header overlap with global feed.
-*   Implement follow functionality for university feeds and display university titles.
-*   Redesign Social to match overall CURE aesthetic (multiple iterations from green/white to dark theme, then to a clean, modern design).
-*   Implement an onboarding flow for new Google sign-ins (user info, role, poster submission prompt for students).
-*   Ensure Professor Network dynamically fetches data (not hardcoded).
-*   Fix profile completion failures during onboarding.
-*   Hide header/footer during onboarding.
-*   Convert university input to a dropdown.
-*   Resolve social feed authentication issues (logged-in users seeing Please log in).
-*   Fix persistent poster viewing issues.
+The initial vision was CURE Social, a verified, research-first academic network with core social features (posts, comments, likes, follows, feeds), academic circles, poster integration, and a professor network. This necessitated a FastAPI backend with MongoDB collections for social data and a React frontend with dedicated social components. Initial MVP also included user migration with roles, an onboarding flow, search, and in-app notifications.
+Extensive user feedback drove numerous UI/UX improvements, including layout, text visibility, consistent aesthetic matching (e.g., green/white to dark theme, then clean, modern), and an onboarding flow with dynamic data. Critical bug fixes included social feed authentication and persistent poster viewing issues.
+A major pivot redirected the project to focus on CURE as an academic publishing platform. This involved completely removing all social features and introducing CURE Journal for abstracts and projects, independent of the poster journal. This new journal requires its own submission process, backend infrastructure, and an admin review system to manage articles, ensuring those under review are not publicly visible. The main website's aesthetic was also refined to display partner university crests with a professional, integrated design.
 </product_requirements>
 
 <key_technical_concepts>
--   **FastAPI:** Python web framework for backend API.
--   **MongoDB Atlas:** NoSQL database for data storage, including new social collections.
--   **React + Vite:** Frontend framework for building UI components.
--   **Tailwind CSS:** Utility-first CSS framework for styling.
--   **Google OAuth:** Authentication method.
--   **Pydantic:** Data validation and settings management (Python).
--   **JWT:** JSON Web Tokens for secure session management.
--   **Supervisor:** Process control system for managing frontend/backend services.
+-   **FastAPI:** Python web framework for backend API development.
+-   **MongoDB Atlas:** NoSQL database for data storage and management.
+-   **React + Vite:** Frontend framework for building interactive user interfaces.
+-   **Tailwind CSS:** Utility-first CSS framework for efficient styling.
+-   **Pydantic:** Python library for data validation and settings management.
+-   **JWT:** JSON Web Tokens for secure authentication and session management.
+-   **Supervisor:** Process control system for managing application services.
+-   **Inter Font:** A popular, highly legible typeface for modern UI.
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: The core FastAPI application.
-    -   **Importance:** Central hub for all backend logic, models, and API endpoints.
-    -   **Changes:** Heavily modified to incorporate CURE Social. New Pydantic models (e.g., , , , , , , ) were added directly. All social API endpoints (, , , etc.) were integrated directly into this file. Helper functions for social features and optional authentication were also added.  model was replaced by  for profile patching. Logic for auto-creating ProfessorNetworkProfile on role update was added.
--   ****: A one-off script.
-    -   **Importance:** Handles initial data migration and seeding.
-    -   **Changes:** Created to seed default academic circles into the MongoDB  collection and update existing users with default  fields.
+-   ****: The central FastAPI application.
+    -   **Importance:** Houses all backend models, API endpoints, and business logic.
+    -   **Changes:** Previously integrated social models/APIs. Recently, new Pydantic models (, , ) and CRUD API endpoints (for submission, review, feed, payment) for the CURE Journal were added. The Stripe webhook handler was also extended to cover journal article payments.
 -   ****: Main React application file.
-    -   **Importance:** Defines global layout, navigation, and routing.
-    -   **Changes:** Updated to include the new  route, integrate social components into the navigation bar, and manage conditional rendering for onboarding.
+    -   **Importance:** Manages global routing, navigation, and top-level layout.
+    -   **Changes:** Removed social-related routes and the  component. Added a new  route for the .
 -   ****: Global CSS file.
-    -   **Importance:** Contains all application-wide styling definitions.
-    -   **Changes:** Significant additions and modifications to style all new social components and align with various design iterations of the CURE aesthetic.
--   ****: The main interface for CURE Social.
-    -   **Importance:** Displays the social feed (following, global, university, circles modes) and handles interactions.
-    -   **Changes:** Created from scratch. Implemented UI for different feed modes, integrated PostComposer, PostCard, CommentThread, and CircleList components. Logic for fetching and displaying posts, as well as authentication handling, was added. Iteratively redesigned for layout, text visibility, and aesthetic matching.
--   ****: New user onboarding flow.
-    -   **Importance:** Guides new users to complete their profile upon first login.
-    -   **Changes:** Created from scratch. Includes forms for user details, role selection (Student/Professor), and a student-only poster submission prompt. University input was changed to a dropdown. Implemented profile completion logic and error handling.
--   ****: User profile display.
-    -   **Importance:** Shows user information and their content.
-    -   **Changes:** Modified to display social statistics (likes, followers, etc.) and added a Share to Social button for approved posters.
--   ****: Displays a list of professors.
-    -   **Importance:** Allows users to view and discover professors.
-    -   **Changes:** Modified to fetch actual professor data from the backend instead of using hardcoded values, ensuring only real professors are displayed.
--   ****: Page for submitting academic posters.
-    -   **Importance:** Allows users to upload and submit posters.
-    -   **Changes:** Added a Share to Social button upon successful poster submission, enabling easy cross-posting.
--   ****: Component for creating new posts.
-    -   **Importance:** Provides the UI for users to draft and publish social posts.
-    -   **Changes:** Created from scratch. Includes text input, attachment handling, tag input, and visibility selection.
--   ****: Component for displaying individual social posts.
-    -   **Importance:** Renders posts within the social feed, including author, content, and engagement metrics.
-    -   **Changes:** Created from scratch. Includes logic for displaying post text, attachments, metrics (likes, comments), and actions (like, repost, comment). A follow button was added, along with its functionality.
--   ****: Component for in-app notifications.
-    -   **Importance:** Provides a visual indicator for new notifications and access to the notification panel.
-    -   **Changes:** Created from scratch and integrated into the global header.
--   ****: Modal for viewing poster PDFs or images.
-    -   **Importance:** Displays the content of academic posters.
-    -   **Changes:** Created to embed poster content. Debugged and updated multiple times to correctly handle PDF viewing, ensure proper URL construction (using the backend  endpoint), and improve error handling with fallback options.
--   ****: Custom hook for authentication.
-    -   **Importance:** Manages user authentication state and related logic.
-    -   **Changes:** Modified to check if a user's profile is complete after Google OAuth and redirect them to the  if necessary.
+    -   **Importance:** Defines application-wide styling.
+    -   **Changes:** Underwent multiple design overhauls, from enhanced professional to Sequoia Capital-inspired dark theme. Styling was added for the new partner universities section, including complex layouts, hover effects, and grayscale-to-color transitions for crests. Styles for  were also introduced.
+-   ****: The main landing page.
+    -   **Importance:** Presents the initial user experience and key information.
+    -   **Changes:** Redesigned to replace a pipette logo with a Partner Universities section. This evolved through several iterations: a simple list, then logos in dark cards, then integrated crests, finally styled with a matte finish, clear cross-pattern dividing lines, and consistent sizing.
+-   ****: User onboarding flow.
+    -   **Importance:** Guides new users through initial profile setup.
+    -   **Changes:** Experienced several UI design changes based on user feedback (professional, minimalist, ultra-minimalist, Sequoia-inspired, back to a cleaner professional look).
+-   ****: Modal for viewing academic posters.
+    -   **Importance:** Displays poster content.
+    -   **Changes:** Fixed to correctly use the backend  endpoint for reliable poster viewing.
+-   ****: New page for CURE Journal articles.
+    -   **Importance:** Displays and manages academic projects/abstracts.
+    -   **Changes:** Created from scratch with initial UI and logic to fetch published journal articles from the backend. Filters for different article statuses were removed as only published ones are shown publicly.
+-   ****: A utility HTML file.
+    -   **Importance:** Provides a visual preview and download links for generated SVG logos.
+    -   **Changes:** Created to facilitate user review of generated logos.
+-   ****: Administrative interface.
+    -   **Importance:** Allows administrators to manage content, including posters and now, journal articles.
+    -   **Changes:** Currently being updated to integrate the CURE Journal. This includes adding new state for journal articles, implementing data fetching, creating an Articles tab in the navigation, and developing handler functions for article review. The  component is actively under construction.
 </code_architecture>
 
 <pending_tasks>
--   Re-introduce professor verification (domain or admin-based).
--   Implement Lab profiles + openings module.
--   Develop University-specific feeds (beyond basic filtering).
+-   Complete the  component in  to manage journal articles.
+-   Create the frontend page for submitting new journal articles.
+-   Implement professor verification (domain or admin-based).
+-   Develop Lab profiles + openings module.
 -   Integrate Email digests for notifications.
 -   Implement AI auto-tagging/summary features.
 -   Develop analytics dashboards.
 </pending_tasks>
 
 <current_work>
-The immediate focus before this summary request was on debugging and fixing the persistent issue with **poster viewing** in the  component.
-The AI engineer identified that the  was incorrectly attempting to use a direct  (which likely points to an internal file path or a non-renderable URL) instead of leveraging the dedicated backend endpoint () designed for serving poster content.
-
-The previous action was:
--   **File Edited**: 
-    -   The component was updated to correctly construct the viewer URL using the  constant and the backend's  endpoint.
-    -   Improved error handling and added a direct link option within the modal for robustness.
--   **File Edited**: 
-    -   New CSS styles were added to support the improved poster viewer, specifically for new buttons.
-
-At the end of the trajectory, the frontend was being restarted to apply these changes and test the fix.
+The current work focuses on integrating the CURE Journal functionality into the administrative interface, specifically within . The AI engineer has progressed significantly by:
+1.  **Adding new state variables**: , , and  have been introduced to manage the state of journal article data within the admin panel.
+2.  **Implementing data fetching logic**: A  function has been created to retrieve journal articles from the new backend endpoint ().
+3.  **Updating UI navigation**: A new Articles tab has been added to the admin panel's navigation, allowing administrators to switch to journal article management.
+4.  **Creating handler functions**: Essential functions such as , , and  have been defined to process administrative actions on journal articles.
+The immediate next step, and where the trajectory leaves off, is the creation of the  component within . This component is intended to display the list of journal articles along with their status and payment details, providing the UI for the previously defined handler functions. The  is being used as a reference for its structure and functionality.
 </current_work>
 
 <optional_next_step>
-Restart the frontend and then verify that poster viewing functionality is working correctly.
+Complete the  component in  to render and manage journal articles.
 </optional_next_step>
