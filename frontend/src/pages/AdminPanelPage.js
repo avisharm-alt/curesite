@@ -318,6 +318,89 @@ const AdminPanelPage = () => {
 };
 
 // Poster Management Tab Component
+
+
+// Article Management Tab Component
+const ArticleManagementTab = ({ articles, onReview, onMarkPayment }) => (
+  <div className="admin-section">
+    <h2>CURE Journal Management</h2>
+    {articles.length > 0 ? (
+      <div className="admin-posters">
+        {articles.map((article) => (
+          <div key={article.id} className="admin-poster-card">
+            <div className="poster-header">
+              <h3>{article.title}</h3>
+              <div className="poster-meta-header">
+                <span className={`status-badge status-${article.status}`}>{article.status}</span>
+                {article.status === 'published' && (
+                  <span className={`status-badge status-${article.payment_status === 'completed' ? 'paid' : 'payment-pending'}`}>
+                    {article.payment_status === 'completed' ? 'Paid' : 'Payment Pending'}
+                  </span>
+                )}
+                <span className="submitted-date">
+                  {new Date(article.submitted_at).toLocaleDateString()}
+                </span>
+              </div>
+            </div>
+            
+            <div className="poster-details">
+              <div className="poster-authors">
+                <strong>Authors:</strong> {article.authors}
+              </div>
+              <div className="poster-institution">
+                <strong>Institution:</strong> {article.university} - {article.program}
+              </div>
+              <div className="poster-abstract">
+                <strong>Abstract:</strong>
+                <p>{article.abstract}</p>
+              </div>
+              {article.keywords && (
+                <div className="poster-keywords">
+                  <strong>Keywords:</strong>
+                  <div className="keywords-list">
+                    {article.keywords.split(',').map((keyword, index) => (
+                      <span key={index} className="keyword-tag">{keyword.trim()}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="admin-actions">
+              {article.status === 'pending' && (
+                <>
+                  <button onClick={() => onReview(article.id, 'published', '')} className="approve-btn">
+                    <CheckCircle size={16} />
+                    Approve
+                  </button>
+                  <button onClick={() => {
+                    const comments = prompt('Rejection reason:');
+                    if (comments) onReview(article.id, 'rejected', comments);
+                  }} className="reject-btn">
+                    <XCircle size={16} />
+                    Reject
+                  </button>
+                </>
+              )}
+              {article.status === 'published' && article.payment_status !== 'completed' && (
+                <button onClick={() => onMarkPayment(article.id)} className="payment-btn">
+                  <DollarSign size={16} />
+                  Mark Payment Complete
+                </button>
+              )}
+              {article.status === 'published' && article.payment_status === 'completed' && (
+                <span className="published-badge">✓ Published & Paid</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <p>No articles submitted yet.</p>
+    )}
+  </div>
+);
+
 const PosterManagementTab = ({ posters, onReview, onDelete, onMarkPayment }) => (
   <div className="admin-section">
     <h2>Poster Management</h2>
