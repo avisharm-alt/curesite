@@ -18,9 +18,30 @@ const SubmitArticlePage = () => {
     keywords: '',
     university: user?.university || '',
     program: user?.program || '',
-    article_type: 'research'
+    article_type: 'research',
+    pdf_url: ''
   });
+  const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check file type
+      if (!file.type.includes('pdf')) {
+        toast.error('Please select a PDF file');
+        return;
+      }
+      
+      // Check file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('File size must be less than 10MB');
+        return;
+      }
+      
+      setSelectedFile(file);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +55,28 @@ const SubmitArticlePage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
-      await axios.post(`${API}/journal/articles`, formData, { headers });
+      // If user selected a PDF, upload it first
+      let pdfUrl = '';
+      if (selectedFile) {
+        const fileFormData = new FormData();
+        fileFormData.append('file', selectedFile);
+
+        const uploadResponse = await axios.post(`${API}/journal/articles/upload`, fileFormData, {
+          headers: {
+            ...headers,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        pdfUrl = uploadResponse.data.file_path;
+      }
+
+      // Submit article data
+      const articleData = {
+        ...formData,
+        pdf_url: pdfUrl || undefined
+      };
+
+      await axios.post(`${API}/journal/articles`, articleData, { headers });
       toast.success('Article submitted successfully! It will be reviewed by our team.');
       navigate('/journal');
     } catch (error) {
