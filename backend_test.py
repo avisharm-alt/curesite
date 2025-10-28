@@ -575,7 +575,7 @@ class CURESocialAPITester:
         )
         
         if success:
-            print("   ✅ Journal article submission properly protected (401 without auth)")
+            print("   ✅ Journal article submission properly protected (403 without auth)")
         else:
             print("   ❌ Journal article submission endpoint not responding correctly")
         
