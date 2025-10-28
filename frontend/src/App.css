@@ -367,13 +367,10 @@ body {
 }
 
 .hero-content {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: var(--spacing-3xl);
   align-items: center;
-  text-align: center;
-  max-width: 1000px;
-  margin: 0 auto;
 }
 
 .hero-text {
@@ -398,15 +395,11 @@ body {
   margin-bottom: var(--spacing-2xl);
   line-height: 1.7;
   font-weight: 400;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .hero-buttons {
   display: flex;
   gap: var(--spacing-lg);
-  justify-content: center;
 }
 
 .cta-primary {
