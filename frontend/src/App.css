@@ -7988,3 +7988,68 @@ body.onboarding-active .onboarding-page {
   margin-bottom: 2rem;
 }
 
+/* ==================== WELCOME ANIMATION ==================== */
+
+.welcome-animation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeOut 3s ease-in-out forwards;
+}
+
+.welcome-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 4rem;
+  font-weight: 300;
+  color: #ffffff;
+  letter-spacing: 0.1em;
+  animation: fadeInText 2s ease-in-out;
+}
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Responsive text size */
+@media (max-width: 768px) {
+  .welcome-text {
+    font-size: 2.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .welcome-text {
+    font-size: 2rem;
+  }
+}
+
