@@ -1167,14 +1167,7 @@ async def create_article_checkout(article_id: str, current_user: User = Depends(
     print(f"💳 Created checkout session for article {article_id}")
     
     return {"checkout_url": session.url, "session_id": session.session_id}
-        return {
-            "checkout_url": checkout_session.url,
-            "session_id": checkout_session.session_id
-        }
-    
-    except Exception as e:
-        print(f"❌ Stripe checkout error: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to create checkout: {str(e)}")
+
 
 @api_router.get("/journal/articles/{article_id}/payment-status")
 async def get_article_payment_status(article_id: str, current_user: User = Depends(get_current_user)):
