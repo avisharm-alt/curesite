@@ -692,6 +692,28 @@ async def upload_poster_file(file: UploadFile = File(...), current_user: User = 
     
     return {"file_path": str(file_path), "filename": unique_filename}
 
+@api_router.post("/journal/articles/upload")
+async def upload_article_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    """Upload article PDF file and return file path"""
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed for articles")
+    
+    # Create uploads directory if it doesn't exist
+    upload_dir = Path("/app/uploads/articles")
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    
+    # Generate unique filename
+    file_extension = Path(file.filename).suffix
+    unique_filename = f"{current_user.id}_{uuid.uuid4()}{file_extension}"
+    file_path = upload_dir / unique_filename
+    
+    # Save file
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+    
+    return {"file_path": str(file_path), "filename": unique_filename}
+
+
 @api_router.post("/posters", response_model=PosterSubmission)
 async def submit_poster(poster: PosterSubmissionCreate, current_user: User = Depends(get_current_user)):
     poster_data = poster.dict()
