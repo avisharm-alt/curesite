@@ -114,7 +114,7 @@ const CureJournalPage = () => {
                 )}
                 
                 <div className="article-actions">
-                  <button className="view-article-btn">
+                  <button onClick={() => handleReadArticle(article)} className="view-article-btn">
                     <FileText size={16} />
                     Read Abstract
                   </button>
