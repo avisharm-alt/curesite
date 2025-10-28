@@ -1101,48 +1101,72 @@ async def create_article_checkout(article_id: str, current_user: User = Depends(
     if article["payment_status"] == "completed":
         raise HTTPException(status_code=400, detail="Payment already completed")
     
-    # Create Stripe checkout session
-    try:
-        success_url = f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/profile?payment=success"
-        cancel_url = f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/profile?payment=cancelled"
-        webhook_url = f"{os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:8001')}/api/webhook/stripe"
-        
-        stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
-        checkout_session = await stripe_checkout.create_checkout_session(
-            amount=POSTER_PUBLICATION_FEE * 100,  # Convert to cents
-            currency="cad",
-            success_url=success_url,
-            cancel_url=cancel_url,
-            metadata={
-                "type": "journal_article",
-                "article_id": article_id,
-                "user_id": current_user.id
-            }
-        )
-        
-        # Store payment link in article
-        await db.journal_articles.update_one(
-            {"id": article_id},
-            {"$set": {
-                "payment_link": checkout_session.url,
-                "stripe_session_id": checkout_session.session_id
-            }}
-        )
-        
-        # Create payment transaction record
-        transaction = {
-            "id": str(uuid.uuid4()),
-            "session_id": checkout_session.session_id,
+    # Check if there's already a pending transaction
+    existing_transaction = await db.payment_transactions.find_one({
+        "item_id": article_id,
+        "type": "journal_article",
+        "payment_status": {"$in": ["pending", "completed"]}
+    })
+    
+    if existing_transaction and existing_transaction.get("payment_status") == "completed":
+        raise HTTPException(status_code=400, detail="Payment already completed")
+    
+    # Initialize Stripe checkout
+    origin_url = os.getenv('FRONTEND_URL', 'http://localhost:3000')
+    webhook_url = f"{os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:8001')}/api/webhook/stripe"
+    stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+    
+    # Create success and cancel URLs
+    success_url = f"{origin_url}/profile?session_id={{CHECKOUT_SESSION_ID}}"
+    cancel_url = f"{origin_url}/profile"
+    
+    # Create checkout session using CheckoutSessionRequest
+    checkout_request = CheckoutSessionRequest(
+        amount=POSTER_PUBLICATION_FEE,
+        currency="cad",
+        success_url=success_url,
+        cancel_url=cancel_url,
+        metadata={
             "type": "journal_article",
-            "item_id": article_id,
+            "article_id": article_id,
             "user_id": current_user.id,
-            "amount": POSTER_PUBLICATION_FEE,
-            "currency": "cad",
-            "status": "pending",
-            "created_at": datetime.now(timezone.utc).isoformat()
+            "user_email": current_user.email,
+            "article_title": article["title"]
         }
-        await db.payment_transactions.insert_one(transaction)
-        
+    )
+    
+    session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+    
+    # Create payment transaction record
+    transaction = PaymentTransaction(
+        session_id=session.session_id,
+        poster_id=article_id,  # Using poster_id field for compatibility
+        user_id=current_user.id,
+        amount=POSTER_PUBLICATION_FEE,
+        currency="cad",
+        payment_status="pending",
+        checkout_status="initiated",
+        metadata={
+            "type": "journal_article",
+            "article_title": article["title"],
+            "user_email": current_user.email
+        }
+    )
+    
+    await db.payment_transactions.insert_one(prepare_for_mongo(transaction.model_dump()))
+    
+    # Store payment link in article
+    await db.journal_articles.update_one(
+        {"id": article_id},
+        {"$set": {
+            "payment_link": session.url,
+            "stripe_session_id": session.session_id
+        }}
+    )
+    
+    print(f"💳 Created checkout session for article {article_id}")
+    
+    return {"checkout_url": session.url, "session_id": session.session_id}
         return {
             "checkout_url": checkout_session.url,
             "session_id": checkout_session.session_id
