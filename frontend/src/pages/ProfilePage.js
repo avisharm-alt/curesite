@@ -13,6 +13,7 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const [profile, setProfile] = useState(user || {});
   const [myPosters, setMyPosters] = useState([]);
+  const [myArticles, setMyArticles] = useState([]);
   const [myNetworkProfile, setMyNetworkProfile] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -34,6 +35,15 @@ const ProfilePage = () => {
       const postersResponse = await axios.get(`${API}/posters/my`, { headers });
       setMyPosters(Array.isArray(postersResponse.data) ? postersResponse.data : []);
 
+      // Fetch my articles
+      try {
+        const articlesResponse = await axios.get(`${API}/journal/articles/my`, { headers });
+        setMyArticles(Array.isArray(articlesResponse.data) ? articlesResponse.data : []);
+      } catch (error) {
+        console.log('No articles found');
+        setMyArticles([]);
+      }
+
       // Try to fetch my network profile
       try {
         const networkResponse = await axios.get(`${API}/student-network/my`, { headers });
@@ -47,6 +57,7 @@ const ProfilePage = () => {
       console.error('Error fetching profile data:', error);
       toast.error('Error fetching profile data');
       setMyPosters([]); // Reset to empty array on error
+      setMyArticles([]);
     } finally {
       setLoading(false);
     }
