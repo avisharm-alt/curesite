@@ -901,6 +901,193 @@ async def get_payment_status(session_id: str, current_user: User = Depends(get_c
         "currency": checkout_status.currency
     }
 
+
+
+# ==================== CURE JOURNAL ARTICLE ENDPOINTS ====================
+
+@api_router.post("/journal/articles", response_model=JournalArticle)
+async def submit_article(article: JournalArticleCreate, current_user: User = Depends(get_current_user)):
+    """Submit a new journal article"""
+    article_data = article.dict()
+    article_obj = JournalArticle(**article_data, submitted_by=current_user.id)
+    article_dict = prepare_for_mongo(article_obj.dict())
+    await db.journal_articles.insert_one(article_dict)
+    return article_obj
+
+@api_router.get("/journal/articles", response_model=List[JournalArticle])
+async def get_articles(status: Optional[str] = None, university: Optional[str] = None):
+    """Get published articles (public can only see published & paid articles)"""
+    query = {
+        "status": "published",
+        "payment_status": "completed"  # Only show paid articles to public
+    }
+    if university:
+        query["university"] = university
+    
+    articles = await db.journal_articles.find(query).to_list(100)
+    return [JournalArticle(**parse_from_mongo(article)) for article in articles]
+
+@api_router.get("/journal/articles/my", response_model=List[JournalArticle])
+async def get_my_articles(current_user: User = Depends(get_current_user)):
+    """Get current user's submitted articles"""
+    articles = await db.journal_articles.find({"submitted_by": current_user.id}).to_list(100)
+    return [JournalArticle(**parse_from_mongo(article)) for article in articles]
+
+@api_router.get("/journal/articles/{article_id}", response_model=JournalArticle)
+async def get_article(article_id: str):
+    """Get a specific article by ID"""
+    article = await db.journal_articles.find_one({"id": article_id, "status": "published", "payment_status": "completed"})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    return JournalArticle(**parse_from_mongo(article))
+
+# Admin endpoints for journal article review
+@api_router.get("/admin/journal/articles", response_model=List[JournalArticle])
+async def get_all_articles_admin(current_user: User = Depends(get_current_user)):
+    """Get all articles for admin review"""
+    if current_user.user_type not in ["admin", "professor"]:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    articles = await db.journal_articles.find({}).to_list(200)
+    return [JournalArticle(**parse_from_mongo(article)) for article in articles]
+
+@api_router.put("/admin/journal/articles/{article_id}/review")
+async def review_article(article_id: str, review_data: JournalArticleReviewRequest, current_user: User = Depends(get_current_user)):
+    """Review an article (approve/reject)"""
+    if current_user.user_type not in ["admin", "professor"]:
+        raise HTTPException(status_code=403, detail="Not authorized to review articles")
+    
+    # Get the article
+    article = await db.journal_articles.find_one({"id": article_id})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    
+    update_data = {
+        "status": review_data.status,
+        "reviewed_at": datetime.now(timezone.utc).isoformat(),
+        "reviewer_id": current_user.id,
+        "reviewer_comments": review_data.comments
+    }
+    
+    # If article is being published, set payment requirements
+    if review_data.status == "published":
+        update_data["payment_status"] = "pending"
+        
+        # Log approval
+        user = await db.users.find_one({"id": article["submitted_by"]})
+        if user:
+            print(f"✅ Article approved: '{article['title']}'")
+            print(f"   Author: {user['name']} ({user['email']})")
+            print(f"   💳 Author can now complete payment ($${POSTER_PUBLICATION_FEE})")
+    
+    await db.journal_articles.update_one({"id": article_id}, {"$set": update_data})
+    return {"message": f"Article {review_data.status}", "article_id": article_id}
+
+@api_router.post("/admin/journal/articles/{article_id}/payment-completed")
+async def mark_article_payment_completed(article_id: str, current_user: User = Depends(get_current_user)):
+    """Mark article payment as completed (admin only)"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    update_data = {
+        "payment_status": "completed",
+        "payment_completed_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    result = await db.journal_articles.update_one({"id": article_id}, {"$set": update_data})
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Article not found")
+    
+    return {"message": "Payment marked as completed", "article_id": article_id}
+
+# Article payment checkout
+@api_router.post("/journal/articles/{article_id}/create-checkout")
+async def create_article_checkout(article_id: str, current_user: User = Depends(get_current_user)):
+    """Create Stripe checkout session for article publication fee"""
+    if not STRIPE_API_KEY:
+        raise HTTPException(status_code=500, detail="Stripe not configured")
+    
+    article = await db.journal_articles.find_one({"id": article_id})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    
+    if article["submitted_by"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Not your article")
+    
+    if article["status"] != "published":
+        raise HTTPException(status_code=400, detail="Article not yet approved")
+    
+    if article["payment_status"] == "completed":
+        raise HTTPException(status_code=400, detail="Payment already completed")
+    
+    # Create Stripe checkout session
+    try:
+        success_url = f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/profile?payment=success"
+        cancel_url = f"{os.getenv('FRONTEND_URL', 'http://localhost:3000')}/profile?payment=cancelled"
+        webhook_url = f"{os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:8001')}/api/webhook/stripe"
+        
+        stripe_checkout = StripeCheckout(api_key=STRIPE_API_KEY, webhook_url=webhook_url)
+        checkout_session = await stripe_checkout.create_checkout_session(
+            amount=POSTER_PUBLICATION_FEE * 100,  # Convert to cents
+            currency="cad",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "type": "journal_article",
+                "article_id": article_id,
+                "user_id": current_user.id
+            }
+        )
+        
+        # Store payment link in article
+        await db.journal_articles.update_one(
+            {"id": article_id},
+            {"$set": {
+                "payment_link": checkout_session.url,
+                "stripe_session_id": checkout_session.session_id
+            }}
+        )
+        
+        # Create payment transaction record
+        transaction = {
+            "id": str(uuid.uuid4()),
+            "session_id": checkout_session.session_id,
+            "type": "journal_article",
+            "item_id": article_id,
+            "user_id": current_user.id,
+            "amount": POSTER_PUBLICATION_FEE,
+            "currency": "cad",
+            "status": "pending",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.payment_transactions.insert_one(transaction)
+        
+        return {
+            "checkout_url": checkout_session.url,
+            "session_id": checkout_session.session_id
+        }
+    
+    except Exception as e:
+        print(f"❌ Stripe checkout error: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create checkout: {str(e)}")
+
+@api_router.get("/journal/articles/{article_id}/payment-status")
+async def get_article_payment_status(article_id: str, current_user: User = Depends(get_current_user)):
+    """Check payment status for an article"""
+    article = await db.journal_articles.find_one({"id": article_id})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    
+    if article["submitted_by"] != current_user.id:
+        raise HTTPException(status_code=403, detail="Not your article")
+    
+    return {
+        "payment_status": article.get("payment_status", "not_required"),
+        "payment_link": article.get("payment_link"),
+        "amount": POSTER_PUBLICATION_FEE,
+        "currency": "CAD"
+    }
+
 @api_router.post("/webhook/stripe")
 async def stripe_webhook(request: Request):
     """Handle Stripe webhook events"""
