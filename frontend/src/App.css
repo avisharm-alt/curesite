@@ -437,57 +437,54 @@ body {
   transform: translateY(-1px);
 }
 
-/* Partner Universities Section - Hero Right Side */
+/* Partner Universities Section - Clean Crests */
 .partner-universities-hero {
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .partner-title {
   text-align: center;
   font-size: 0.875rem;
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 }
 
-.university-logos-grid {
+.university-crests {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.university-logo-card {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100px;
-  transition: all 0.3s ease;
-}
-
-.university-logo-card:hover {
-  background: rgba(0, 0, 0, 0.6);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-.university-logo-img {
+  gap: 2.5rem;
   width: 100%;
-  height: auto;
-  max-width: 140px;
-  object-fit: contain;
+  max-width: 450px;
 }
 
-.logo-text-placeholder {
-  font-size: 1rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.8);
-  text-align: center;
+.university-crest {
+  width: 100%;
+  height: 140px;
+  object-fit: contain;
+  opacity: 0.85;
+  transition: all 0.3s ease;
+  filter: brightness(1.1);
+}
+
+.university-crest:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* UofT crest needs extra scaling since it's smaller */
+.university-crest-uoft {
+  transform: scale(1.3);
+}
+
+.university-crest-uoft:hover {
+  transform: scale(1.35);
 }
 
 .hero-image {
