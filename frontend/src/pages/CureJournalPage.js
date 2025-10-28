@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { BookOpen, Plus, Calendar, User, Tag, FileText, Download } from 'lucide-react';
+import { BookOpen, Plus, Calendar, User, Tag, FileText, Download, X } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
