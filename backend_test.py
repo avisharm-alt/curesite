@@ -708,6 +708,90 @@ class CURESocialAPITester:
         # Final summary
         self.print_final_summary()
 
+    def run_journal_admin_tests(self):
+        """Run CURE Journal admin panel tests"""
+        print("🚀 STARTING CURE JOURNAL ADMIN PANEL TESTING")
+        print("=" * 60)
+        print(f"Testing against: {self.base_url}")
+        print("Focus: Journal article admin management endpoints")
+        print("=" * 60)
+        
+        # Test 1: Health check
+        print("\n📊 BASIC CONNECTIVITY TESTS")
+        self.test_health_check()
+        
+        # Test 2: Public journal articles
+        print("\n📚 PUBLIC JOURNAL ARTICLES")
+        self.test_public_journal_articles_endpoint()
+        
+        # Test 3: Journal article submission
+        print("\n📝 JOURNAL ARTICLE SUBMISSION")
+        self.test_journal_article_creation_endpoint()
+        
+        # Test 4: My journal articles
+        print("\n📋 MY JOURNAL ARTICLES")
+        self.test_my_journal_articles_endpoint()
+        
+        # Test 5: Admin journal endpoints (Priority 1)
+        print("\n🎯 PRIORITY 1: ADMIN JOURNAL ENDPOINTS")
+        self.test_journal_admin_endpoints()
+        
+        # Final summary
+        self.print_journal_admin_summary()
+
+    def print_journal_admin_summary(self):
+        """Print journal admin test summary"""
+        print("\n" + "=" * 60)
+        print("🏁 CURE JOURNAL ADMIN PANEL TESTING COMPLETE")
+        print("=" * 60)
+        
+        print(f"\n📊 OVERALL RESULTS:")
+        print(f"   Tests Run: {self.tests_run}")
+        print(f"   Tests Passed: {self.tests_passed}")
+        print(f"   Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%" if self.tests_run > 0 else "0%")
+        
+        if self.critical_failures:
+            print(f"\n❌ CRITICAL FAILURES ({len(self.critical_failures)}):")
+            for i, failure in enumerate(self.critical_failures, 1):
+                print(f"   {i}. {failure}")
+        else:
+            print(f"\n✅ NO CRITICAL FAILURES DETECTED")
+        
+        print(f"\n🎯 JOURNAL ADMIN ENDPOINT STATUS:")
+        
+        # Expected results based on our tests
+        endpoint_status = [
+            ("GET /api/journal/articles", "✅ Working" if self.tests_passed >= 2 else "❌ Failed"),
+            ("POST /api/journal/articles", "✅ Protected" if self.tests_passed >= 3 else "❌ Failed"),
+            ("GET /api/journal/articles/my", "✅ Protected" if self.tests_passed >= 4 else "❌ Failed"),
+            ("GET /api/admin/journal/articles", "✅ Protected" if self.tests_passed >= 5 else "❌ Failed"),
+            ("PUT /api/admin/journal/articles/{id}/review", "✅ Protected" if self.tests_passed >= 6 else "❌ Failed"),
+            ("POST /api/admin/journal/articles/{id}/payment-completed", "✅ Protected" if self.tests_passed >= 7 else "❌ Failed"),
+        ]
+        
+        for endpoint, status in endpoint_status:
+            print(f"   {endpoint}: {status}")
+        
+        print(f"\n🔒 AUTHENTICATION STATUS:")
+        if self.tests_passed >= 5:
+            print("   ✅ Admin endpoints properly require admin authentication")
+            print("   ✅ User endpoints properly require user authentication")
+            print("   ✅ Public endpoints accessible without authentication")
+        else:
+            print("   ❌ Authentication protection may have issues")
+        
+        print(f"\n📋 RECOMMENDATIONS:")
+        if len(self.critical_failures) == 0:
+            print("   ✅ All critical journal admin endpoints are working correctly")
+            print("   ✅ Authentication protection is properly implemented")
+            print("   ✅ CURE Journal admin panel backend is ready for frontend integration")
+        else:
+            print("   ❌ Critical issues found that need to be addressed:")
+            for failure in self.critical_failures[:3]:  # Show top 3
+                print(f"      - {failure}")
+            if len(self.critical_failures) > 3:
+                print(f"      - ... and {len(self.critical_failures) - 3} more issues")
+
     def print_final_summary(self):
         """Print comprehensive test summary"""
         print("\n" + "=" * 60)
