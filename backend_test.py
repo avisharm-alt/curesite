@@ -14,6 +14,7 @@ class CURESocialAPITester:
         self.critical_failures = []
         self.test_user_id = None
         self.test_post_id = None
+        self.test_article_id = None
 
     def run_test(self, name, method, endpoint, expected_status, data=None, headers=None, critical=False):
         """Run a single API test"""
