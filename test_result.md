@@ -674,17 +674,17 @@ frontend:
           agent: "main"
           comment: "USER REQUESTED: Change article submission from modal to full page like SubmitPosterPage. IMPLEMENTED: Created new SubmitArticlePage.js similar to SubmitPosterPage with full form fields (title, authors, article type dropdown, abstract textarea, keywords, university dropdown, program). Added route to App.js. Updated CureJournalPage to navigate to /submit-article instead of showing modal. Form uses consistent styling with poster submission. Removed all modal-related code from CureJournalPage."
 
-  - task: "Article detail modal and admin delete functionality"
+  - task: "Fix article payment checkout Stripe error"
     implemented: true
     working: "NA"
-    file: "frontend/src/pages/CureJournalPage.js, frontend/src/pages/AdminPanelPage.js, backend/server.py"
+    file: "backend/server.py"
     stuck_count: 0
-    priority: "high"
+    priority: "critical"
     needs_retesting: true
     status_history:
         - working: "NA"
           agent: "main"
-          comment: "USER REQUESTED: 1) Make 'Read Abstract' button clickable for published articles. 2) Admin needs delete functionality for article submissions. IMPLEMENTED: 1) Added article detail modal in CureJournalPage with full article information (title, authors, type badge, institution, program, published date, keywords, full abstract, download PDF button if available). Modal opens when clicking 'Read Abstract'. 2) Created DELETE /admin/journal/articles/{article_id} endpoint (admin-only). 3) Added handleArticleDelete() function in AdminPanelPage with confirmation dialog. 4) Added Delete button in ArticleManagementTab that appears for all articles regardless of status. 5) Delete function refreshes article list after successful deletion."
+          comment: "USER REPORTED BUG: 'Failed to create checkout: StripeCheckout.create_checkout_session() got an unexpected keyword argument amount'. ROOT CAUSE: Article checkout endpoint was passing parameters directly to create_checkout_session() instead of using CheckoutSessionRequest object. FIX: Updated POST /journal/articles/{article_id}/create-checkout to match poster checkout pattern - now uses CheckoutSessionRequest with proper parameters (amount, currency, success_url, cancel_url, metadata). Also creates PaymentTransaction record using Pydantic model. Cleaned up duplicate return statements and orphaned try-except block. Article payment should now work correctly."
 
 metadata:
   created_by: "main_agent"
