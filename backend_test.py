@@ -802,7 +802,15 @@ class CURESocialAPITester:
         print("\n📋 MY JOURNAL ARTICLES")
         self.test_my_journal_articles_endpoint()
         
-        # Test 5: Admin journal endpoints (Priority 1)
+        # Test 5: Database connectivity
+        print("\n🔧 DATABASE CONNECTIVITY")
+        self.test_database_connectivity()
+        
+        # Test 6: Response structure
+        print("\n📋 RESPONSE STRUCTURE")
+        self.test_endpoint_response_structure()
+        
+        # Test 7: Admin journal endpoints (Priority 1)
         print("\n🎯 PRIORITY 1: ADMIN JOURNAL ENDPOINTS")
         self.test_journal_admin_endpoints()
         
