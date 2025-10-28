@@ -34,26 +34,46 @@ const HomePage = () => {
               </button>
             </div>
           </div>
-          <div className="partner-universities">
-            <h3 className="partner-title">Trusted by Students at</h3>
-            <div className="university-logos">
-              <div className="university-logo">
-                <div className="logo-text">Western University</div>
+          <div className="partner-universities-hero">
+            <h3 className="partner-title">Partner Universities</h3>
+            <div className="university-logos-grid">
+              <div className="university-logo-card">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_948ff013-2cd0-406a-97a8-f570e6ddf57c/artifacts/q4ij5buu_image.png"
+                  alt="Western University"
+                  className="university-logo-img"
+                />
               </div>
-              <div className="university-logo">
-                <div className="logo-text">University of Toronto</div>
+              <div className="university-logo-card">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_948ff013-2cd0-406a-97a8-f570e6ddf57c/artifacts/94if80s3_image.png"
+                  alt="University of Toronto"
+                  className="university-logo-img"
+                />
               </div>
-              <div className="university-logo">
-                <div className="logo-text">McMaster University</div>
+              <div className="university-logo-card">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_948ff013-2cd0-406a-97a8-f570e6ddf57c/artifacts/thazsck8_image.png"
+                  alt="McMaster University"
+                  className="university-logo-img"
+                />
               </div>
-              <div className="university-logo">
-                <div className="logo-text">University of Waterloo</div>
+              <div className="university-logo-card">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_948ff013-2cd0-406a-97a8-f570e6ddf57c/artifacts/9wu1ypai_image.png"
+                  alt="University of Waterloo"
+                  className="university-logo-img"
+                />
               </div>
-              <div className="university-logo">
-                <div className="logo-text">Queen's University</div>
+              <div className="university-logo-card">
+                <img 
+                  src="https://customer-assets.emergentagent.com/job_948ff013-2cd0-406a-97a8-f570e6ddf57c/artifacts/du2tgvmu_image.png"
+                  alt="Queen's University"
+                  className="university-logo-img"
+                />
               </div>
-              <div className="university-logo">
-                <div className="logo-text">uOttawa</div>
+              <div className="university-logo-card">
+                <div className="logo-text-placeholder">uOttawa</div>
               </div>
             </div>
           </div>
