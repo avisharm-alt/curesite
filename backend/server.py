@@ -162,6 +162,43 @@ class PosterSubmissionCreate(BaseModel):
     program: str
     poster_url: Optional[str] = None
 
+
+# Journal Article Models
+class JournalArticle(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    authors: str  # Comma-separated author names
+    abstract: str
+    keywords: Optional[str] = None  # Comma-separated keywords
+    university: str
+    program: str
+    article_type: str = "research"  # research, review, case_study
+    pdf_url: Optional[str] = None
+    submitted_by: str  # user_id
+    status: str = "pending"  # pending, published, rejected
+    submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    reviewed_at: Optional[datetime] = None
+    reviewer_id: Optional[str] = None
+    reviewer_comments: Optional[str] = None
+    payment_status: str = "not_required"  # not_required, pending, completed
+    payment_link: Optional[str] = None
+    stripe_session_id: Optional[str] = None
+    payment_completed_at: Optional[datetime] = None
+
+class JournalArticleCreate(BaseModel):
+    title: str
+    authors: str
+    abstract: str
+    keywords: Optional[str] = None
+    university: str
+    program: str
+    article_type: str = "research"
+    pdf_url: Optional[str] = None
+
+class JournalArticleReviewRequest(BaseModel):
+    status: str  # published or rejected
+    comments: Optional[str] = None
+
 class ECProfile(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     medical_school: str
