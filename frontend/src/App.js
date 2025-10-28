@@ -20,7 +20,6 @@ import OnboardingPage from './pages/OnboardingPage';
 
 // Import hooks and components
 import { AuthProvider, useAuth } from './hooks/useAuth';
-import NotificationBell from './components/NotificationBell';
 
 // Import Lucide React icons
 import { 
