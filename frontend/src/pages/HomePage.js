@@ -35,7 +35,6 @@ const HomePage = () => {
             </div>
           </div>
           <div className="partner-universities-hero">
-            <h3 className="partner-title">Partner Universities</h3>
             <div className="university-crests">
               <img 
                 src="https://customer-assets.emergentagent.com/job_948ff013-2cd0-406a-97a8-f570e6ddf57c/artifacts/qpgs5g6x_University_of_Western_Ontario_Logosvg.png"
