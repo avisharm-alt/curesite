@@ -1068,6 +1068,19 @@ async def mark_article_payment_completed(article_id: str, current_user: User = D
     
     return {"message": "Payment marked as completed", "article_id": article_id}
 
+@api_router.delete("/admin/journal/articles/{article_id}")
+async def delete_article(article_id: str, current_user: User = Depends(get_current_user)):
+    """Delete an article (admin only)"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    result = await db.journal_articles.delete_one({"id": article_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Article not found")
+    
+    return {"message": "Article deleted successfully", "article_id": article_id}
+
+
 # Article payment checkout
 @api_router.post("/journal/articles/{article_id}/create-checkout")
 async def create_article_checkout(article_id: str, current_user: User = Depends(get_current_user)):
