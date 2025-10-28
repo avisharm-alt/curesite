@@ -471,6 +471,166 @@ class CURESocialAPITester:
         
         return success, response
 
+    def test_journal_admin_endpoints(self):
+        """Test CURE Journal admin panel endpoints"""
+        print("\n🚨 CRITICAL TEST: CURE Journal Admin Panel Endpoints")
+        print("   Testing journal article admin management endpoints")
+        
+        all_success = True
+        results = {}
+        
+        # Test 1: GET /api/admin/journal/articles (should require admin auth)
+        success_list, response_list = self.run_test(
+            "GET /api/admin/journal/articles (No Auth)",
+            "GET",
+            "admin/journal/articles",
+            403,  # Should require admin authentication
+            critical=True
+        )
+        results['list_articles'] = {'success': success_list, 'response': response_list}
+        all_success = all_success and success_list
+        
+        if success_list:
+            print("   ✅ Admin journal articles listing properly protected (403 without auth)")
+        
+        # Test 2: PUT /api/admin/journal/articles/{article_id}/review (should require admin auth)
+        test_article_id = "test-article-id-123"
+        review_data = {
+            "status": "published",
+            "comments": "Article approved for publication"
+        }
+        
+        success_review, response_review = self.run_test(
+            "PUT /api/admin/journal/articles/{id}/review (No Auth)",
+            "PUT",
+            f"admin/journal/articles/{test_article_id}/review",
+            403,  # Should require admin authentication
+            data=review_data,
+            critical=True
+        )
+        results['review_article'] = {'success': success_review, 'response': response_review}
+        all_success = all_success and success_review
+        
+        if success_review:
+            print("   ✅ Admin article review endpoint properly protected (403 without auth)")
+        
+        # Test 3: POST /api/admin/journal/articles/{article_id}/payment-completed (should require admin auth)
+        success_payment, response_payment = self.run_test(
+            "POST /api/admin/journal/articles/{id}/payment-completed (No Auth)",
+            "POST",
+            f"admin/journal/articles/{test_article_id}/payment-completed",
+            403,  # Should require admin authentication
+            critical=True
+        )
+        results['payment_completed'] = {'success': success_payment, 'response': response_payment}
+        all_success = all_success and success_payment
+        
+        if success_payment:
+            print("   ✅ Admin payment completion endpoint properly protected (403 without auth)")
+        
+        # Test 4: Test with different article ID formats
+        uuid_article_id = "550e8400-e29b-41d4-a716-446655440000"
+        success_uuid, response_uuid = self.run_test(
+            "PUT /api/admin/journal/articles/{uuid}/review (No Auth)",
+            "PUT",
+            f"admin/journal/articles/{uuid_article_id}/review",
+            403,  # Should require admin authentication
+            data=review_data,
+            critical=True
+        )
+        results['uuid_test'] = {'success': success_uuid, 'response': response_uuid}
+        all_success = all_success and success_uuid
+        
+        if success_uuid:
+            print("   ✅ Admin endpoints work with UUID format article IDs")
+        
+        return all_success, results
+
+    def test_journal_article_creation_endpoint(self):
+        """Test journal article submission endpoint"""
+        print("\n🚨 CRITICAL TEST: Journal Article Submission")
+        print("   Testing POST /api/journal/articles (should require auth)")
+        
+        article_data = {
+            "title": "Test Research Article for CURE Journal",
+            "authors": "Dr. Jane Smith, Dr. John Doe",
+            "abstract": "This is a comprehensive test abstract for a research article submission to CURE Journal. The study investigates novel approaches in medical research.",
+            "keywords": "medical research, cure journal, testing",
+            "university": "University of Toronto",
+            "program": "Medical Research",
+            "article_type": "research",
+            "pdf_url": "https://example.com/test-article.pdf"
+        }
+        
+        # Test without authentication (should fail)
+        success, response = self.run_test(
+            "POST /api/journal/articles (No Auth)",
+            "POST",
+            "journal/articles",
+            401,  # Should require authentication
+            data=article_data,
+            critical=True
+        )
+        
+        if success:
+            print("   ✅ Journal article submission properly protected (401 without auth)")
+        else:
+            print("   ❌ Journal article submission endpoint not responding correctly")
+        
+        return success, response
+
+    def test_public_journal_articles_endpoint(self):
+        """Test public journal articles endpoint"""
+        print("\n🚨 CRITICAL TEST: Public Journal Articles")
+        print("   Testing GET /api/journal/articles (should work without auth)")
+        
+        # Test public articles endpoint (should work without auth)
+        success, response = self.run_test(
+            "GET /api/journal/articles",
+            "GET",
+            "journal/articles",
+            200,  # Should work without auth
+            critical=True
+        )
+        
+        if success:
+            print("   ✅ Public journal articles endpoint accessible without auth")
+            if isinstance(response, list):
+                print(f"   Found {len(response)} published articles")
+                if len(response) > 0:
+                    article = response[0]
+                    expected_fields = ['id', 'title', 'authors', 'abstract', 'university', 'status', 'payment_status']
+                    for field in expected_fields:
+                        if field in article:
+                            print(f"   ✅ Article has {field} field")
+                        else:
+                            print(f"   ⚠️  Article missing {field} field")
+        else:
+            print("   ❌ Public journal articles endpoint not working")
+        
+        return success, response
+
+    def test_my_journal_articles_endpoint(self):
+        """Test user's journal articles endpoint"""
+        print("\n🚨 CRITICAL TEST: My Journal Articles")
+        print("   Testing GET /api/journal/articles/my (should require auth)")
+        
+        # Test without authentication (should fail)
+        success, response = self.run_test(
+            "GET /api/journal/articles/my (No Auth)",
+            "GET",
+            "journal/articles/my",
+            401,  # Should require authentication
+            critical=True
+        )
+        
+        if success:
+            print("   ✅ My journal articles endpoint properly protected (401 without auth)")
+        else:
+            print("   ❌ My journal articles endpoint not responding correctly")
+        
+        return success, response
+
     def test_backend_logs_for_social_setup(self):
         """Check if backend has social collections and indexes set up"""
         print("\n🔍 TESTING: Backend Social Setup")
