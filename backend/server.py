@@ -166,6 +166,7 @@ class PosterSubmissionCreate(BaseModel):
 # Journal Article Models
 class JournalArticle(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    cure_identifier: Optional[str] = None  # e.g., CURE.2024.001
     title: str
     authors: str  # Comma-separated author names
     abstract: str
