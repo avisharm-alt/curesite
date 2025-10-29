@@ -1410,29 +1410,47 @@ async def download_approved_poster(poster_id: str):
 
 @api_router.get("/posters/{poster_id}/view")
 async def view_approved_poster(poster_id: str):
-    """View approved poster inline (public access)"""
+    """View approved poster inline (public access) - retrieves from GridFS"""
     poster = await db.poster_submissions.find_one({"id": poster_id})
     if not poster:
         raise HTTPException(status_code=404, detail="Poster not found")
     
-    if poster.get("status") != "approved":
-        raise HTTPException(status_code=403, detail="Poster not approved for public viewing")
+    if poster.get("status") != "approved" or poster.get("payment_status") != "completed":
+        raise HTTPException(status_code=403, detail="Poster not approved or payment not completed")
     
-    if not poster.get("poster_url"):
+    # Get file_id from poster_url (now stores GridFS file ID)
+    file_identifier = poster.get("poster_url")
+    if not file_identifier:
         raise HTTPException(status_code=404, detail="No file attached to this poster")
     
-    file_path = Path(poster["poster_url"])
-    if not file_path.exists():
+    try:
+        # Try to get file from GridFS using ObjectId
+        from bson import ObjectId
+        
+        # Check if it's a GridFS ID or old file path
+        if file_identifier.startswith("/"):
+            # Old file path format - file doesn't exist anymore
+            raise HTTPException(status_code=404, detail="Poster file not found. Please re-upload.")
+        
+        file_id = ObjectId(file_identifier)
+        grid_out = await fs.open_download_stream(file_id)
+        
+        # Get metadata
+        content_type = grid_out.metadata.get('content_type', 'application/pdf') if grid_out.metadata else 'application/pdf'
+        
+        # Stream the file
+        file_content = await grid_out.read()
+        
+        return StreamingResponse(
+            io.BytesIO(file_content),
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"inline; filename={poster.get('title', 'poster')}.pdf"
+            }
+        )
+    except Exception as e:
+        print(f"❌ Error retrieving poster file: {e}")
         raise HTTPException(status_code=404, detail="Poster file not found")
-    
-    # Determine media type based on file extension
-    file_extension = file_path.suffix.lower()
-    if file_extension == '.pdf':
-        media_type = 'application/pdf'
-    elif file_extension in ['.png']:
-        media_type = 'image/png'
-    elif file_extension in ['.jpg', '.jpeg']:
-        media_type = 'image/jpeg'
     elif file_extension == '.gif':
         media_type = 'image/gif'
     else:
