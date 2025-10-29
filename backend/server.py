@@ -1009,6 +1009,18 @@ async def get_article(article_id: str):
         raise HTTPException(status_code=404, detail="Article not found")
     return JournalArticle(**parse_from_mongo(article))
 
+@api_router.get("/journal/article/{identifier}", response_model=JournalArticle)
+async def get_article_by_identifier(identifier: str):
+    """Get a specific article by CURE identifier (e.g., CURE.2024.001)"""
+    article = await db.journal_articles.find_one({
+        "cure_identifier": identifier,
+        "status": "published",
+        "payment_status": "completed"
+    })
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    return JournalArticle(**parse_from_mongo(article))
+
 # Admin endpoints for journal article review
 @api_router.get("/admin/journal/articles", response_model=List[JournalArticle])
 async def get_all_articles_admin(current_user: User = Depends(get_current_user)):
