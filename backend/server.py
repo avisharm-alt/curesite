@@ -1414,7 +1414,7 @@ async def download_approved_poster(poster_id: str):
 
 @api_router.get("/posters/{poster_id}/view")
 async def view_approved_poster(poster_id: str):
-    """View approved poster inline (public access) - retrieves from GridFS"""
+    """View approved poster inline (public access) - retrieves from GridFS with chunked streaming"""
     poster = await db.poster_submissions.find_one({"id": poster_id})
     if not poster:
         raise HTTPException(status_code=404, detail="Poster not found")
@@ -1428,28 +1428,35 @@ async def view_approved_poster(poster_id: str):
         raise HTTPException(status_code=404, detail="No file attached to this poster")
     
     try:
-        # Try to get file from GridFS using ObjectId
         from bson import ObjectId
         
         # Check if it's a GridFS ID or old file path
         if file_identifier.startswith("/"):
-            # Old file path format - file doesn't exist anymore
             raise HTTPException(status_code=404, detail="Poster file not found. Please re-upload.")
         
         file_id = ObjectId(file_identifier)
+        
+        # Open download stream from GridFS
         grid_out = await fs.open_download_stream(file_id)
         
         # Get metadata
         content_type = grid_out.metadata.get('content_type', 'application/pdf') if grid_out.metadata else 'application/pdf'
         
-        # Stream the file
-        file_content = await grid_out.read()
+        # Create async generator for chunked streaming
+        async def file_iterator():
+            chunk_size = 1024 * 64  # 64KB chunks for faster streaming
+            while True:
+                chunk = await grid_out.read(chunk_size)
+                if not chunk:
+                    break
+                yield chunk
         
         return StreamingResponse(
-            io.BytesIO(file_content),
+            file_iterator(),
             media_type=content_type,
             headers={
-                "Content-Disposition": f"inline; filename={poster.get('title', 'poster')}.pdf"
+                "Content-Disposition": f"inline; filename={poster.get('title', 'poster')}.pdf",
+                "Cache-Control": "public, max-age=3600"
             }
         )
     except Exception as e:
