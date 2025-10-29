@@ -926,21 +926,35 @@ async def get_payment_status(session_id: str, current_user: User = Depends(get_c
         "payment_status": "completed" if checkout_status.payment_status == "paid" else transaction["payment_status"]
     }
     
-    # If payment is completed, update poster and transaction
+    # If payment is completed, update poster/article and transaction
     if checkout_status.payment_status == "paid" and transaction["payment_status"] != "completed":
         update_data["payment_status"] = "completed"
         update_data["completed_at"] = datetime.now(timezone.utc).isoformat()
         
-        # Update poster payment status
-        await db.poster_submissions.update_one(
-            {"id": transaction["poster_id"]},
-            {"$set": {
-                "payment_status": "completed",
-                "payment_completed_at": datetime.now(timezone.utc).isoformat()
-            }}
-        )
+        # Determine if this is a poster or article payment based on metadata
+        item_type = transaction.get("metadata", {}).get("type", "poster")
+        item_id = transaction.get("poster_id")  # Field is named poster_id for both
         
-        print(f"✅ Payment completed for poster {transaction['poster_id']}")
+        if item_type == "journal_article":
+            # Update article payment status
+            await db.journal_articles.update_one(
+                {"id": item_id},
+                {"$set": {
+                    "payment_status": "completed",
+                    "payment_completed_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            print(f"✅ Payment completed for article {item_id}")
+        else:
+            # Update poster payment status
+            await db.poster_submissions.update_one(
+                {"id": item_id},
+                {"$set": {
+                    "payment_status": "completed",
+                    "payment_completed_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            print(f"✅ Payment completed for poster {item_id}")
     
     await db.payment_transactions.update_one(
         {"session_id": session_id},
