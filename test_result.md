@@ -704,8 +704,22 @@ metadata:
   test_sequence: 0
   run_ui: false
 
+frontend:
+  - task: "arXiv-style individual article pages with unique identifiers"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/ArticleDetailPage.js, frontend/src/pages/CureJournalPage.js, backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "USER REQUESTED: Create individual arXiv-style pages for each article with unique identifiers (like internal DOIs). IMPLEMENTED: 1) Added cure_identifier field to JournalArticle model (format: CURE.YYYY.NNN, e.g., CURE.2024.001), 2) Auto-generate identifier when admin approves article (sequential numbering), 3) Created ArticleDetailPage.js with professional arXiv-style layout, 4) Added route /journal/article/:identifier, 5) Updated CureJournalPage to navigate to detail page instead of modal, 6) Features: Large title, author list, unique identifier display, dates, university/program, full abstract, keywords, citation section with copy button, copyable article link, PDF download button, clean professional design. 7) Added comprehensive CSS styling matching arXiv preprint aesthetic. Backend and frontend hot reload active."
+
 test_plan:
-  current_focus: []
+  current_focus:
+    - "arXiv-style individual article pages with unique identifiers"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
