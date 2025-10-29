@@ -8,6 +8,7 @@ import './App.css';
 import HomePage from './pages/HomePage';
 import PosterJournalPage from './pages/PosterJournalPage';
 import CureJournalPage from './pages/CureJournalPage';
+import ArticleDetailPage from './pages/ArticleDetailPage';
 import StudentNetworkPage from './pages/StudentNetworkPage';
 import ProfessorNetworkPage from './pages/ProfessorNetworkPage';
 import VolunteerOpportunitiesPage from './pages/VolunteerOpportunitiesPage';
