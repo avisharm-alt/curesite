@@ -74,7 +74,24 @@ const CureJournalPage = () => {
 
         {/* Articles Grid */}
         {loading ? (
-          <div className="loading-state">Loading articles...</div>
+          <div className="articles-loading-container">
+            <div className="loading-skeleton-grid">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="article-card-skeleton">
+                  <div className="skeleton-badge"></div>
+                  <div className="skeleton-title"></div>
+                  <div className="skeleton-author"></div>
+                  <div className="skeleton-text"></div>
+                  <div className="skeleton-text"></div>
+                  <div className="skeleton-tags">
+                    <div className="skeleton-tag"></div>
+                    <div className="skeleton-tag"></div>
+                    <div className="skeleton-tag"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         ) : articles.length === 0 ? (
           <div className="empty-state">
             <BookOpen size={64} />
