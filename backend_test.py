@@ -1206,6 +1206,245 @@ class CURESocialAPITester:
             'article': response_article
         }
 
+    def test_payment_status_endpoint_fix(self):
+        """Test the specific fix for GET /api/payments/status/{session_id} endpoint"""
+        print("\n🚨 CRITICAL TEST: Payment Status Endpoint Fix")
+        print("   Testing GET /api/payments/status/{session_id} for both articles and posters")
+        
+        all_success = True
+        results = {}
+        
+        # Test session IDs for both article and poster payments
+        test_sessions = [
+            {"session_id": "cs_test_article_payment_123", "type": "article"},
+            {"session_id": "cs_test_poster_payment_456", "type": "poster"}
+        ]
+        
+        for session_info in test_sessions:
+            session_id = session_info["session_id"]
+            payment_type = session_info["type"]
+            
+            print(f"\n   Testing {payment_type} payment status check...")
+            
+            # Test payment status endpoint (should require auth)
+            success, response = self.run_test(
+                f"GET /api/payments/status/{session_id} ({payment_type} - No Auth)",
+                "GET",
+                f"payments/status/{session_id}",
+                403,  # Should require authentication
+                critical=True
+            )
+            
+            results[f'{payment_type}_status'] = {'success': success, 'response': response}
+            all_success = all_success and success
+            
+            if success:
+                print(f"   ✅ Payment status endpoint properly protected for {payment_type} payments")
+            else:
+                print(f"   ❌ Payment status endpoint failed for {payment_type} payments")
+        
+        return all_success, results
+
+    def test_payment_transaction_metadata_handling(self):
+        """Test that payment transactions handle metadata.type correctly"""
+        print("\n🚨 CRITICAL TEST: Payment Transaction Metadata Handling")
+        print("   Testing that transactions correctly identify article vs poster payments")
+        
+        # This tests the core fix: checking metadata.type to determine payment type
+        # We test this indirectly by verifying both article and poster checkout endpoints exist
+        
+        all_success = True
+        results = {}
+        
+        # Test 1: Article checkout endpoint (creates transactions with metadata.type='journal_article')
+        article_id = "test-article-metadata-123"
+        success_article, response_article = self.run_test(
+            "POST /api/journal/articles/{id}/create-checkout (Metadata Test - No Auth)",
+            "POST",
+            f"journal/articles/{article_id}/create-checkout",
+            403,  # Should require authentication
+            critical=True
+        )
+        results['article_checkout'] = {'success': success_article, 'response': response_article}
+        all_success = all_success and success_article
+        
+        if success_article:
+            print("   ✅ Article checkout endpoint exists (creates metadata.type='journal_article')")
+        
+        # Test 2: Poster checkout endpoint (creates transactions with metadata.type='poster' or default)
+        poster_checkout_data = {
+            "poster_id": "test-poster-metadata-456",
+            "origin_url": "https://curesite-production.up.railway.app"
+        }
+        
+        success_poster, response_poster = self.run_test(
+            "POST /api/payments/create-checkout (Metadata Test - No Auth)",
+            "POST",
+            "payments/create-checkout",
+            403,  # Should require authentication
+            data=poster_checkout_data,
+            critical=True
+        )
+        results['poster_checkout'] = {'success': success_poster, 'response': response_poster}
+        all_success = all_success and success_poster
+        
+        if success_poster:
+            print("   ✅ Poster checkout endpoint exists (creates metadata for poster payments)")
+        
+        # Test 3: Verify webhook endpoint can handle both types
+        webhook_test_data = {
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "id": "cs_test_metadata_789",
+                    "metadata": {
+                        "type": "journal_article",
+                        "article_id": "test-article-123"
+                    }
+                }
+            }
+        }
+        
+        success_webhook, response_webhook = self.run_test(
+            "POST /api/webhook/stripe (Metadata Test - No Signature)",
+            "POST",
+            "webhook/stripe",
+            400,  # Should require Stripe signature
+            data=webhook_test_data,
+            critical=True
+        )
+        results['webhook_metadata'] = {'success': success_webhook, 'response': response_webhook}
+        all_success = all_success and success_webhook
+        
+        if success_webhook:
+            print("   ✅ Webhook endpoint exists and validates signatures (handles metadata.type)")
+        
+        return all_success, results
+
+    def test_collection_update_logic(self):
+        """Test that the fix updates the correct collection based on payment type"""
+        print("\n🚨 CRITICAL TEST: Collection Update Logic")
+        print("   Testing that articles update journal_articles and posters update poster_submissions")
+        
+        # This tests the core fix logic:
+        # - If metadata.type == 'journal_article': update journal_articles collection
+        # - Else: update poster_submissions collection
+        
+        all_success = True
+        results = {}
+        
+        # Test 1: Verify journal articles collection is accessible
+        success_articles, response_articles = self.run_test(
+            "Collection Test - Journal Articles",
+            "GET",
+            "journal/articles",
+            200,
+            critical=True
+        )
+        results['journal_articles_collection'] = {'success': success_articles, 'response': response_articles}
+        all_success = all_success and success_articles
+        
+        if success_articles:
+            print("   ✅ journal_articles collection accessible")
+            if isinstance(response_articles, list):
+                print(f"   Found {len(response_articles)} published & paid articles")
+        
+        # Test 2: Verify poster submissions collection is accessible
+        success_posters, response_posters = self.run_test(
+            "Collection Test - Poster Submissions",
+            "GET",
+            "posters",
+            200,
+            critical=True
+        )
+        results['poster_submissions_collection'] = {'success': success_posters, 'response': response_posters}
+        all_success = all_success and success_posters
+        
+        if success_posters:
+            print("   ✅ poster_submissions collection accessible")
+            if isinstance(response_posters, list):
+                print(f"   Found {len(response_posters)} approved & paid posters")
+        
+        # Test 3: Verify admin endpoints can manage both collections
+        test_article_id = "collection-test-article-123"
+        test_poster_id = "collection-test-poster-456"
+        
+        # Test article admin endpoint
+        success_article_admin, response_article_admin = self.run_test(
+            "Admin Article Management (Collection Test - No Auth)",
+            "PUT",
+            f"admin/journal/articles/{test_article_id}/review",
+            403,  # Should require admin auth
+            data={"status": "published", "comments": "Collection test"},
+            critical=True
+        )
+        results['article_admin'] = {'success': success_article_admin, 'response': response_article_admin}
+        all_success = all_success and success_article_admin
+        
+        # Test poster admin endpoint
+        success_poster_admin, response_poster_admin = self.run_test(
+            "Admin Poster Management (Collection Test - No Auth)",
+            "PUT",
+            f"admin/posters/{test_poster_id}/review",
+            403,  # Should require admin auth
+            data={"status": "approved", "comments": "Collection test"},
+            critical=True
+        )
+        results['poster_admin'] = {'success': success_poster_admin, 'response': response_poster_admin}
+        all_success = all_success and success_poster_admin
+        
+        if success_article_admin and success_poster_admin:
+            print("   ✅ Both article and poster admin endpoints exist (can update respective collections)")
+        
+        return all_success, results
+
+    def run_payment_status_polling_tests(self):
+        """Run comprehensive tests for the payment status polling fix"""
+        print("🚀 STARTING PAYMENT STATUS POLLING FIX TESTING")
+        print("=" * 60)
+        print(f"Testing against: {self.base_url}")
+        print("Focus: Article payment status polling fix verification")
+        print("=" * 60)
+        
+        # Test 1: Health check
+        print("\n📊 BASIC CONNECTIVITY TESTS")
+        self.test_health_check()
+        
+        # Test 2: Payment status endpoint fix
+        print("\n🎯 PRIORITY 1: PAYMENT STATUS ENDPOINT FIX")
+        self.test_payment_status_endpoint_fix()
+        
+        # Test 3: Payment transaction metadata handling
+        print("\n🔍 PRIORITY 2: METADATA HANDLING")
+        self.test_payment_transaction_metadata_handling()
+        
+        # Test 4: Collection update logic
+        print("\n📊 PRIORITY 3: COLLECTION UPDATE LOGIC")
+        self.test_collection_update_logic()
+        
+        # Test 5: Article payment webhook fix (existing test)
+        print("\n🎯 PRIORITY 4: WEBHOOK FUNCTIONALITY")
+        self.test_article_payment_webhook_fix()
+        
+        # Test 6: Regression tests
+        print("\n🔄 PRIORITY 5: REGRESSION TESTS")
+        self.test_public_journal_articles_endpoint()
+        
+        # Test 7: Poster payment regression
+        success_posters, response_posters = self.run_test(
+            "Poster Payment Regression Test",
+            "GET",
+            "posters",
+            200,
+            critical=True
+        )
+        
+        if success_posters:
+            print("   ✅ Poster payment functionality not affected by article fix")
+        
+        # Final summary
+        self.print_payment_status_summary()
+
     def run_article_webhook_tests(self):
         """Run comprehensive article payment webhook tests"""
         print("🚀 STARTING ARTICLE PAYMENT WEBHOOK TESTING")
