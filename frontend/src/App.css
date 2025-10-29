@@ -8312,8 +8312,9 @@ body.onboarding-active .onboarding-page {
   font-family: 'Courier New', monospace;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--cure-blue);
-  background-color: var(--gray-100);
+  color: var(--cure-green);
+  background-color: rgba(0, 255, 136, 0.1);
+  border: 1px solid var(--cure-green);
   padding: 0.25rem 0.5rem;
   border-radius: 0.25rem;
   display: inline-block;
@@ -8323,6 +8324,14 @@ body.onboarding-active .onboarding-page {
 
 /* Responsive Design for Article Detail Page */
 @media (max-width: 768px) {
+  .article-detail-page {
+    padding: 3rem 1rem 2rem 1rem;
+  }
+
+  .article-detail-container {
+    padding: 1.5rem;
+  }
+
   .article-main-title {
     font-size: 1.5rem;
   }
@@ -8349,7 +8358,11 @@ body.onboarding-active .onboarding-page {
 
 @media (max-width: 480px) {
   .article-detail-page {
-    padding: 1rem 0.5rem;
+    padding: 2rem 0.5rem 1rem 0.5rem;
+  }
+
+  .article-detail-container {
+    padding: 1rem;
   }
 
   .article-main-title {
