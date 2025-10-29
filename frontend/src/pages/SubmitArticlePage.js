@@ -67,7 +67,7 @@ const SubmitArticlePage = () => {
             'Content-Type': 'multipart/form-data'
           }
         });
-        pdfUrl = uploadResponse.data.file_path;
+        pdfUrl = uploadResponse.data.file_id;
       }
 
       // Submit article data
