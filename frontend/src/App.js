@@ -195,6 +195,7 @@ const App = () => {
               <Route path="/" element={<HomePage />} />
               <Route path="/posters" element={<PosterJournalPage />} />
               <Route path="/journal" element={<CureJournalPage />} />
+              <Route path="/journal/article/:identifier" element={<ArticleDetailPage />} />
               <Route path="/students" element={<StudentNetworkPage />} />
               <Route path="/professors" element={<ProfessorNetworkPage />} />
               <Route path="/volunteer" element={<VolunteerOpportunitiesPage />} />
