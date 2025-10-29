@@ -1455,19 +1455,6 @@ async def view_approved_poster(poster_id: str):
     except Exception as e:
         print(f"❌ Error retrieving poster file: {e}")
         raise HTTPException(status_code=404, detail="Poster file not found")
-    elif file_extension == '.gif':
-        media_type = 'image/gif'
-    else:
-        media_type = 'application/octet-stream'
-    
-    return FileResponse(
-        path=file_path,
-        media_type=media_type,
-        headers={
-            "Content-Disposition": "inline",
-            "Cache-Control": "public, max-age=3600"
-        }
-    )
 
 @api_router.delete("/posters/{poster_id}")
 async def delete_poster(poster_id: str, current_user: User = Depends(get_current_user)):
