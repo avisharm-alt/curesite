@@ -574,8 +574,8 @@ frontend:
 
   - task: "Display payment status and link in student profile"
     implemented: true
-    working: false
-    file: "frontend/src/pages/ProfilePage.js"
+    working: "NA"
+    file: "frontend/src/pages/ProfilePage.js, backend/server.py"
     stuck_count: 2
     priority: "high"
     needs_retesting: true
@@ -592,6 +592,9 @@ frontend:
         - working: false
           agent: "user"
           comment: "USER REPORTED: Article shows 'Payment Pending' in profile even after successful payment and article appearing on public CURE Journal page. ROOT CAUSE: Payment polling logic (lines 197-210) only handles POSTER payments, not ARTICLE payments. When user returns from article Stripe checkout, there's no polling or refresh to update the article payment status display. Need to add article payment session detection and polling."
+        - working: "NA"
+          agent: "main"
+          comment: "BUG FIXED: Root cause was in backend GET /api/payments/status/{session_id} endpoint (lines 929-943). This endpoint was ONLY updating poster_submissions when payment completed, NOT journal_articles. Updated endpoint to check transaction metadata.type (same as webhook) and update either poster_submissions OR journal_articles based on payment type. Now when user returns from article payment, the existing ProfilePage polling logic (lines 197-210) will correctly detect and update article payment status. Backend restarted successfully."
 
   - task: "Payment status polling after Stripe redirect"
     implemented: true
