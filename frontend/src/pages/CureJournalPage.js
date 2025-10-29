@@ -43,8 +43,13 @@ const CureJournalPage = () => {
   };
 
   const handleReadArticle = (article) => {
-    setSelectedArticle(article);
-    setShowArticleModal(true);
+    if (article.cure_identifier) {
+      navigate(`/journal/article/${article.cure_identifier}`);
+    } else {
+      // Fallback for old articles without identifier
+      setSelectedArticle(article);
+      setShowArticleModal(true);
+    }
   };
 
   return (
