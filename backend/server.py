@@ -1463,6 +1463,54 @@ async def view_approved_poster(poster_id: str):
         print(f"❌ Error retrieving poster file: {e}")
         raise HTTPException(status_code=404, detail="Poster file not found")
 
+
+@api_router.get("/posters/{poster_id}/download")
+async def download_approved_poster(poster_id: str):
+    """Download approved poster as attachment (public access)"""
+    poster = await db.poster_submissions.find_one({"id": poster_id})
+    if not poster:
+        raise HTTPException(status_code=404, detail="Poster not found")
+    
+    if poster.get("status") != "approved" or poster.get("payment_status") != "completed":
+        raise HTTPException(status_code=403, detail="Poster not approved or payment not completed")
+    
+    file_identifier = poster.get("poster_url")
+    if not file_identifier:
+        raise HTTPException(status_code=404, detail="No file attached to this poster")
+    
+    try:
+        from bson import ObjectId
+        
+        if file_identifier.startswith("/"):
+            raise HTTPException(status_code=404, detail="Poster file not found. Please re-upload.")
+        
+        file_id = ObjectId(file_identifier)
+        grid_out = await fs.open_download_stream(file_id)
+        content_type = grid_out.metadata.get('content_type', 'application/pdf') if grid_out.metadata else 'application/pdf'
+        
+        # Async generator for streaming
+        async def file_iterator():
+            chunk_size = 1024 * 64
+            while True:
+                chunk = await grid_out.read(chunk_size)
+                if not chunk:
+                    break
+                yield chunk
+        
+        # Force download instead of inline view
+        filename = f"{poster.get('title', 'poster').replace(' ', '_')}.pdf"
+        return StreamingResponse(
+            file_iterator(),
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}",
+                "Cache-Control": "public, max-age=3600"
+            }
+        )
+    except Exception as e:
+        print(f"❌ Error downloading poster file: {e}")
+        raise HTTPException(status_code=404, detail="Poster file not found")
+
 @api_router.delete("/posters/{poster_id}")
 async def delete_poster(poster_id: str, current_user: User = Depends(get_current_user)):
     """Delete poster (user can delete their own, admin can delete any)"""
