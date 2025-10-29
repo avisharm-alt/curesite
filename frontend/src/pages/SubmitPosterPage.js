@@ -55,7 +55,7 @@ const SubmitPosterPage = () => {
         ...formData,
         authors: formData.authors.split(',').map(author => author.trim()).filter(author => author),
         keywords: formData.keywords.split(',').map(keyword => keyword.trim()).filter(keyword => keyword),
-        poster_url: uploadResponse.data.file_path
+        poster_url: uploadResponse.data.file_id
       };
 
       await axios.post(`${API}/posters`, posterData, { headers });
