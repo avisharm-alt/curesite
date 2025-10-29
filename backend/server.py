@@ -710,24 +710,28 @@ async def upload_poster_file(file: UploadFile = File(...), current_user: User = 
 
 @api_router.post("/journal/articles/upload")
 async def upload_article_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
-    """Upload article PDF file and return file path"""
+    """Upload article PDF file to MongoDB GridFS and return file ID"""
     if not file.filename.lower().endswith('.pdf'):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed for articles")
     
-    # Create uploads directory if it doesn't exist
-    upload_dir = Path("/app/uploads/articles")
-    upload_dir.mkdir(parents=True, exist_ok=True)
+    # Read file content
+    file_content = await file.read()
     
-    # Generate unique filename
-    file_extension = Path(file.filename).suffix
-    unique_filename = f"{current_user.id}_{uuid.uuid4()}{file_extension}"
-    file_path = upload_dir / unique_filename
+    # Upload to GridFS
+    file_id = await fs.upload_from_stream(
+        file.filename,
+        io.BytesIO(file_content),
+        metadata={
+            'user_id': current_user.id,
+            'content_type': 'application/pdf',
+            'uploaded_at': datetime.now(timezone.utc).isoformat(),
+            'type': 'article'
+        }
+    )
     
-    # Save file
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    print(f"📁 Uploaded article file to GridFS: {file_id}")
     
-    return {"file_path": str(file_path), "filename": unique_filename}
+    return {"file_id": str(file_id), "filename": file.filename}
 
 
 @api_router.post("/posters", response_model=PosterSubmission)
