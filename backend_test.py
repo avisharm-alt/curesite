@@ -1615,6 +1615,15 @@ if __name__ == "__main__":
             
             tester = CURESocialAPITester(base_url)
             tester.run_article_webhook_tests()
+        elif test_type == "payment":
+            print("🚀 PAYMENT STATUS POLLING FIX TESTER")
+            print("=" * 50)
+            print(f"Target: {base_url}")
+            print("Focus: Testing article payment status polling fix")
+            print("=" * 50)
+            
+            tester = CURESocialAPITester(base_url)
+            tester.run_payment_status_polling_tests()
         else:
             print("🚀 CURE SOCIAL BACKEND API TESTER")
             print("=" * 50)
@@ -1625,11 +1634,11 @@ if __name__ == "__main__":
             tester = CURESocialAPITester(base_url)
             tester.run_comprehensive_social_tests()
     else:
-        print("🚀 ARTICLE PAYMENT WEBHOOK TESTER")
+        print("🚀 PAYMENT STATUS POLLING FIX TESTER")
         print("=" * 50)
         print(f"Target: {base_url}")
-        print("Focus: Testing article payment webhook fix")
+        print("Focus: Testing article payment status polling fix")
         print("=" * 50)
         
         tester = CURESocialAPITester(base_url)
-        tester.run_article_webhook_tests()
+        tester.run_payment_status_polling_tests()
