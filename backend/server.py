@@ -29,6 +29,7 @@ mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
 client = AsyncIOMotorClient(mongo_url)
 db_name = os.environ.get('DB_NAME', 'cure_db')
 db = client[db_name]
+fs = AsyncIOMotorGridFSBucket(db)
 
 # Log connection info (without sensitive data)
 print(f"📊 Connecting to database: {db_name}")
