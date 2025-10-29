@@ -574,9 +574,9 @@ frontend:
 
   - task: "Display payment status and link in student profile"
     implemented: true
-    working: "NA"
+    working: false
     file: "frontend/src/pages/ProfilePage.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: true
     status_history:
@@ -589,6 +589,9 @@ frontend:
         - working: "NA"
           agent: "main"
           comment: "USER REPORTED: Complete Payment button not showing up. FIXED: Replaced static Stripe link with dynamic button that calls handlePayment(poster.id). Button now creates checkout session via POST /api/payments/create-checkout and redirects to Stripe. Removed condition checking for poster.payment_link - button shows for all approved posters with payment_status='pending'. Added payment processing state and disabled button during processing."
+        - working: false
+          agent: "user"
+          comment: "USER REPORTED: Article shows 'Payment Pending' in profile even after successful payment and article appearing on public CURE Journal page. ROOT CAUSE: Payment polling logic (lines 197-210) only handles POSTER payments, not ARTICLE payments. When user returns from article Stripe checkout, there's no polling or refresh to update the article payment status display. Need to add article payment session detection and polling."
 
   - task: "Payment status polling after Stripe redirect"
     implemented: true
