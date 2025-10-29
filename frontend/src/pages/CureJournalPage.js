@@ -98,6 +98,12 @@ const CureJournalPage = () => {
                   </span>
                 </div>
                 
+                {article.cure_identifier && (
+                  <div className="article-identifier">
+                    {article.cure_identifier}
+                  </div>
+                )}
+                
                 <h3 className="article-title">{article.title}</h3>
                 
                 <div className="article-authors">
@@ -121,7 +127,7 @@ const CureJournalPage = () => {
                 <div className="article-actions">
                   <button onClick={() => handleReadArticle(article)} className="view-article-btn">
                     <FileText size={16} />
-                    Read Abstract
+                    Read Full Article
                   </button>
                   {article.pdf_url && (
                     <button className="download-btn">
