@@ -1,58 +1,55 @@
 <analysis>
-The previous AI engineer successfully launched CURE Social, iteratively refining its UI/UX and fixing bugs like poster viewing. Subsequent user feedback led to numerous design iterations for the onboarding page and overall site aesthetic, culminating in a Sequoia Capital-inspired dark theme that was well-received. A set of CURE logos was also generated. A significant shift occurred when the user requested the removal of all social features, pivoting CURE to an academic publishing platform with a new CURE Journal for abstracts. This involved backend model/endpoint creation and frontend integration. Concurrently, the homepage was redesigned to feature partner university crests. The current task is to complete the backend and frontend for the CURE Journal, specifically by integrating article management into the Admin Panel.
+The AI engineer successfully transitioned the CURE application from a social network to an academic publishing platform, CURE Journal. Key accomplishments include integrating journal article management into the Admin Panel, developing a dedicated article submission page with PDF upload functionality, and robust backend endpoints for article submission, review, and payment. User feedback drove iterative UI/UX changes, including the removal of social features and an elegant dark theme. Critical bug fixes addressed Stripe checkout parameter issues and the Stripe webhook logic, ensuring articles correctly appear after successful payment. The engineer also implemented an Read Abstract modal for articles and admin deletion capabilities.
 </analysis>
 
 <product_requirements>
-The initial vision was CURE Social, a verified, research-first academic network with core social features (posts, comments, likes, follows, feeds), academic circles, poster integration, and a professor network. This necessitated a FastAPI backend with MongoDB collections for social data and a React frontend with dedicated social components. Initial MVP also included user migration with roles, an onboarding flow, search, and in-app notifications.
-Extensive user feedback drove numerous UI/UX improvements, including layout, text visibility, consistent aesthetic matching (e.g., green/white to dark theme, then clean, modern), and an onboarding flow with dynamic data. Critical bug fixes included social feed authentication and persistent poster viewing issues.
-A major pivot redirected the project to focus on CURE as an academic publishing platform. This involved completely removing all social features and introducing CURE Journal for abstracts and projects, independent of the poster journal. This new journal requires its own submission process, backend infrastructure, and an admin review system to manage articles, ensuring those under review are not publicly visible. The main website's aesthetic was also refined to display partner university crests with a professional, integrated design.
+The initial product, CURE Social, was a verified academic network with social features, academic circles, poster integration, and a professor network. This involved a FastAPI backend with MongoDB and a React frontend. Extensive UI/UX refinements were made based on user feedback, including authentication fixes, poster viewing, and a Sequoia Capital-inspired dark theme.
+
+A significant pivot transformed CURE into an academic publishing platform, removing all social features and introducing CURE Journal for abstracts and projects. This required a new backend for submissions, an admin review system for article management (ensuring private visibility until published and paid), and a refined homepage displaying partner university crests. The journal now requires a complete payment and acceptance system, similar to the poster journal, with the ability to upload PDF documents, a functional Read Abstract button, and admin functionality to delete submissions.
 </product_requirements>
 
 <key_technical_concepts>
--   **FastAPI:** Python web framework for backend API development.
--   **MongoDB Atlas:** NoSQL database for data storage and management.
--   **React + Vite:** Frontend framework for building interactive user interfaces.
--   **Tailwind CSS:** Utility-first CSS framework for efficient styling.
--   **Pydantic:** Python library for data validation and settings management.
--   **JWT:** JSON Web Tokens for secure authentication and session management.
--   **Supervisor:** Process control system for managing application services.
--   **Inter Font:** A popular, highly legible typeface for modern UI.
+-   **FastAPI:** Python web framework for backend APIs.
+-   **MongoDB Atlas:** NoSQL database for data storage.
+-   **React + Vite:** Frontend framework for user interfaces.
+-   **Pydantic:** Python for data validation.
+-   **JWT:** Secure authentication.
+-   **Stripe:** Payment processing.
+-   **SendGrid:** Email notifications (placeholder implemented).
 </key_technical_concepts>
 
 <code_architecture>
 
--   ****: The central FastAPI application.
-    -   **Importance:** Houses all backend models, API endpoints, and business logic.
-    -   **Changes:** Previously integrated social models/APIs. Recently, new Pydantic models (, , ) and CRUD API endpoints (for submission, review, feed, payment) for the CURE Journal were added. The Stripe webhook handler was also extended to cover journal article payments.
+-   ****: Central FastAPI application.
+    -   **Importance:** Contains all backend logic, models, and API endpoints.
+    -   **Changes:** Integrated new Pydantic models for  submission and response. Added CRUD API endpoints for journal articles (, , ). Extended Stripe webhook to handle journal article payments. Added a placeholder  function for SendGrid. Implemented  endpoint. Fixed  to use  and corrected the Stripe webhook logic for  processing.
 -   ****: Main React application file.
-    -   **Importance:** Manages global routing, navigation, and top-level layout.
-    -   **Changes:** Removed social-related routes and the  component. Added a new  route for the .
+    -   **Importance:** Manages global routing and navigation.
+    -   **Changes:** Removed social-related routes. Added  route for  and  for . Removed the  route and its import.
 -   ****: Global CSS file.
     -   **Importance:** Defines application-wide styling.
-    -   **Changes:** Underwent multiple design overhauls, from enhanced professional to Sequoia Capital-inspired dark theme. Styling was added for the new partner universities section, including complex layouts, hover effects, and grayscale-to-color transitions for crests. Styles for  were also introduced.
--   ****: The main landing page.
-    -   **Importance:** Presents the initial user experience and key information.
-    -   **Changes:** Redesigned to replace a pipette logo with a Partner Universities section. This evolved through several iterations: a simple list, then logos in dark cards, then integrated crests, finally styled with a matte finish, clear cross-pattern dividing lines, and consistent sizing.
+    -   **Changes:** Updated for Sequoia Capital-inspired dark theme, partner universities, and . Welcome animation styles were added, then effectively deprecated with the route removal.
+-   ****: Main landing page.
+    -   **Importance:** Initial user experience.
+    -   **Changes:** Redesigned to feature a Partner Universities section.
 -   ****: User onboarding flow.
-    -   **Importance:** Guides new users through initial profile setup.
-    -   **Changes:** Experienced several UI design changes based on user feedback (professional, minimalist, ultra-minimalist, Sequoia-inspired, back to a cleaner professional look).
--   ****: Modal for viewing academic posters.
-    -   **Importance:** Displays poster content.
-    -   **Changes:** Fixed to correctly use the backend  endpoint for reliable poster viewing.
--   ****: New page for CURE Journal articles.
-    -   **Importance:** Displays and manages academic projects/abstracts.
-    -   **Changes:** Created from scratch with initial UI and logic to fetch published journal articles from the backend. Filters for different article statuses were removed as only published ones are shown publicly.
--   ****: A utility HTML file.
-    -   **Importance:** Provides a visual preview and download links for generated SVG logos.
-    -   **Changes:** Created to facilitate user review of generated logos.
+    -   **Importance:** Guides new users.
+    -   **Changes:** Underwent multiple UI design changes, then entirely removed from the application's routes.
+-   ****: Displays CURE Journal articles.
+    -   **Importance:** Public view for academic projects.
+    -   **Changes:** Created to fetch and display published journal articles. Initially had a modal for submission, which was replaced by navigation to a dedicated . Added a Read Abstract button with a modal to view abstract details.
 -   ****: Administrative interface.
-    -   **Importance:** Allows administrators to manage content, including posters and now, journal articles.
-    -   **Changes:** Currently being updated to integrate the CURE Journal. This includes adding new state for journal articles, implementing data fetching, creating an Articles tab in the navigation, and developing handler functions for article review. The  component is actively under construction.
+    -   **Importance:** Manages content.
+    -   **Changes:** Integrated CURE Journal management. Added new state (), data fetching logic, an Articles tab, and handler functions (, , ). The  component was implemented with review and delete actions.
+-   ****: New page for submitting journal articles.
+    -   **Importance:** Facilitates new article submissions.
+    -   **Changes:** Created as a dedicated page (similar to ), replacing the prior modal-based submission. Includes fields for article metadata and a PDF upload input.
+-   ****: User profile page.
+    -   **Importance:** Displays user information and submissions.
+    -   **Changes:** Removed social-related fields (role, bio, interests, links) and associated UI elements (e.g., social stats, share buttons). Added functionality to fetch and display submitted journal articles with their payment status, including payment handling.
 </code_architecture>
 
 <pending_tasks>
--   Complete the  component in  to manage journal articles.
--   Create the frontend page for submitting new journal articles.
 -   Implement professor verification (domain or admin-based).
 -   Develop Lab profiles + openings module.
 -   Integrate Email digests for notifications.
@@ -61,14 +58,9 @@ A major pivot redirected the project to focus on CURE as an academic publishing 
 </pending_tasks>
 
 <current_work>
-The current work focuses on integrating the CURE Journal functionality into the administrative interface, specifically within . The AI engineer has progressed significantly by:
-1.  **Adding new state variables**: , , and  have been introduced to manage the state of journal article data within the admin panel.
-2.  **Implementing data fetching logic**: A  function has been created to retrieve journal articles from the new backend endpoint ().
-3.  **Updating UI navigation**: A new Articles tab has been added to the admin panel's navigation, allowing administrators to switch to journal article management.
-4.  **Creating handler functions**: Essential functions such as , , and  have been defined to process administrative actions on journal articles.
-The immediate next step, and where the trajectory leaves off, is the creation of the  component within . This component is intended to display the list of journal articles along with their status and payment details, providing the UI for the previously defined handler functions. The  is being used as a reference for its structure and functionality.
+The immediate preceding work involved fixing a critical bug where journal articles, after successful payment, were not appearing on the site. The AI engineer diagnosed this as an issue within the Stripe webhook handler in . Specifically, the  model only contained a  field, while the webhook logic was incorrectly attempting to access generic  and  fields. The webhook logic was modified to correctly use the existing  field for identifying the payment type and associated article, ensuring that the  for journal articles is accurately updated to completed upon a successful webhook event. This fix was verified by the backend testing agent.
 </current_work>
 
 <optional_next_step>
-Complete the  component in  to render and manage journal articles.
+Verify the full article payment flow end-to-end after the webhook fix.
 </optional_next_step>
