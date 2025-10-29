@@ -676,24 +676,37 @@ async def delete_account(current_user: User = Depends(get_current_user)):
 # Poster Routes
 @api_router.post("/posters/upload")
 async def upload_poster_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
-    """Upload poster file and return file path"""
+    """Upload poster file to MongoDB GridFS and return file ID"""
     if not file.filename.lower().endswith(('.pdf', '.png', '.jpg', '.jpeg')):
         raise HTTPException(status_code=400, detail="Only PDF and image files are allowed")
     
-    # Create uploads directory if it doesn't exist
-    upload_dir = Path("/app/uploads")
-    upload_dir.mkdir(exist_ok=True)
+    # Read file content
+    file_content = await file.read()
     
-    # Generate unique filename
-    file_extension = Path(file.filename).suffix
-    unique_filename = f"{current_user.id}_{uuid.uuid4()}{file_extension}"
-    file_path = upload_dir / unique_filename
+    # Determine content type
+    file_extension = Path(file.filename).suffix.lower()
+    content_type_map = {
+        '.pdf': 'application/pdf',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg'
+    }
+    content_type = content_type_map.get(file_extension, 'application/octet-stream')
     
-    # Save file
-    with open(file_path, "wb") as buffer:
-        shutil.copyfileobj(file.file, buffer)
+    # Upload to GridFS
+    file_id = await fs.upload_from_stream(
+        file.filename,
+        io.BytesIO(file_content),
+        metadata={
+            'user_id': current_user.id,
+            'content_type': content_type,
+            'uploaded_at': datetime.now(timezone.utc).isoformat()
+        }
+    )
     
-    return {"file_path": str(file_path), "filename": unique_filename}
+    print(f"📁 Uploaded poster file to GridFS: {file_id}")
+    
+    return {"file_id": str(file_id), "filename": file.filename}
 
 @api_router.post("/journal/articles/upload")
 async def upload_article_file(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
