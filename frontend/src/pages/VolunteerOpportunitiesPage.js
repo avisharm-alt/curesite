@@ -100,7 +100,7 @@ const VolunteerOpportunitiesPage = () => {
         <div>
           <h1 className="page-title">Volunteer Opportunities</h1>
           <p className="page-description">
-            Discover medical-related volunteer opportunities to build your experience and give back to the community.
+            Discover research, community, and academic volunteer opportunities across all fields to build your experience and give back to the community.
           </p>
         </div>
       </div>
