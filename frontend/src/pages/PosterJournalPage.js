@@ -13,7 +13,7 @@ const PosterJournalPage = () => {
   const { user } = useAuth();
   const [posters, setPosters] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ status: 'approved', university: '' });
+  const [filters, setFilters] = useState({ university: '' });
   const [viewingPoster, setViewingPoster] = useState(null);
 
   useEffect(() => {
@@ -24,16 +24,20 @@ const PosterJournalPage = () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
-      if (filters.status) params.append('status', filters.status);
+      // Always filter for approved and paid posters only
+      params.append('status', 'approved');
       if (filters.university) params.append('university', filters.university);
       
       const response = await axios.get(`${API}/posters?${params}`);
-      // Ensure we always have an array
-      setPosters(Array.isArray(response.data) ? response.data : []);
+      // Ensure we always have an array and filter for payment completed
+      const approvedPosters = Array.isArray(response.data) 
+        ? response.data.filter(p => p.payment_status === 'completed')
+        : [];
+      setPosters(approvedPosters);
     } catch (error) {
       console.error('Error fetching posters:', error);
       toast.error('Error fetching posters');
-      setPosters([]); // Reset to empty array on error
+      setPosters([]);
     } finally {
       setLoading(false);
     }
