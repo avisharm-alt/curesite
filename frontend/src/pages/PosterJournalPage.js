@@ -146,7 +146,7 @@ const PosterJournalPage = () => {
         <div>
           <h1 className="page-title">Poster Journal</h1>
           <p className="page-description">
-            Showcase your research and discover groundbreaking work from undergraduate students across Canada.
+            Showcase your research across all fields - from engineering and computer science to psychology, biology, and beyond. Discover groundbreaking undergraduate work from students across Canada.
           </p>
         </div>
       </div>
@@ -154,16 +154,6 @@ const PosterJournalPage = () => {
       <div className="page-content">
         <div className="poster-controls">
           <div className="poster-filters">
-            <select 
-              value={filters.status} 
-              onChange={(e) => setFilters({...filters, status: e.target.value})}
-              className="filter-select"
-            >
-              <option value="approved">Approved</option>
-              <option value="pending">Pending Review</option>
-              <option value="">All Status</option>
-            </select>
-            
             <input
               type="text"
               placeholder="Filter by university..."
