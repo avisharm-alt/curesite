@@ -95,7 +95,7 @@ const HomePage = () => {
                 <BarChart3 size={32} />
               </div>
               <h3>EC Profiles</h3>
-              <p>Anonymous profiles and statistics from accepted Canadian medical students.</p>
+              <p>Anonymous profiles and statistics from successful Canadian undergraduate applicants across all programs.</p>
             </div>
             
             <div className="feature-card" onClick={() => navigate('/volunteer')}>
@@ -103,7 +103,7 @@ const HomePage = () => {
                 <Heart size={32} />
               </div>
               <h3>Volunteer Opportunities</h3>
-              <p>Discover medical-related volunteer opportunities to build your experience.</p>
+              <p>Discover research, community, and academic volunteer opportunities to build your experience.</p>
             </div>
           </div>
         </div>
