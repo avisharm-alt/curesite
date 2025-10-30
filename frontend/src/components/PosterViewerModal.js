@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, X, AlertTriangle } from 'lucide-react';
+import { Download, X, AlertTriangle, ExternalLink } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -12,28 +12,11 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
 
   const handleDownload = () => {
     const url = `${API}/posters/${poster.id}/download`;
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${poster.title}.pdf`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    window.open(url, '_blank');
   };
 
-  const getFileType = (url) => {
-    if (!url) return 'unknown';
-    const ext = url.split('.').pop().toLowerCase();
-    if (['pdf'].includes(ext)) return 'pdf';
-    if (['png', 'jpg', 'jpeg', 'gif', 'webp'].includes(ext)) return 'image';
-    return 'unknown';
-  };
-
-  const fileType = getFileType(poster.poster_url);
   // Use the backend view endpoint for proper file serving
   const viewerUrl = `${API}/posters/${poster.id}/view`;
-  
-  // Add #toolbar=0 to hide PDF toolbar and ensure it displays
-  const pdfViewerUrl = fileType === 'pdf' ? `${viewerUrl}#view=FitH` : viewerUrl;
 
   return (
     <div className="poster-modal-overlay" onClick={onClose}>
@@ -46,6 +29,13 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
           <div className="poster-modal-actions">
             <button onClick={handleDownload} className="download-modal-btn" title="Download">
               <Download size={20} />
+            </button>
+            <button 
+              onClick={() => window.open(viewerUrl, '_blank')} 
+              className="open-tab-modal-btn" 
+              title="Open in New Tab"
+            >
+              <ExternalLink size={20} />
             </button>
             <button onClick={onClose} className="close-modal-btn" title="Close">
               <X size={20} />
@@ -64,56 +54,32 @@ const PosterViewerModal = ({ poster, isOpen, onClose }) => {
           {error && (
             <div className="poster-error">
               <AlertTriangle size={48} />
-              <p>Unable to display poster</p>
+              <p>Unable to display poster in modal</p>
               <div className="error-actions">
+                <button onClick={() => window.open(viewerUrl, '_blank')} className="open-new-tab-btn">
+                  <ExternalLink size={20} />
+                  Open in New Tab
+                </button>
                 <button onClick={handleDownload} className="download-btn">
                   <Download size={20} />
-                  Download Poster
+                  Download
                 </button>
-                <a 
-                  href={viewerUrl} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="open-new-tab-btn"
-                >
-                  Open in New Tab
-                </a>
               </div>
             </div>
           )}
           
-          {fileType === 'pdf' && !error && (
-            <object
-              data={pdfViewerUrl}
-              type="application/pdf"
-              className="poster-pdf-viewer"
-              onLoad={() => setLoading(false)}
-              onError={() => {
-                console.error('PDF failed to load');
-                setLoading(false);
-                setError(true);
-              }}
-            >
-              <embed
-                src={pdfViewerUrl}
-                type="application/pdf"
-                className="poster-pdf-viewer"
-              />
-            </object>
-          )}
-          
-          {fileType === 'image' && !error && (
-            <img
-              src={viewerUrl}
-              alt={poster.title}
-              className="poster-image-viewer"
-              onLoad={() => setLoading(false)}
-              onError={() => {
-                setLoading(false);
-                setError(true);
-              }}
-            />
-          )}
+          <iframe
+            src={viewerUrl}
+            title={poster.title}
+            className="poster-iframe-viewer"
+            onLoad={() => setLoading(false)}
+            onError={() => {
+              console.error('Failed to load poster');
+              setLoading(false);
+              setError(true);
+            }}
+            style={{ display: error ? 'none' : 'block' }}
+          />
         </div>
       </div>
     </div>
