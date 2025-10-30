@@ -2297,6 +2297,7 @@ a:focus {
 }
 
 .download-modal-btn,
+.open-tab-modal-btn,
 .close-modal-btn {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -2310,7 +2311,8 @@ a:focus {
   justify-content: center;
 }
 
-.download-modal-btn:hover {
+.download-modal-btn:hover,
+.open-tab-modal-btn:hover {
   background: var(--cure-green);
   color: var(--cure-black);
   border-color: var(--cure-green);
