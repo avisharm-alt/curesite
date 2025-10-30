@@ -2327,6 +2327,13 @@ a:focus {
   overflow: hidden;
 }
 
+.poster-iframe-viewer {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: white;
+}
+
 .poster-pdf-viewer {
   width: 100%;
   height: 100%;
