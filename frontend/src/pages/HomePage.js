@@ -16,8 +16,8 @@ const HomePage = () => {
               <span className="accent-text"> Research Exchange</span>
             </h1>
             <p className="hero-description">
-              The premier platform connecting Canadian undergraduate students with research opportunities, 
-              medical school preparation resources, and a thriving community of future healthcare professionals.
+              The premier platform connecting Canadian undergraduate students with research opportunities across all STEM fields, 
+              academic resources, and a thriving community of aspiring researchers, engineers, scientists, and scholars.
             </p>
             <div className="hero-buttons">
               <button 
