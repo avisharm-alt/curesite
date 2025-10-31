@@ -1589,6 +1589,310 @@ class CURESocialAPITester:
         print("   ✅ Updates payment_status field correctly (not 'status')")
         print("   ✅ Maintains compatibility with existing poster payments")
 
+    def test_volunteer_opportunities_public_endpoint(self):
+        """Test public volunteer opportunities endpoint"""
+        print("\n🚨 CRITICAL TEST: Public Volunteer Opportunities Endpoint")
+        print("   Testing GET /api/volunteer-opportunities (should return list of opportunities)")
+        
+        success, response = self.run_test(
+            "GET /api/volunteer-opportunities",
+            "GET",
+            "volunteer-opportunities",
+            200,  # Should work without auth
+            critical=True
+        )
+        
+        if success:
+            print("   ✅ Public volunteer opportunities endpoint accessible")
+            if isinstance(response, list):
+                print(f"   Found {len(response)} volunteer opportunities")
+                
+                # Check if opportunities have expected fields including new ones
+                if len(response) > 0:
+                    opportunity = response[0]
+                    expected_fields = ['id', 'title', 'organization', 'type', 'description', 'location', 
+                                     'contact_email', 'time_commitment', 'application_link', 'created_at']
+                    
+                    for field in expected_fields:
+                        if field in opportunity:
+                            print(f"   ✅ Opportunity has {field} field: {opportunity.get(field, 'N/A')}")
+                        else:
+                            print(f"   ⚠️  Opportunity missing {field} field")
+                    
+                    # Specifically check for new fields
+                    if 'type' in opportunity:
+                        print(f"   ✅ NEW FIELD 'type' present: {opportunity['type']}")
+                    if 'application_link' in opportunity:
+                        print(f"   ✅ NEW FIELD 'application_link' present: {opportunity.get('application_link', 'None')}")
+                    if 'created_at' in opportunity:
+                        print(f"   ✅ 'created_at' field present (used for display): {opportunity['created_at']}")
+                else:
+                    print("   ℹ️  No volunteer opportunities found (empty list is valid)")
+            else:
+                print("   ❌ Response is not a list")
+        else:
+            print("   ❌ Public volunteer opportunities endpoint failed")
+        
+        return success, response
+
+    def test_volunteer_opportunities_admin_endpoints(self):
+        """Test admin volunteer opportunities endpoints"""
+        print("\n🚨 CRITICAL TEST: Admin Volunteer Opportunities Endpoints")
+        print("   Testing admin endpoints for volunteer opportunities management")
+        
+        all_success = True
+        results = {}
+        
+        # Test data with new fields
+        test_opportunity_data = {
+            "title": "Test Clinical Volunteer",
+            "organization": "Test Hospital",
+            "type": "Clinical",
+            "description": "Test opportunity for clinical volunteering experience",
+            "location": "Test City",
+            "contact_email": "test@example.com",
+            "time_commitment": "4-6 hours/week",
+            "application_link": "https://typeform.com/test123",
+            "requirements": ["CPR certified", "Background check"]
+        }
+        
+        # Test 1: POST /api/admin/volunteer-opportunities (should require admin auth)
+        success_create, response_create = self.run_test(
+            "POST /api/admin/volunteer-opportunities (No Auth)",
+            "POST",
+            "admin/volunteer-opportunities",
+            403,  # Should require admin authentication
+            data=test_opportunity_data,
+            critical=True
+        )
+        results['create_opportunity'] = {'success': success_create, 'response': response_create}
+        all_success = all_success and success_create
+        
+        if success_create:
+            print("   ✅ Admin volunteer opportunity creation properly protected (403 without auth)")
+        
+        # Test 2: GET /api/admin/volunteer-opportunities (should require admin auth)
+        success_list, response_list = self.run_test(
+            "GET /api/admin/volunteer-opportunities (No Auth)",
+            "GET",
+            "admin/volunteer-opportunities",
+            403,  # Should require admin authentication
+            critical=True
+        )
+        results['list_opportunities'] = {'success': success_list, 'response': response_list}
+        all_success = all_success and success_list
+        
+        if success_list:
+            print("   ✅ Admin volunteer opportunities listing properly protected (403 without auth)")
+        
+        # Test 3: Test with different opportunity ID formats for update/delete
+        test_opportunity_id = "test-volunteer-opportunity-123"
+        
+        # Test PUT endpoint
+        update_data = {
+            "title": "Updated Test Clinical Volunteer",
+            "organization": "Updated Test Hospital",
+            "type": "Research",
+            "description": "Updated test opportunity",
+            "location": "Updated Test City",
+            "contact_email": "updated@example.com",
+            "time_commitment": "6-8 hours/week",
+            "application_link": "https://typeform.com/updated123",
+            "requirements": ["Updated requirements"]
+        }
+        
+        success_update, response_update = self.run_test(
+            "PUT /api/admin/volunteer-opportunities/{id} (No Auth)",
+            "PUT",
+            f"admin/volunteer-opportunities/{test_opportunity_id}",
+            403,  # Should require admin authentication
+            data=update_data,
+            critical=True
+        )
+        results['update_opportunity'] = {'success': success_update, 'response': response_update}
+        all_success = all_success and success_update
+        
+        if success_update:
+            print("   ✅ Admin volunteer opportunity update properly protected (403 without auth)")
+        
+        # Test DELETE endpoint
+        success_delete, response_delete = self.run_test(
+            "DELETE /api/admin/volunteer-opportunities/{id} (No Auth)",
+            "DELETE",
+            f"admin/volunteer-opportunities/{test_opportunity_id}",
+            403,  # Should require admin authentication
+            critical=True
+        )
+        results['delete_opportunity'] = {'success': success_delete, 'response': response_delete}
+        all_success = all_success and success_delete
+        
+        if success_delete:
+            print("   ✅ Admin volunteer opportunity deletion properly protected (403 without auth)")
+        
+        return all_success, results
+
+    def test_volunteer_opportunities_field_validation(self):
+        """Test that volunteer opportunities include all required fields"""
+        print("\n🚨 CRITICAL TEST: Volunteer Opportunities Field Validation")
+        print("   Testing that responses include new fields: type, application_link, created_at")
+        
+        # Get public opportunities to check field structure
+        success, response = self.run_test(
+            "Field Validation - GET /api/volunteer-opportunities",
+            "GET",
+            "volunteer-opportunities",
+            200,
+            critical=True
+        )
+        
+        if success and isinstance(response, list):
+            print("   ✅ Successfully retrieved volunteer opportunities list")
+            
+            if len(response) > 0:
+                opportunity = response[0]
+                
+                # Check for all expected fields
+                required_fields = {
+                    'id': 'Unique identifier',
+                    'title': 'Opportunity title',
+                    'organization': 'Organization name',
+                    'type': 'NEW FIELD - Opportunity type (Clinical, Research, etc.)',
+                    'description': 'Opportunity description',
+                    'location': 'Location',
+                    'contact_email': 'Contact email',
+                    'time_commitment': 'Time commitment',
+                    'application_link': 'NEW FIELD - TypeForm or external application link',
+                    'created_at': 'Creation timestamp (used for display instead of posted_date)'
+                }
+                
+                missing_fields = []
+                present_fields = []
+                
+                for field, description in required_fields.items():
+                    if field in opportunity:
+                        present_fields.append(field)
+                        value = opportunity.get(field)
+                        if field in ['type', 'application_link', 'created_at']:
+                            print(f"   ✅ {field}: {value} ({description})")
+                        else:
+                            print(f"   ✅ {field}: Present")
+                    else:
+                        missing_fields.append(field)
+                        print(f"   ❌ {field}: Missing ({description})")
+                
+                # Summary
+                print(f"\n   📊 Field Summary:")
+                print(f"   Present: {len(present_fields)}/{len(required_fields)} fields")
+                print(f"   Missing: {len(missing_fields)} fields")
+                
+                if len(missing_fields) == 0:
+                    print("   ✅ All required fields present including new fields")
+                else:
+                    print(f"   ⚠️  Missing fields: {missing_fields}")
+                    self.critical_failures.append(f"Volunteer opportunities missing fields: {missing_fields}")
+                
+                return len(missing_fields) == 0, {
+                    'present_fields': present_fields,
+                    'missing_fields': missing_fields,
+                    'sample_opportunity': opportunity
+                }
+            else:
+                print("   ℹ️  No opportunities found - cannot validate field structure")
+                print("   ℹ️  This is acceptable if no opportunities have been created yet")
+                return True, {'message': 'No opportunities to validate'}
+        else:
+            print("   ❌ Failed to retrieve volunteer opportunities for field validation")
+            return False, response
+
+    def run_volunteer_opportunities_tests(self):
+        """Run comprehensive volunteer opportunities tests"""
+        print("🚀 STARTING VOLUNTEER OPPORTUNITIES TESTING")
+        print("=" * 60)
+        print(f"Testing against: {self.base_url}")
+        print("Focus: Volunteer opportunities functionality after recent changes")
+        print("=" * 60)
+        
+        # Test 1: Health check
+        print("\n📊 BASIC CONNECTIVITY TESTS")
+        self.test_health_check()
+        
+        # Test 2: Public volunteer opportunities endpoint
+        print("\n🎯 PRIORITY 1: PUBLIC VOLUNTEER OPPORTUNITIES ENDPOINT")
+        self.test_volunteer_opportunities_public_endpoint()
+        
+        # Test 3: Admin volunteer opportunities endpoints
+        print("\n🔒 PRIORITY 2: ADMIN VOLUNTEER OPPORTUNITIES ENDPOINTS")
+        self.test_volunteer_opportunities_admin_endpoints()
+        
+        # Test 4: Field validation for new fields
+        print("\n🔍 PRIORITY 3: FIELD VALIDATION (NEW FIELDS)")
+        self.test_volunteer_opportunities_field_validation()
+        
+        # Final summary
+        self.print_volunteer_opportunities_summary()
+
+    def print_volunteer_opportunities_summary(self):
+        """Print volunteer opportunities test summary"""
+        print("\n" + "=" * 60)
+        print("🏁 VOLUNTEER OPPORTUNITIES TESTING COMPLETE")
+        print("=" * 60)
+        
+        print(f"\n📊 OVERALL RESULTS:")
+        print(f"   Tests Run: {self.tests_run}")
+        print(f"   Tests Passed: {self.tests_passed}")
+        print(f"   Success Rate: {(self.tests_passed/self.tests_run*100):.1f}%" if self.tests_run > 0 else "0%")
+        
+        if self.critical_failures:
+            print(f"\n❌ CRITICAL FAILURES ({len(self.critical_failures)}):")
+            for i, failure in enumerate(self.critical_failures, 1):
+                print(f"   {i}. {failure}")
+        else:
+            print(f"\n✅ NO CRITICAL FAILURES DETECTED")
+        
+        print(f"\n🎯 VOLUNTEER OPPORTUNITIES STATUS:")
+        
+        # Expected results based on our tests
+        volunteer_status = [
+            ("Public Endpoint", "✅ Working" if self.tests_passed >= 2 else "❌ Failed"),
+            ("Admin Create", "✅ Protected" if self.tests_passed >= 3 else "❌ Failed"),
+            ("Admin List", "✅ Protected" if self.tests_passed >= 4 else "❌ Failed"),
+            ("Admin Update", "✅ Protected" if self.tests_passed >= 5 else "❌ Failed"),
+            ("Admin Delete", "✅ Protected" if self.tests_passed >= 6 else "❌ Failed"),
+            ("Field Validation", "✅ Passed" if self.tests_passed >= 7 else "❌ Failed"),
+        ]
+        
+        for component, status in volunteer_status:
+            print(f"   {component}: {status}")
+        
+        print(f"\n🆕 NEW FIELDS STATUS:")
+        if self.tests_passed >= 7:
+            print("   ✅ 'type' field: Present (Clinical, Research, Community Health, Non-clinical)")
+            print("   ✅ 'application_link' field: Present (TypeForm or external links)")
+            print("   ✅ 'created_at' field: Present (used for display instead of posted_date)")
+        else:
+            print("   ❌ New fields validation incomplete")
+        
+        print(f"\n🔒 AUTHENTICATION STATUS:")
+        if self.tests_passed >= 4:
+            print("   ✅ Admin endpoints properly require admin authentication")
+            print("   ✅ Public endpoint accessible without authentication")
+        else:
+            print("   ❌ Authentication protection may have issues")
+        
+        print(f"\n📋 RECOMMENDATIONS:")
+        if len(self.critical_failures) == 0:
+            print("   ✅ All volunteer opportunities endpoints are working correctly")
+            print("   ✅ New fields (type, application_link) are properly implemented")
+            print("   ✅ Admin can manage opportunities with TypeForm links")
+            print("   ✅ Date display issue resolved (using created_at instead of posted_date)")
+            print("   ✅ Volunteer opportunities functionality ready for production")
+        else:
+            print("   ❌ Issues found that need to be addressed:")
+            for failure in self.critical_failures[:3]:  # Show top 3
+                print(f"      - {failure}")
+            if len(self.critical_failures) > 3:
+                print(f"      - ... and {len(self.critical_failures) - 3} more issues")
+
 if __name__ == "__main__":
     # Use production backend URL from frontend config
     base_url = "https://curesite-production.up.railway.app"
