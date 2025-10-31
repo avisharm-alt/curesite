@@ -86,7 +86,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",  # Local development
         "https://localhost:3000",  # Local development HTTPS
-        os.environ.get("FRONTEND_URL", "*"),  # Production frontend URL
+        "https://curesite-olive.vercel.app",  # Production Vercel frontend
+        os.environ.get("FRONTEND_URL", "*"),  # Additional production frontend URL
     ],
     allow_credentials=True,
     allow_methods=["*"],
