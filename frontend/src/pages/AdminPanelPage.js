@@ -298,14 +298,33 @@ const AdminPanelPage = () => {
   async function handleAddVolunteerOpp(opportunityData) {
     try {
       const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
+      if (!token) {
+        toast.error('No authentication token found. Please login again.');
+        return;
+      }
       
-      await axios.post(`${API}/admin/volunteer-opportunities`, opportunityData, { headers });
+      console.log('Adding volunteer opportunity:', opportunityData);
+      console.log('Using token:', token ? 'Token exists' : 'No token');
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      const response = await axios.post(`${API}/admin/volunteer-opportunities`, opportunityData, { headers });
+      
+      console.log('Success response:', response.data);
       toast.success('Volunteer opportunity added successfully');
       fetchData();
     } catch (error) {
-      console.error('Add volunteer error:', error.response?.data || error.message);
-      toast.error('Error adding volunteer opportunity: ' + (error.response?.data?.detail || error.message));
+      console.error('Add volunteer error - Full error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error message:', error.message);
+      console.error('Error detail:', error.response?.data?.detail);
+      
+      if (error.response?.status === 403) {
+        toast.error('Admin access denied. Please ensure you are logged in as admin.');
+      } else if (error.message === 'Network Error') {
+        toast.error('Network Error: Cannot connect to server. Please check your connection.');
+      } else {
+        toast.error('Error adding volunteer opportunity: ' + (error.response?.data?.detail || error.message));
+      }
     }
   }
 
