@@ -1928,6 +1928,15 @@ if __name__ == "__main__":
             
             tester = CURESocialAPITester(base_url)
             tester.run_payment_status_polling_tests()
+        elif test_type == "volunteer":
+            print("🚀 VOLUNTEER OPPORTUNITIES TESTER")
+            print("=" * 50)
+            print(f"Target: {base_url}")
+            print("Focus: Testing volunteer opportunities functionality")
+            print("=" * 50)
+            
+            tester = CURESocialAPITester(base_url)
+            tester.run_volunteer_opportunities_tests()
         else:
             print("🚀 CURE SOCIAL BACKEND API TESTER")
             print("=" * 50)
@@ -1938,11 +1947,12 @@ if __name__ == "__main__":
             tester = CURESocialAPITester(base_url)
             tester.run_comprehensive_social_tests()
     else:
-        print("🚀 PAYMENT STATUS POLLING FIX TESTER")
+        # Default to volunteer opportunities tests based on the review request
+        print("🚀 VOLUNTEER OPPORTUNITIES TESTER")
         print("=" * 50)
         print(f"Target: {base_url}")
-        print("Focus: Testing article payment status polling fix")
+        print("Focus: Testing volunteer opportunities functionality after recent changes")
         print("=" * 50)
         
         tester = CURESocialAPITester(base_url)
-        tester.run_payment_status_polling_tests()
+        tester.run_volunteer_opportunities_tests()
