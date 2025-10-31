@@ -99,41 +99,6 @@ const VolunteerOpportunitiesPage = () => {
       </div>
 
       <div className="page-content">
-        <div className="volunteer-controls">
-          <div className="search-box">
-            <Search size={20} />
-            <input
-              type="text"
-              placeholder="Search opportunities..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
-          
-          <div className="volunteer-filters">
-            <select
-              value={filters.type}
-              onChange={(e) => setFilters({...filters, type: e.target.value})}
-              className="filter-select"
-            >
-              <option value="">All Types</option>
-              <option value="Clinical">Clinical</option>
-              <option value="Research">Research</option>
-              <option value="Community Health">Community Health</option>
-              <option value="Non-clinical">Non-clinical</option>
-            </select>
-            
-            <input
-              type="text"
-              placeholder="Location..."
-              value={filters.location}
-              onChange={(e) => setFilters({...filters, location: e.target.value})}
-              className="filter-input"
-            />
-          </div>
-        </div>
-
         {loading ? (
           <div className="loading">Loading opportunities...</div>
         ) : (
