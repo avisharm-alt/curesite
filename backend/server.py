@@ -252,7 +252,7 @@ class VolunteerOpportunityCreate(BaseModel):
     type: str  # Clinical, Research, Community Health, Non-clinical
     description: str
     location: str
-    contact_email: EmailStr
+    contact_email: Optional[EmailStr] = None
     contact_phone: Optional[str] = None
     requirements: List[str] = []
     time_commitment: str
