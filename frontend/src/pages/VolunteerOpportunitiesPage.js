@@ -67,7 +67,7 @@ const VolunteerOpportunitiesPage = () => {
       
       <div className="opportunity-footer">
         <div className="opportunity-posted">
-          Posted: {new Date(opportunity.posted_date).toLocaleDateString()}
+          Posted: {new Date(opportunity.created_at).toLocaleDateString()}
         </div>
         {opportunity.application_link && (
           <a 
