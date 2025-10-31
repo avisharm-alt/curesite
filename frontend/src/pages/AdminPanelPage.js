@@ -598,8 +598,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
     e.preventDefault();
     const oppData = {
       ...formData,
-      requirements: formData.requirements.split(',').map(req => req.trim()).filter(req => req),
-      posted_date: new Date().toISOString()
+      requirements: formData.requirements.split(',').map(req => req.trim()).filter(req => req)
     };
 
     if (editingOpp) {
