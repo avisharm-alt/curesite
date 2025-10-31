@@ -9,22 +9,15 @@ const API = `${BACKEND_URL}/api`;
 const VolunteerOpportunitiesPage = () => {
   const [opportunities, setOpportunities] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({ type: '', location: '' });
 
   useEffect(() => {
     fetchOpportunities();
-  }, [searchTerm, filters]);
+  }, []);
 
   const fetchOpportunities = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams();
-      if (searchTerm) params.append('title', searchTerm);
-      if (filters.type) params.append('type', filters.type);
-      if (filters.location) params.append('location', filters.location);
-      
-      const response = await axios.get(`${API}/volunteer-opportunities?${params}`);
+      const response = await axios.get(`${API}/volunteer-opportunities`);
       setOpportunities(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching volunteer opportunities:', error);
