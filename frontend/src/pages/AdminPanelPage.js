@@ -764,7 +764,7 @@ const VolunteerManagementTab = ({ opportunities, onAdd, onEdit, onDelete, onRefr
                 <div className="form-field">
                   <label>Application Link</label>
                   <input
-                    type="url"
+                    type="text"
                     value={formData.application_link}
                     onChange={(e) => setFormData({...formData, application_link: e.target.value})}
                     className="form-input compact-input"
