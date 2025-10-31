@@ -233,12 +233,14 @@ class VolunteerOpportunity(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     title: str
     organization: str
+    type: str  # Clinical, Research, Community Health, Non-clinical
     description: str
     location: str
     contact_email: str
     contact_phone: Optional[str] = None
     requirements: List[str] = []
     time_commitment: str
+    application_link: Optional[str] = None  # TypeForm or external application link
     medical_relevant: bool = True
     posted_by: str  # user_id
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -247,12 +249,14 @@ class VolunteerOpportunity(BaseModel):
 class VolunteerOpportunityCreate(BaseModel):
     title: str
     organization: str
+    type: str  # Clinical, Research, Community Health, Non-clinical
     description: str
     location: str
     contact_email: EmailStr
     contact_phone: Optional[str] = None
     requirements: List[str] = []
     time_commitment: str
+    application_link: Optional[str] = None  # TypeForm or external application link
     expires_at: Optional[datetime] = None
 
 class StudentNetwork(BaseModel):
