@@ -1667,6 +1667,7 @@ async def admin_delete_professor(profile_id: str, current_user: User = Depends(g
     return {"message": "Professor profile deleted successfully"}
 
 @api_router.post("/admin/volunteer-opportunities", response_model=VolunteerOpportunity)
+@api_router.post("/admin/opportunities", response_model=VolunteerOpportunity)  # Alternative endpoint to avoid ad blockers
 async def admin_create_volunteer_opportunity(opportunity: VolunteerOpportunityCreate, current_user: User = Depends(get_current_user)):
     """Admin creates volunteer opportunity"""
     if current_user.user_type != "admin":
@@ -1679,6 +1680,7 @@ async def admin_create_volunteer_opportunity(opportunity: VolunteerOpportunityCr
     return opportunity_obj
 
 @api_router.put("/admin/volunteer-opportunities/{opportunity_id}", response_model=VolunteerOpportunity)
+@api_router.put("/admin/opportunities/{opportunity_id}", response_model=VolunteerOpportunity)  # Alternative endpoint to avoid ad blockers
 async def admin_update_volunteer_opportunity(opportunity_id: str, opportunity: VolunteerOpportunityCreate, current_user: User = Depends(get_current_user)):
     """Admin updates volunteer opportunity"""
     if current_user.user_type != "admin":
@@ -1696,6 +1698,7 @@ async def admin_update_volunteer_opportunity(opportunity_id: str, opportunity: V
     return VolunteerOpportunity(**parse_from_mongo(updated_opportunity))
 
 @api_router.delete("/admin/volunteer-opportunities/{opportunity_id}")
+@api_router.delete("/admin/opportunities/{opportunity_id}")  # Alternative endpoint to avoid ad blockers
 async def admin_delete_volunteer_opportunity(opportunity_id: str, current_user: User = Depends(get_current_user)):
     """Admin deletes volunteer opportunity"""
     if current_user.user_type != "admin":
