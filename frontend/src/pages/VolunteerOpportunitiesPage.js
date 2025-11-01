@@ -17,7 +17,8 @@ const VolunteerOpportunitiesPage = () => {
   const fetchOpportunities = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/volunteer-opportunities`, {
+      // Using /opportunities endpoint instead of /volunteer-opportunities to avoid ad blocker issues
+      const response = await axios.get(`${API}/opportunities`, {
         withCredentials: true
       });
       setOpportunities(Array.isArray(response.data) ? response.data : []);
