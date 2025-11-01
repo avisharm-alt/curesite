@@ -1778,7 +1778,11 @@ async def admin_get_all_posters(current_user: User = Depends(get_current_user)):
             "status": poster.get("status", "pending"),
             "submitted_at": poster.get("submitted_at"),
             "submitted_by": poster.get("submitted_by"),
-            "poster_url": poster.get("poster_url")
+            "poster_url": poster.get("poster_url"),
+            "payment_status": poster.get("payment_status", "not_required"),
+            "payment_link": poster.get("payment_link"),
+            "payment_completed_at": poster.get("payment_completed_at"),
+            "stripe_session_id": poster.get("stripe_session_id")
         })
     return result
 
