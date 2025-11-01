@@ -1875,6 +1875,7 @@ async def create_volunteer_opportunity(opportunity: VolunteerOpportunityCreate, 
     return opportunity_obj
 
 @api_router.get("/volunteer-opportunities", response_model=List[VolunteerOpportunity])
+@api_router.get("/opportunities", response_model=List[VolunteerOpportunity])  # Alternative endpoint to avoid ad blockers
 async def get_volunteer_opportunities(location: Optional[str] = None):
     query = {}
     if location:
