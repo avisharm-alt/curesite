@@ -17,7 +17,9 @@ const VolunteerOpportunitiesPage = () => {
   const fetchOpportunities = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${API}/volunteer-opportunities`);
+      const response = await axios.get(`${API}/volunteer-opportunities`, {
+        withCredentials: true
+      });
       setOpportunities(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching volunteer opportunities:', error);
