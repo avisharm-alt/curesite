@@ -81,17 +81,24 @@ app = FastAPI(title="CURE - Canadian Undergraduate Research Exchange")
 app.add_middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32))
 
 # Add CORS middleware for deployment
+allowed_origins = [
+    "http://localhost:3000",  # Local development
+    "https://localhost:3000",  # Local development HTTPS
+    "https://curesite-olive.vercel.app",  # Production Vercel frontend
+    "https://curesite-production.up.railway.app",  # Production Railway backend
+]
+
+# Add any additional frontend URL from environment
+if os.environ.get("FRONTEND_URL"):
+    allowed_origins.append(os.environ.get("FRONTEND_URL"))
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",  # Local development
-        "https://localhost:3000",  # Local development HTTPS
-        "https://curesite-olive.vercel.app",  # Production Vercel frontend
-        os.environ.get("FRONTEND_URL", "*"),  # Additional production frontend URL
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Health check endpoint for Railway
