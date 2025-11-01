@@ -352,7 +352,8 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.delete(`${API}/admin/volunteer-opportunities/${oppId}`, { headers });
+      // Using /admin/opportunities instead of /admin/volunteer-opportunities to avoid ad blocker issues
+      await axios.delete(`${API}/admin/opportunities/${oppId}`, { headers });
       toast.success('Volunteer opportunity deleted successfully');
       fetchData();
     } catch (error) {
