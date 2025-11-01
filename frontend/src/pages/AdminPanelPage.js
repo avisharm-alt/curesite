@@ -335,7 +335,8 @@ const AdminPanelPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
       
-      await axios.put(`${API}/admin/volunteer-opportunities/${oppId}`, opportunityData, { headers });
+      // Using /admin/opportunities instead of /admin/volunteer-opportunities to avoid ad blocker issues
+      await axios.put(`${API}/admin/opportunities/${oppId}`, opportunityData, { headers });
       toast.success('Volunteer opportunity updated successfully');
       fetchData();
     } catch (error) {
