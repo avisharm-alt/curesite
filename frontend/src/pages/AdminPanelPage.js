@@ -308,7 +308,8 @@ const AdminPanelPage = () => {
       console.log('Using token:', token ? 'Token exists' : 'No token');
       
       const headers = { Authorization: `Bearer ${token}` };
-      const response = await axios.post(`${API}/admin/volunteer-opportunities`, opportunityData, { headers });
+      // Using /admin/opportunities instead of /admin/volunteer-opportunities to avoid ad blocker issues
+      const response = await axios.post(`${API}/admin/opportunities`, opportunityData, { headers });
       
       console.log('Success response:', response.data);
       toast.success('Volunteer opportunity added successfully');
