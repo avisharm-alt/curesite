@@ -157,6 +157,7 @@ class PosterSubmission(BaseModel):
     program: str
     poster_url: Optional[str] = None
     submitted_by: str  # user_id
+    submitter_email: Optional[str] = None
     status: str = "pending"  # pending, approved, rejected
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     reviewed_at: Optional[datetime] = None
@@ -175,6 +176,7 @@ class PosterSubmissionCreate(BaseModel):
     university: str
     program: str
     poster_url: Optional[str] = None
+    submitter_email: str
 
 
 # Journal Article Models
