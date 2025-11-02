@@ -79,7 +79,7 @@ const HomePage = () => {
                 <Users size={32} />
               </div>
               <h3>Student Network</h3>
-              <p>Connect with like-minded undergraduate students passionate about research.</p>
+              <p>Connect with like-minded undergraduate researchers.</p>
             </div>
             
             <div className="feature-card" onClick={() => navigate('/professors')}>
