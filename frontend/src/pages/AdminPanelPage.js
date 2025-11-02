@@ -58,11 +58,6 @@ const AdminPanelPage = () => {
           console.log('Articles response:', articlesRes.data);
           setArticles(Array.isArray(articlesRes.data) ? articlesRes.data : []);
           break;
-        case 'volunteer':
-          // Using /admin/opportunities instead of /admin/volunteer-opportunities to avoid ad blocker issues
-          const volRes = await axios.get(`${API}/admin/opportunities`, { headers });
-          setVolunteerOpps(Array.isArray(volRes.data) ? volRes.data : []);
-          break;
       }
       
       console.log(`Successfully loaded ${activeTab} data`);
