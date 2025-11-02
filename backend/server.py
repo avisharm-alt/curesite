@@ -189,7 +189,6 @@ class JournalArticle(BaseModel):
     program: str
     article_type: str = "research"  # research, review, case_study
     pdf_url: Optional[str] = None
-    contact_email: str  # Submitter's contact email
     submitted_by: str  # user_id
     status: str = "pending"  # pending, published, rejected
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -210,7 +209,6 @@ class JournalArticleCreate(BaseModel):
     program: str
     article_type: str = "research"
     pdf_url: Optional[str] = None
-    contact_email: str
 
 class JournalArticleReviewRequest(BaseModel):
     status: str  # published or rejected
