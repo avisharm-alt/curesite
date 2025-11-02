@@ -245,6 +245,20 @@ const SubmitArticlePage = () => {
                 />
               </div>
             </div>
+
+            <div className="form-field">
+              <label htmlFor="contact_email">Contact Email *</label>
+              <input
+                type="email"
+                id="contact_email"
+                value={formData.contact_email}
+                onChange={(e) => setFormData({...formData, contact_email: e.target.value})}
+                className="form-input"
+                required
+                placeholder="Enter your email address"
+              />
+              <small>We'll use this email to contact you about your submission</small>
+            </div>
           </div>
 
           <div className="form-actions">
