@@ -40,7 +40,6 @@ const Header = () => {
     { name: 'Poster Journal', href: '/posters', icon: FileText },
     { name: 'CURE Journal', href: '/journal', icon: BookOpen },
     { name: 'Student Network', href: '/students', icon: Users },
-    { name: 'Volunteer Opportunities', href: '/volunteer', icon: Heart },
     ...(user ? [{ name: 'My Profile', href: '/profile', icon: User }] : []),
     ...(user?.user_type === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Award }] : []),
   ];
