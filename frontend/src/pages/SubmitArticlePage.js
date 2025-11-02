@@ -19,8 +19,7 @@ const SubmitArticlePage = () => {
     university: user?.university || '',
     program: user?.program || '',
     article_type: 'research',
-    pdf_url: '',
-    contact_email: user?.email || ''
+    pdf_url: ''
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
