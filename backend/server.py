@@ -640,11 +640,8 @@ async def google_callback(request: Request):
             data={"sub": user.id}, expires_delta=access_token_expires
         )
 
-        # Determine frontend URL - prioritize env var, then use known production URLs
-        frontend_url = os.environ.get('FRONTEND_URL')
-        if not frontend_url:
-            # Default to custom domain if available, otherwise Vercel subdomain
-            frontend_url = 'https://cureproject.ca'
+        # Determine frontend URL - prioritize env var, then use Vercel subdomain
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://curesite-olive.vercel.app')
         
         user_data_encoded = quote(user.json())
         redirect_url = f"{frontend_url}/?token={access_token}&user={user_data_encoded}"
