@@ -76,7 +76,7 @@ const StudentNetworkPage = () => {
         <div>
           <h1 className="page-title">Student Network</h1>
           <p className="page-description">
-            Connect with like-minded undergraduate students passionate about research and medical careers.
+            Connect with like-minded undergraduate researchers.
           </p>
         </div>
       </div>
