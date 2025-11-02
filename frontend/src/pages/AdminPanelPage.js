@@ -308,6 +308,11 @@ const ArticleManagementTab = ({ articles, onReview, onMarkPayment, onDelete }) =
               <div className="poster-institution">
                 <strong>Institution:</strong> {article.university} - {article.program}
               </div>
+              {article.contact_email && (
+                <div className="poster-email">
+                  <strong>Contact Email:</strong> {article.contact_email}
+                </div>
+              )}
               <div className="poster-abstract">
                 <strong>Abstract:</strong>
                 <p>{article.abstract}</p>
