@@ -640,8 +640,12 @@ async def google_callback(request: Request):
             data={"sub": user.id}, expires_delta=access_token_expires
         )
 
-        # Redirect to frontend with token and user data
-        frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+        # Determine frontend URL - prioritize env var, then use known production URLs
+        frontend_url = os.environ.get('FRONTEND_URL')
+        if not frontend_url:
+            # Default to custom domain if available, otherwise Vercel subdomain
+            frontend_url = 'https://cureproject.ca'
+        
         user_data_encoded = quote(user.json())
         redirect_url = f"{frontend_url}/?token={access_token}&user={user_data_encoded}"
 
@@ -649,7 +653,7 @@ async def google_callback(request: Request):
 
     except Exception as e:
         # Redirect to frontend with error
-        frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://cureproject.ca')
         error_message = quote(str(e))
         redirect_url = f"{frontend_url}/?error={error_message}"
         return RedirectResponse(url=redirect_url)
