@@ -17,7 +17,8 @@ const SubmitPosterPage = () => {
     abstract: '',
     keywords: '',
     university: user?.university || '',
-    program: user?.program || ''
+    program: user?.program || '',
+    contact_email: user?.email || ''
   });
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
