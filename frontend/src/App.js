@@ -22,7 +22,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 
 // Import Lucide React icons
 import { 
-  BookOpen, Users, GraduationCap, Heart, FileText, 
+  BookOpen, Users, GraduationCap, FileText, 
   User, LogOut, Menu, X, Home, Award, BarChart3, MessageSquare
 } from 'lucide-react';
 
