@@ -397,6 +397,11 @@ const PosterManagementTab = ({ posters, onReview, onDelete, onMarkPayment }) => 
               <div className="poster-institution">
                 <strong>Institution:</strong> {poster.university} - {poster.program}
               </div>
+              {poster.contact_email && (
+                <div className="poster-email">
+                  <strong>Contact Email:</strong> {poster.contact_email}
+                </div>
+              )}
               <div className="poster-abstract">
                 <strong>Abstract:</strong>
                 <p>{poster.abstract}</p>
