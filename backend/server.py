@@ -650,7 +650,7 @@ async def google_callback(request: Request):
 
     except Exception as e:
         # Redirect to frontend with error
-        frontend_url = os.environ.get('FRONTEND_URL', 'https://cureproject.ca')
+        frontend_url = os.environ.get('FRONTEND_URL', 'https://curesite-olive.vercel.app')
         error_message = quote(str(e))
         redirect_url = f"{frontend_url}/?error={error_message}"
         return RedirectResponse(url=redirect_url)
