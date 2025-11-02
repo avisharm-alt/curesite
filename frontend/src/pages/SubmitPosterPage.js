@@ -150,6 +150,20 @@ const SubmitPosterPage = () => {
             </div>
 
             <div className="form-field">
+              <label htmlFor="submitter_email">Your Email *</label>
+              <input
+                type="email"
+                id="submitter_email"
+                value={formData.submitter_email}
+                onChange={(e) => setFormData({...formData, submitter_email: e.target.value})}
+                className="form-input"
+                required
+                placeholder="Enter your email address"
+              />
+              <small>We'll use this email to contact you about your submission</small>
+            </div>
+
+            <div className="form-field">
               <label htmlFor="abstract">Abstract *</label>
               <textarea
                 id="abstract"
