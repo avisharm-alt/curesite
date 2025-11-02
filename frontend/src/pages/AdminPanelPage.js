@@ -115,12 +115,6 @@ const AdminPanelPage = () => {
           >
             CURE Journal
           </button>
-          <button
-            onClick={() => setActiveTab('volunteer')}
-            className={`admin-tab ${activeTab === 'volunteer' ? 'active' : ''}`}
-          >
-            Volunteer Opportunities
-          </button>
         </div>
         
         <div className="admin-info">
