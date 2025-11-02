@@ -144,7 +144,6 @@ const Footer = () => {
             <li><Link to="/posters">Poster Journal</Link></li>
             <li><Link to="/students">Student Network</Link></li>
             <li><Link to="/profiles">EC Profiles</Link></li>
-            <li><Link to="/volunteer">Volunteer Opportunities</Link></li>
           </ul>
         </div>
         
