@@ -85,6 +85,10 @@ allowed_origins = [
     "http://localhost:3000",  # Local development
     "https://localhost:3000",  # Local development HTTPS
     "https://curesite-olive.vercel.app",  # Production Vercel frontend
+    "https://cureproject.ca",  # Custom domain
+    "http://cureproject.ca",  # Custom domain HTTP (redirects to HTTPS)
+    "https://www.cureproject.ca",  # Custom domain with www
+    "http://www.cureproject.ca",  # Custom domain with www HTTP
     "https://curesite-production.up.railway.app",  # Production Railway backend
 ]
 
