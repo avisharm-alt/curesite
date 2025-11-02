@@ -143,15 +143,6 @@ const AdminPanelPage = () => {
                   onDelete={handleArticleDelete}
                 />
               )}
-              {activeTab === 'volunteer' && (
-                <VolunteerManagementTab 
-                  opportunities={volunteerOpps}
-                  onAdd={handleAddVolunteerOpp}
-                  onEdit={handleEditVolunteerOpp}
-                  onDelete={handleDeleteVolunteerOpp}
-                  onRefresh={fetchData}
-                />
-              )}
             </>
           )}
         </div>
