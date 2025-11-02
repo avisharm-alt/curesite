@@ -156,7 +156,6 @@ class PosterSubmission(BaseModel):
     university: str
     program: str
     poster_url: Optional[str] = None
-    contact_email: str  # Submitter's contact email
     submitted_by: str  # user_id
     status: str = "pending"  # pending, approved, rejected
     submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
@@ -176,7 +175,6 @@ class PosterSubmissionCreate(BaseModel):
     university: str
     program: str
     poster_url: Optional[str] = None
-    contact_email: str
 
 
 # Journal Article Models
