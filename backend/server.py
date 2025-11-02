@@ -1787,6 +1787,7 @@ async def admin_get_all_posters(current_user: User = Depends(get_current_user)):
             "keywords": poster["keywords"],
             "university": poster["university"],
             "program": poster["program"],
+            "contact_email": poster.get("contact_email", ""),
             "status": poster.get("status", "pending"),
             "submitted_at": poster.get("submitted_at"),
             "submitted_by": poster.get("submitted_by"),
