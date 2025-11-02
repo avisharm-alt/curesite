@@ -224,14 +224,30 @@ const SubmitPosterPage = () => {
                   required
                 >
                   <option value="">Select University</option>
-                  <option value="University of Toronto">University of Toronto</option>
-                  <option value="University of Western Ontario">University of Western Ontario</option>
-                  <option value="McMaster University">McMaster University</option>
-                  <option value="Queen's University">Queen's University</option>
-                  <option value="University of Ottawa">University of Ottawa</option>
-                  <option value="University of British Columbia">University of British Columbia</option>
+                  <option value="Brock University">Brock University</option>
+                  <option value="Carleton University">Carleton University</option>
+                  <option value="Dalhousie University">Dalhousie University</option>
                   <option value="McGill University">McGill University</option>
+                  <option value="McMaster University">McMaster University</option>
+                  <option value="Memorial University of Newfoundland">Memorial University of Newfoundland</option>
+                  <option value="Ontario Tech University (OTU)">Ontario Tech University (OTU)</option>
+                  <option value="Queen's University">Queen's University</option>
+                  <option value="Simon Fraser University">Simon Fraser University</option>
+                  <option value="Toronto Metropolitan University (TMU)">Toronto Metropolitan University (TMU)</option>
+                  <option value="Université de Montréal">Université de Montréal</option>
+                  <option value="Université Laval">Université Laval</option>
                   <option value="University of Alberta">University of Alberta</option>
+                  <option value="University of British Columbia (UBC)">University of British Columbia (UBC)</option>
+                  <option value="University of Calgary">University of Calgary</option>
+                  <option value="University of Manitoba">University of Manitoba</option>
+                  <option value="University of Ottawa">University of Ottawa</option>
+                  <option value="University of Saskatchewan">University of Saskatchewan</option>
+                  <option value="University of Toronto">University of Toronto</option>
+                  <option value="University of Victoria">University of Victoria</option>
+                  <option value="University of Waterloo">University of Waterloo</option>
+                  <option value="Western University">Western University</option>
+                  <option value="Wilfrid Laurier University (WLU)">Wilfrid Laurier University (WLU)</option>
+                  <option value="York University">York University</option>
                 </select>
               </div>
 
