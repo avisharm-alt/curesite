@@ -130,9 +130,9 @@ const ArticleDetailPage = () => {
             </div>
           </div>
 
-          {/* CURE Identifier */}
+          {/* NSR Identifier */}
           <div className="cure-identifier-box">
-            <div className="identifier-label">CURE Identifier:</div>
+            <div className="identifier-label">NSR Identifier:</div>
             <div className="identifier-value">{article.cure_identifier}</div>
           </div>
         </div>
