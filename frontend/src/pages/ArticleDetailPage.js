@@ -39,7 +39,7 @@ const ArticleDetailPage = () => {
     const title = article.title;
     const identifier = article.cure_identifier;
     
-    return `${authors} (${year}). ${title}. CURE Journal, ${identifier}.`;
+    return `${authors} (${year}). ${title}. North Star Journal, ${identifier}.`;
   };
 
   const copyToClipboard = async (text, type) => {
