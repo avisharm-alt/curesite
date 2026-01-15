@@ -34,7 +34,7 @@ const DebugPage = () => {
 
   return (
     <div style={{ padding: '20px', fontFamily: 'monospace' }}>
-      <h1>🔧 North Star Research Debug Page</h1>
+      <h1>🔧 North Star Foundation Debug Page</h1>
       
       <div style={{ marginBottom: '20px' }}>
         <h3>Environment Check:</h3>
