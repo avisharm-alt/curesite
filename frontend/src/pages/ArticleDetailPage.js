@@ -100,7 +100,7 @@ const ArticleDetailPage = () => {
         {/* Back Button */}
         <Link to="/journal" className="back-link">
           <ArrowLeft size={16} />
-          Back to CURE Journal
+          Back to North Star Journal
         </Link>
 
         {/* Article Header */}
