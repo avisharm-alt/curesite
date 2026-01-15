@@ -36,7 +36,7 @@ const CureJournalPage = () => {
 
   const handleSubmit = () => {
     if (!user) {
-      toast.error('Please log in to submit to CURE Journal');
+      toast.error('Please log in to submit to North Star Journal');
       return;
     }
     navigate('/submit-article');
