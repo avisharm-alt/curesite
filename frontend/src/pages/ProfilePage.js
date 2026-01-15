@@ -568,7 +568,7 @@ const ProfilePage = () => {
             <div className="empty-state compact">
               <BookOpen size={32} />
               <h3>No article submissions yet</h3>
-              <p>Submit your first article to CURE Journal!</p>
+              <p>Submit your first article to North Star Journal!</p>
             </div>
           )}
         </div>
