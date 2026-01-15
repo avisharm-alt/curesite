@@ -1,33 +1,34 @@
-/* North Star Research Website Styles - Professional Research Platform Design */
+/* North Star Research Website Styles - Celestial Research Platform Design */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* North Star Research Brand Colors */
-  --nsr-black: #0a0a0a;
+  /* North Star Research Brand Colors - Celestial Blue Theme */
+  --nsr-black: #0a0a14;
   --nsr-white: #ffffff;
-  --nsr-green: #00ff88;
-  --nsr-green-dark: #00cc6a;
-  --nsr-green-light: #33ff99;
+  --nsr-blue: #60a5fa;
+  --nsr-blue-dark: #3b82f6;
+  --nsr-blue-light: #93c5fd;
+  --nsr-star: #e0f2fe;
+  --nsr-glow: rgba(96, 165, 250, 0.3);
   
   /* Neutral Colors */
-  --gray-50: #fafafa;
-  --gray-100: #f5f5f5;
-  --gray-200: #e5e5e5;
-  --gray-300: #d4d4d4;
-  --gray-400: #a3a3a3;
-  --gray-500: #737373;
-  --gray-600: #525252;
-  --gray-700: #404040;
-  --gray-800: #262626;
-  --gray-900: #171717;
+  --gray-50: #f8fafc;
+  --gray-100: #f1f5f9;
+  --gray-200: #e2e8f0;
+  --gray-300: #cbd5e1;
+  --gray-400: #94a3b8;
+  --gray-500: #64748b;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1e293b;
+  --gray-900: #0f172a;
   
   /* Semantic Colors */
-  --success: var(--nsr-green);
+  --success: #10b981;
   --warning: #fbbf24;
   --error: #ef4444;
-  --info: #3b82f6;
-  --nsr-blue: #2563eb;
+  --info: var(--nsr-blue);
   
   /* Spacing */
   --spacing-xs: 0.25rem;
