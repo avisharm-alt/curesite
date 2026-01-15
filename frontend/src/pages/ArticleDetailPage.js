@@ -83,7 +83,7 @@ const ArticleDetailPage = () => {
             <p>The article you're looking for doesn't exist or hasn't been published yet.</p>
             <Link to="/journal" className="back-link">
               <ArrowLeft size={16} />
-              Back to CURE Journal
+              Back to North Star Journal
             </Link>
           </div>
         </div>
