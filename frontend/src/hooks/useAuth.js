@@ -15,13 +15,23 @@ export const useAuth = () => {
   return context;
 };
 
+// Helper function to validate JWT format
+const isValidJWT = (token) => {
+  if (!token || typeof token !== 'string') return false;
+  if (token === 'undefined' || token === 'null') return false;
+  const parts = token.split('.');
+  return parts.length === 3;
+};
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    if (token) {
+    
+    // Validate token format before using it
+    if (token && isValidJWT(token)) {
       // Verify token and get user info
       axios.get(`${API}/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -31,11 +41,16 @@ export const AuthProvider = ({ children }) => {
       })
       .catch(() => {
         localStorage.removeItem('token');
+        setUser(null);
       })
       .finally(() => {
         setLoading(false);
       });
     } else {
+      // Clear invalid token
+      if (token) {
+        localStorage.removeItem('token');
+      }
       setLoading(false);
     }
 
@@ -44,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     const token_param = urlParams.get('token');
     const user_param = urlParams.get('user');
     
-    if (token_param && user_param) {
+    if (token_param && user_param && isValidJWT(token_param)) {
       try {
         const userData = JSON.parse(decodeURIComponent(user_param));
         localStorage.setItem('token', token_param);
@@ -61,9 +76,13 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, token) => {
-    localStorage.setItem('token', token);
-    setUser(userData);
-    toast.success(`Welcome back, ${userData.name}!`);
+    if (isValidJWT(token)) {
+      localStorage.setItem('token', token);
+      setUser(userData);
+      toast.success(`Welcome back, ${userData.name}!`);
+    } else {
+      toast.error('Invalid authentication token');
+    }
   };
 
   const logout = () => {
