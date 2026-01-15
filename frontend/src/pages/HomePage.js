@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FileText, Users, GraduationCap, BarChart3, Heart } from 'lucide-react';
+import { FileText, Users, GraduationCap, BarChart3, Heart, Info } from 'lucide-react';
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -13,24 +13,24 @@ const HomePage = () => {
           <div className="hero-text">
             <h1 className="hero-title">
               North Star
-              <span className="accent-text"> Research</span>
+              <span className="accent-text"> Foundation</span>
             </h1>
             <p className="hero-description">
-              The premier platform for connecting Canadian undergraduate students with research opportunities across all STEM fields, 
-              academic resources, and a thriving community of aspiring researchers, engineers, scientists, and scholars.
+              Guiding communities forward through compassion and action. We support those in need with 
+              100% of proceeds going directly to community-centered projects helping the homeless and vulnerable.
             </p>
             <div className="hero-buttons">
               <button 
                 className="cta-primary"
-                onClick={() => navigate('/students')}
+                onClick={() => navigate('/about')}
               >
-                Join the Network
+                Learn About Our Impact
               </button>
               <button 
                 className="cta-secondary"
-                onClick={() => navigate('/posters')}
+                onClick={() => navigate('/volunteer')}
               >
-                Explore Resources
+                Get Involved
               </button>
             </div>
           </div>
@@ -66,6 +66,14 @@ const HomePage = () => {
         <div className="container">
           <h2 className="section-title">Explore The Platform</h2>
           <div className="features-grid">
+            <div className="feature-card" onClick={() => navigate('/about')}>
+              <div className="feature-icon">
+                <Heart size={32} />
+              </div>
+              <h3>Our Impact</h3>
+              <p>Learn how we're making a difference in the homeless community, starting with blanket drives in London, Ontario.</p>
+            </div>
+            
             <div className="feature-card" onClick={() => navigate('/posters')}>
               <div className="feature-icon">
                 <FileText size={32} />
@@ -82,28 +90,12 @@ const HomePage = () => {
               <p>Connect with like-minded undergraduate researchers.</p>
             </div>
             
-            <div className="feature-card" onClick={() => navigate('/professors')}>
+            <div className="feature-card" onClick={() => navigate('/volunteer')}>
               <div className="feature-icon">
                 <GraduationCap size={32} />
               </div>
-              <h3>Professor Network</h3>
-              <p>Find faculty mentors for research opportunities and career guidance.</p>
-            </div>
-            
-            <div className="feature-card" onClick={() => navigate('/profiles')}>
-              <div className="feature-icon">
-                <BarChart3 size={32} />
-              </div>
-              <h3>EC Profiles</h3>
-              <p>Anonymous profiles and statistics from successful Canadian undergraduate applicants across all programs.</p>
-            </div>
-            
-            <div className="feature-card" onClick={() => navigate('/volunteer')}>
-              <div className="feature-icon">
-                <Heart size={32} />
-              </div>
               <h3>Volunteer Opportunities</h3>
-              <p>Discover research, community, and academic volunteer opportunities to build your experience.</p>
+              <p>Find opportunities to give back and make a difference in your community.</p>
             </div>
           </div>
         </div>
