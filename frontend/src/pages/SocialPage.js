@@ -268,7 +268,7 @@ const SocialPage = () => {
         {/* Right Sidebar - Trending & Suggestions */}
         <aside className="social-sidebar-right">
           <div className="sidebar-card">
-            <h3 className="sidebar-title">About CURE Social</h3>
+            <h3 className="sidebar-title">About North Star Social</h3>
             <p className="sidebar-text">
               Where scientists connect. Built in Canada. Academic-first. Politics-free.
             </p>
