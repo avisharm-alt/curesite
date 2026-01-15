@@ -133,9 +133,9 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-section">
-          <h3>CURE</h3>
-          <p>Canadian Undergraduate Research Exchange</p>
-          <p>Connecting students with research opportunities and medical school preparation.</p>
+          <h3>North Star Research</h3>
+          <p>Guiding Your Research Journey</p>
+          <p>Connecting students with research opportunities and academic preparation.</p>
         </div>
         
         <div className="footer-section">
