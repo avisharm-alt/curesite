@@ -108,7 +108,7 @@ app.add_middleware(
 # Health check endpoint for Railway
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "CURE Backend"}
+    return {"status": "healthy", "service": "North Star Research Backend"}
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
