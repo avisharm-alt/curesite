@@ -29,7 +29,7 @@ const SocialPage = () => {
   // Redirect if not logged in
   useEffect(() => {
     if (!user) {
-      toast.error('Please log in to access CURE Social');
+      toast.error('Please log in to access North Star Social');
       navigate('/');
     }
   }, [user, navigate]);
