@@ -110,7 +110,7 @@ const SubmitArticlePage = () => {
         <div>
           <h1 className="page-title">Submit Article</h1>
           <p className="page-description">
-            Submit your research article or abstract for review and publication in CURE Journal.
+            Submit your research article or abstract for review and publication in North Star Journal.
           </p>
         </div>
       </div>
