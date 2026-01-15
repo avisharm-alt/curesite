@@ -6,6 +6,7 @@ import './App.css';
 
 // Import pages
 import HomePage from './pages/HomePage';
+import AboutPage from './pages/AboutPage';
 import PosterJournalPage from './pages/PosterJournalPage';
 import CureJournalPage from './pages/CureJournalPage';
 import ArticleDetailPage from './pages/ArticleDetailPage';
