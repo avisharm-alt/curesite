@@ -113,7 +113,7 @@ const AdminPanelPage = () => {
             onClick={() => setActiveTab('articles')}
             className={`admin-tab ${activeTab === 'articles' ? 'active' : ''}`}
           >
-            CURE Journal
+            North Star Journal
           </button>
         </div>
         
