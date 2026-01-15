@@ -12,8 +12,8 @@ const HomePage = () => {
         <div className="hero-content">
           <div className="hero-text">
             <h1 className="hero-title">
-              Canadian Undergraduate
-              <span className="accent-text"> Research Exchange</span>
+              North Star
+              <span className="accent-text"> Research</span>
             </h1>
             <p className="hero-description">
               The premier platform for connecting Canadian undergraduate students with research opportunities across all STEM fields, 
