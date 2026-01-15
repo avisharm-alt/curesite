@@ -29,6 +29,16 @@ const ProfilePage = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      
+      // Check if token exists and is valid format
+      if (!token || token === 'undefined' || token === 'null' || !token.includes('.')) {
+        console.error('Invalid or missing token');
+        toast.error('Please log in again to access your profile');
+        logout();
+        navigate('/');
+        return;
+      }
+      
       const headers = { Authorization: `Bearer ${token}` };
 
       // Fetch my posters
@@ -55,7 +65,14 @@ const ProfilePage = () => {
 
     } catch (error) {
       console.error('Error fetching profile data:', error);
-      toast.error('Error fetching profile data');
+      // Check if it's an authentication error
+      if (error.response?.status === 401) {
+        toast.error('Session expired. Please log in again.');
+        logout();
+        navigate('/');
+      } else {
+        toast.error('Error fetching profile data');
+      }
       setMyPosters([]); // Reset to empty array on error
       setMyArticles([]);
     } finally {
