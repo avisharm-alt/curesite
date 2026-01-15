@@ -58,7 +58,7 @@ const Header = () => {
           <Link to="/">
             <img 
               src="https://customer-assets.emergentagent.com/job_northstar-hub/artifacts/2811jplu_Logo%20maker%20project%20%2811%29.png" 
-              alt="North Star Research Logo" 
+              alt="North Star Foundation Logo" 
               className="logo"
             />
           </Link>
