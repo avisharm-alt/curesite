@@ -175,7 +175,7 @@ const App = () => {
     let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
     link.type = 'image/png';
     link.rel = 'shortcut icon';
-    link.href = 'https://customer-assets.emergentagent.com/job_northstar-hub/artifacts/jmyyjaj2_Logo%20maker%20project%20%2810%29.png';
+    link.href = 'https://customer-assets.emergentagent.com/job_northstar-hub/artifacts/2811jplu_Logo%20maker%20project%20%2811%29.png';
     document.getElementsByTagName('head')[0].appendChild(link);
   }, []);
 
