@@ -18,7 +18,7 @@ const OnboardingPage = () => {
   return (
     <div className="welcome-animation">
       <div className="welcome-text">
-        North Star Research
+        North Star Foundation
       </div>
     </div>
   );
