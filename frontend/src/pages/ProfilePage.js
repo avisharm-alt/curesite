@@ -541,7 +541,7 @@ const ProfilePage = () => {
                   {article.status === 'published' && article.payment_status === 'completed' && (
                     <div className="payment-success">
                       <p style={{ marginBottom: '0', fontSize: '14px', color: '#059669' }}>
-                        ✅ Payment completed! Your article is live on CURE Journal.
+                        ✅ Payment completed! Your article is live on North Star Journal.
                       </p>
                     </div>
                   )}
