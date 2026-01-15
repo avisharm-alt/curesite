@@ -1,14 +1,14 @@
-/* CURE Website Styles - Inspired by Kraken.com with CURE Branding */
+/* North Star Research Website Styles - Professional Research Platform Design */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 :root {
-  /* CURE Brand Colors */
-  --cure-black: #0a0a0a;
-  --cure-white: #ffffff;
-  --cure-green: #00ff88;
-  --cure-green-dark: #00cc6a;
-  --cure-green-light: #33ff99;
+  /* North Star Research Brand Colors */
+  --nsr-black: #0a0a0a;
+  --nsr-white: #ffffff;
+  --nsr-green: #00ff88;
+  --nsr-green-dark: #00cc6a;
+  --nsr-green-light: #33ff99;
   
   /* Neutral Colors */
   --gray-50: #fafafa;
