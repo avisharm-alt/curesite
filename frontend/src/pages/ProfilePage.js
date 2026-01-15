@@ -114,6 +114,15 @@ const ProfilePage = () => {
   const handleDeleteAccount = async () => {
     try {
       const token = localStorage.getItem('token');
+      
+      // Check if token exists and is valid format
+      if (!token || token === 'undefined' || token === 'null' || !token.includes('.')) {
+        toast.error('Please log in again to delete your account');
+        logout();
+        navigate('/');
+        return;
+      }
+      
       const headers = { Authorization: `Bearer ${token}` };
 
       await axios.delete(`${API}/users/account`, { headers });
@@ -121,7 +130,14 @@ const ProfilePage = () => {
       logout();
       navigate('/');
     } catch (error) {
-      toast.error('Error deleting account');
+      console.error('Error deleting account:', error);
+      if (error.response?.status === 401) {
+        toast.error('Session expired. Please log in again.');
+        logout();
+        navigate('/');
+      } else {
+        toast.error('Error deleting account');
+      }
     }
   };
 
