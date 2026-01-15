@@ -167,10 +167,10 @@ const Footer = () => {
 // Main App Component
 const App = () => {
   // Force set document title immediately
-  document.title = "CURE Project";
+  document.title = "North Star Research";
   
   React.useEffect(() => {
-    document.title = "CURE Project";
+    document.title = "North Star Research";
     // Also update favicon
     let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
     link.type = 'image/png';
