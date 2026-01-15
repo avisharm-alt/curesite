@@ -61,7 +61,7 @@ const CureJournalPage = () => {
             <div className="journal-title-section">
               <BookOpen size={32} className="journal-icon" />
               <div>
-                <h1 className="journal-title">CURE Journal</h1>
+                <h1 className="journal-title">North Star Journal</h1>
                 <p className="journal-subtitle">Undergraduate Research Across All Disciplines - Engineering, Sciences, Psychology & Beyond</p>
               </div>
             </div>
