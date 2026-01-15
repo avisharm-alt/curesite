@@ -96,7 +96,7 @@ const CureJournalPage = () => {
           <div className="empty-state">
             <BookOpen size={64} />
             <h3>No Articles Yet</h3>
-            <p>Be the first to submit to CURE Journal</p>
+            <p>Be the first to submit to North Star Journal</p>
             <button onClick={handleSubmit} className="submit-article-btn">
               Submit Article
             </button>
