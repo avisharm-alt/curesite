@@ -1238,7 +1238,7 @@ body::before {
 
 /* FOOTER */
 .footer {
-  background: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 27, 75, 0.9) 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding: var(--spacing-3xl) var(--spacing-xl) var(--spacing-xl);
   margin-top: var(--spacing-3xl);
