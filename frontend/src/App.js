@@ -133,9 +133,9 @@ const Footer = () => {
     <footer className="footer">
       <div className="footer-content">
         <div className="footer-section">
-          <h3>North Star Research</h3>
-          <p>Guiding Your Research Journey</p>
-          <p>Connecting students with research opportunities and academic preparation.</p>
+          <h3>North Star Foundation</h3>
+          <p>Guiding Communities Forward</p>
+          <p>All proceeds are donated to community-centered projects helping those in need.</p>
         </div>
         
         <div className="footer-section">
