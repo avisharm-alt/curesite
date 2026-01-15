@@ -55,7 +55,7 @@ const Header = () => {
         <div className="nav-brand">
           <Link to="/">
             <img 
-              src="https://customer-assets.emergentagent.com/job_northstar-hub/artifacts/sllr8y1a_2.png" 
+              src="https://customer-assets.emergentagent.com/job_northstar-hub/artifacts/jmyyjaj2_Logo%20maker%20project%20%2810%29.png" 
               alt="North Star Research Logo" 
               className="logo"
             />
