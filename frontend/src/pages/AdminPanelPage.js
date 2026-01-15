@@ -281,7 +281,7 @@ const AdminPanelPage = () => {
 // Article Management Tab Component
 const ArticleManagementTab = ({ articles, onReview, onMarkPayment, onDelete }) => (
   <div className="admin-section">
-    <h2>CURE Journal Management</h2>
+    <h2>North Star Journal Management</h2>
     {articles.length > 0 ? (
       <div className="admin-posters">
         {articles.map((article) => (
