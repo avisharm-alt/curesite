@@ -402,40 +402,38 @@ body {
 }
 
 .cta-primary {
-  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
-  color: #ffffff;
+  background: var(--nsr-accent);
+  color: #0f0f0f;
   border: none;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(96, 165, 250, 0.3);
-}
-
-.cta-primary:hover {
-  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(96, 165, 250, 0.4);
-}
-
-.cta-secondary {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(96, 165, 250, 0.4);
   padding: 1rem 2rem;
   border-radius: 8px;
   font-weight: 500;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
+}
+
+.cta-primary:hover {
+  background: var(--nsr-accent-light);
+  transform: translateY(-1px);
+}
+
+.cta-secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .cta-secondary:hover {
-  border-color: var(--nsr-accent);
-  background: rgba(96, 165, 250, 0.1);
-  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-1px);
 }
 
 /* Partner Universities Section - Natural Integrated Look */
@@ -452,8 +450,8 @@ body {
   gap: 0;
   width: 100%;
   max-width: 520px;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(96, 165, 250, 0.15);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 20px;
   padding: 2rem;
   backdrop-filter: blur(10px);
