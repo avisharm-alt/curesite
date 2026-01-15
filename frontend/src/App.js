@@ -25,7 +25,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 // Import Lucide React icons
 import { 
   BookOpen, Users, GraduationCap, FileText, 
-  User, LogOut, Menu, X, Home, Award, BarChart3, MessageSquare, Heart, Info
+  User, LogOut, Menu, X, Home, Award, BarChart3, MessageSquare, Heart, Mail
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -40,6 +40,7 @@ const Header = () => {
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'About Us', href: '/about', icon: Heart },
+    { name: 'Contact', href: '/contact', icon: Mail },
     { name: 'Poster Journal', href: '/posters', icon: FileText },
     { name: 'North Star Journal', href: '/journal', icon: BookOpen },
     { name: 'Student Network', href: '/students', icon: Users },
