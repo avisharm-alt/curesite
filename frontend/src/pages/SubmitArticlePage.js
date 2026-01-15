@@ -94,7 +94,7 @@ const SubmitArticlePage = () => {
           <div className="empty-state">
             <BookOpen size={48} />
             <h3>Please sign in to submit an article</h3>
-            <p>Sign in with Google to submit your article to CURE Journal.</p>
+            <p>Sign in with Google to submit your article to North Star Journal.</p>
           </div>
         </div>
       </div>
