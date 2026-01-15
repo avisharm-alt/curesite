@@ -1093,7 +1093,7 @@ async def review_article(article_id: str, review_data: JournalArticleReviewReque
     if review_data.status == "published":
         update_data["payment_status"] = "pending"
         
-        # Generate unique CURE identifier if not already assigned
+        # Generate unique NSR identifier if not already assigned
         if not article.get("cure_identifier"):
             # Get count of published articles to determine next number
             published_count = await db.journal_articles.count_documents({
@@ -1102,9 +1102,9 @@ async def review_article(article_id: str, review_data: JournalArticleReviewReque
             })
             year = datetime.now(timezone.utc).year
             next_number = published_count + 1
-            cure_id = f"CURE.{year}.{next_number:03d}"
-            update_data["cure_identifier"] = cure_id
-            print(f"   🔖 Assigned identifier: {cure_id}")
+            nsr_id = f"NSR.{year}.{next_number:03d}"
+            update_data["cure_identifier"] = nsr_id
+            print(f"   🔖 Assigned identifier: {nsr_id}")
         
         # Get user details for email
         user = await db.users.find_one({"id": article["submitted_by"]})
