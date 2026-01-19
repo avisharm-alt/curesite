@@ -46,7 +46,7 @@ security = HTTPBearer()
 # Stripe Payment Configuration
 STRIPE_API_KEY = os.environ.get('STRIPE_API_KEY')
 STRIPE_PUBLISHABLE_KEY = os.environ.get('STRIPE_PUBLISHABLE_KEY')
-POSTER_PUBLICATION_FEE = 10.00  # Fixed fee in CAD for poster publication
+POSTER_PUBLICATION_FEE = 15.00  # Fixed fee in CAD for poster publication
 
 if STRIPE_API_KEY:
     print("✅ Stripe configured with live keys")
