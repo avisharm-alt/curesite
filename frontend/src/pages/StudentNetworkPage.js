@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { Users, Search } from 'lucide-react';
+import { Users, Search, FileText, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -42,6 +43,53 @@ const StudentNetworkPage = () => {
           <span className="student-program">{student.user_program}</span>
         </div>
       </div>
+      
+      {/* Publications Section */}
+      {student.publications_count > 0 && (
+        <div className="student-publications">
+          <div className="publications-header">
+            <h4>Publications</h4>
+            <span className="publications-count">{student.publications_count}</span>
+          </div>
+          <div className="publications-stats">
+            {student.posters_count > 0 && (
+              <span className="pub-stat">
+                <FileText size={14} />
+                {student.posters_count} poster{student.posters_count !== 1 ? 's' : ''}
+              </span>
+            )}
+            {student.articles_count > 0 && (
+              <span className="pub-stat">
+                <BookOpen size={14} />
+                {student.articles_count} article{student.articles_count !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
+          {student.recent_publications && student.recent_publications.length > 0 && (
+            <div className="recent-publications">
+              {student.recent_publications.map((pub, index) => (
+                <div key={index} className="publication-item">
+                  {pub.type === 'article' && pub.identifier ? (
+                    <Link to={`/journal/article/${pub.identifier}`} className="publication-link">
+                      <span className="pub-type-icon">
+                        {pub.type === 'poster' ? <FileText size={12} /> : <BookOpen size={12} />}
+                      </span>
+                      <span className="pub-title">{pub.title}</span>
+                    </Link>
+                  ) : (
+                    <span className="publication-link">
+                      <span className="pub-type-icon">
+                        {pub.type === 'poster' ? <FileText size={12} /> : <BookOpen size={12} />}
+                      </span>
+                      <span className="pub-title">{pub.title}</span>
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
       
       <div className="student-interests">
         <h4>Research Interests</h4>
