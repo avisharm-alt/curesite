@@ -9499,3 +9499,100 @@ body.onboarding-active .onboarding-page {
     align-items: center;
   }
 }
+
+/* ============================================================================
+   STUDENT CARD PUBLICATIONS STYLES
+   ============================================================================ */
+
+.student-publications {
+  background: rgba(96, 165, 250, 0.08);
+  border: 1px solid rgba(96, 165, 250, 0.15);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.publications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.publications-header h4 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--nsr-accent);
+  margin: 0;
+}
+
+.publications-count {
+  background: var(--nsr-accent);
+  color: #0f0f0f;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 50px;
+}
+
+.publications-stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.pub-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.pub-stat svg {
+  color: var(--nsr-accent);
+}
+
+.recent-publications {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.publication-item {
+  padding: 0.5rem 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.publication-item:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.publication-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  transition: color 0.2s ease;
+}
+
+a.publication-link:hover {
+  color: var(--nsr-accent);
+}
+
+.pub-type-icon {
+  color: var(--nsr-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pub-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
