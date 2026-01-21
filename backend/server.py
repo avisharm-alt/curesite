@@ -1924,16 +1924,57 @@ async def get_student_network(research_interest: Optional[str] = None):
     
     profiles = await db.student_network.find(query).to_list(100)
     
-    # Join with user data
+    # Join with user data and publications
     result = []
     for profile in profiles:
         user = await db.users.find_one({"id": profile["user_id"]})
         if user:
+            # Get published posters count
+            posters_count = await db.posters.count_documents({
+                "submitter_email": user.get("email"),
+                "status": "published"
+            })
+            
+            # Get published articles count
+            articles_count = await db.journal_articles.count_documents({
+                "submitter_email": user.get("email"),
+                "status": "published"
+            })
+            
+            # Get recent publication titles (up to 3)
+            recent_posters = await db.posters.find({
+                "submitter_email": user.get("email"),
+                "status": "published"
+            }).sort("created_at", -1).limit(2).to_list(2)
+            
+            recent_articles = await db.journal_articles.find({
+                "submitter_email": user.get("email"),
+                "status": "published"
+            }).sort("created_at", -1).limit(2).to_list(2)
+            
+            publications = []
+            for poster in recent_posters:
+                publications.append({
+                    "type": "poster",
+                    "title": poster.get("title", "Untitled"),
+                    "id": poster.get("id")
+                })
+            for article in recent_articles:
+                publications.append({
+                    "type": "article",
+                    "title": article.get("title", "Untitled"),
+                    "identifier": article.get("cure_identifier")
+                })
+            
             result.append({
                 **parse_from_mongo(profile),
                 "user_name": user["name"],
                 "user_university": user.get("university", ""),
-                "user_program": user.get("program", "")
+                "user_program": user.get("program", ""),
+                "publications_count": posters_count + articles_count,
+                "posters_count": posters_count,
+                "articles_count": articles_count,
+                "recent_publications": publications[:3]  # Limit to 3 total
             })
     
     return result
