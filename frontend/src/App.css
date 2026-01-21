@@ -637,11 +637,12 @@ body {
 }
 
 .payment-notice {
-  background-color: #ecfdf5;
-  border: 1px solid #10b981;
+  background-color: #f0fdf4;
+  border: 2px solid #10b981;
   border-radius: var(--radius-md);
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg);
   margin: var(--spacing-md) 0;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
 }
 
 .payment-link-btn {
