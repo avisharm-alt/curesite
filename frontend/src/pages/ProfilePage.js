@@ -556,7 +556,7 @@ const ProfilePage = () => {
                       <div>
                         <p style={{ fontWeight: 600, marginBottom: '4px' }}>Payment Required</p>
                         <p style={{ marginBottom: '8px', fontSize: '14px' }}>
-                          Complete the $10 publication fee to publish your article
+                          Complete the $15 publication fee to publish your article
                         </p>
                         <button
                           onClick={() => handleArticlePayment(article.id)}
