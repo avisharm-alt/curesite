@@ -7838,7 +7838,7 @@ body.onboarding-active .onboarding-page {
   gap: 0.5rem;
   padding: 0.875rem 1.75rem;
   background: var(--nsr-accent);
-  color: #0f0f0f;
+  color: var(--nsr-white);
   border: none;
   border-radius: 8px;
   font-size: 1rem;
@@ -9100,7 +9100,7 @@ body.onboarding-active .onboarding-page {
 
 .impact-icon {
   background: var(--nsr-accent);
-  color: #0f0f0f;
+  color: var(--nsr-white);
   padding: 1rem;
   border-radius: 12px;
   display: flex;
@@ -9110,7 +9110,7 @@ body.onboarding-active .onboarding-page {
 
 .impact-badge {
   background: var(--nsr-accent);
-  color: #0f0f0f;
+  color: var(--nsr-white);
   padding: 0.375rem 0.875rem;
   border-radius: 50px;
   font-size: 0.75rem;
@@ -9389,7 +9389,7 @@ body.onboarding-active .onboarding-page {
 
 .contact-icon {
   background: var(--nsr-accent);
-  color: #0f0f0f;
+  color: var(--nsr-white);
   width: 70px;
   height: 70px;
   border-radius: 16px;
@@ -9572,7 +9572,7 @@ body.onboarding-active .onboarding-page {
 
 .publications-count {
   background: var(--nsr-accent);
-  color: #0f0f0f;
+  color: var(--nsr-white);
   font-size: 0.75rem;
   font-weight: 600;
   padding: 0.2rem 0.5rem;
