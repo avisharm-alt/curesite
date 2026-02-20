@@ -114,7 +114,7 @@ body {
 .nav-brand .logo {
   height: 36px;
   width: auto;
-  opacity: 0.95;
+  filter: invert(1);
 }
 
 .nav-links {
