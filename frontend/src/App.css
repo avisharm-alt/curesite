@@ -107,8 +107,9 @@ body {
 }
 
 .nav-brand .logo {
-  height: 40px;
+  height: 44px;
   width: auto;
+  filter: brightness(1.1);
 }
 
 .nav-links {
