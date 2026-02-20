@@ -9051,7 +9051,7 @@ body.onboarding-active .onboarding-page {
 }
 
 .section-icon {
-  color: var(--slate-500);
+  color: var(--nsr-accent);
 }
 
 .mission-text {
