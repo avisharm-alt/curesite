@@ -437,19 +437,19 @@ body {
 .cta-secondary {
   background: transparent;
   color: rgba(255, 255, 255, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--nsr-accent);
   padding: 1rem 2rem;
   border-radius: 8px;
   font-weight: 500;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .cta-secondary:hover {
-  border-color: rgba(255, 255, 255, 0.4);
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
+  border-color: var(--nsr-accent-light);
+  background: rgba(138, 90, 255, 0.1);
+  transform: translateY(-2px);
 }
 
 /* Partner Universities Section - Natural Integrated Look */
