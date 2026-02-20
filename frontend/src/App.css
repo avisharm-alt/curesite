@@ -9271,8 +9271,8 @@ body.onboarding-active .onboarding-page {
 }
 
 .cta-card {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, rgba(110, 58, 255, 0.08) 0%, rgba(110, 58, 255, 0.03) 100%);
+  border: 1px solid rgba(110, 58, 255, 0.2);
   border-radius: 20px;
   padding: 3rem;
   text-align: center;
@@ -9282,12 +9282,12 @@ body.onboarding-active .onboarding-page {
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: #ffffff;
+  color: #1a1a2e;
 }
 
 .cta-card p {
   font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: #64748b;
   max-width: 500px;
   margin: 0 auto 2rem;
   line-height: 1.6;
@@ -9304,6 +9304,16 @@ body.onboarding-active .onboarding-page {
   align-items: center;
   gap: 0.5rem;
   text-decoration: none;
+  background: var(--nsr-accent);
+  color: #ffffff;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cta-buttons .cta-primary:hover {
+  background: var(--nsr-accent-dark);
 }
 
 /* Responsive */
