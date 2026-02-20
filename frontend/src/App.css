@@ -2047,8 +2047,8 @@ a:focus {
 }
 
 .admin-poster-card {
-  background: rgba(110, 58, 255, 0.03);
-  border: 1px solid rgba(110, 58, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
 }
