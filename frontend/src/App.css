@@ -412,7 +412,7 @@ body {
 }
 
 .accent-text {
-  color: var(--nsr-accent);
+  color: var(--slate-400);
 }
 
 .hero-description {
