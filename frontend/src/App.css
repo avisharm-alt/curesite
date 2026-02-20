@@ -475,11 +475,10 @@ body {
   gap: 0;
   width: 100%;
   max-width: 520px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
   padding: 2rem;
-  backdrop-filter: blur(10px);
   position: relative;
 }
 
@@ -491,7 +490,7 @@ body {
   left: 2rem;
   right: 2rem;
   height: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #1a1a2e;
   transform: translateY(-50%);
 }
 
@@ -502,7 +501,7 @@ body {
   top: 2rem;
   bottom: 2rem;
   width: 1px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #1a1a2e;
   transform: translateX(-50%);
 }
 
@@ -510,9 +509,9 @@ body {
   width: 100%;
   height: 160px;
   object-fit: contain;
-  opacity: 0.75;
-  filter: saturate(0.85) brightness(0.95);
-  transition: all 0.4s ease;
+  opacity: 0.9;
+  filter: saturate(0.9);
+  transition: all 0.3s ease;
   padding: 2rem;
   cursor: pointer;
   position: relative;
@@ -521,8 +520,8 @@ body {
 
 .university-crest:hover {
   opacity: 1;
-  filter: saturate(1) brightness(1.05);
-  transform: scale(1.1);
+  filter: saturate(1);
+  transform: scale(1.05);
 }
 
 /* UofT crest needs extra scaling since it's smaller */
@@ -531,7 +530,7 @@ body {
 }
 
 .university-crest-uoft:hover {
-  transform: scale(1.45);
+  transform: scale(1.4);
 }
 
 .hero-image {
