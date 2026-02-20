@@ -416,20 +416,22 @@ body {
 }
 
 .cta-primary {
-  background: var(--nsr-accent);
-  color: #0f0f0f;
+  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
+  color: #ffffff;
   border: none;
   padding: 1rem 2rem;
   border-radius: 8px;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 1rem;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-purple);
 }
 
 .cta-primary:hover {
-  background: var(--nsr-accent-light);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-purple-lg);
 }
 
 .cta-secondary {
