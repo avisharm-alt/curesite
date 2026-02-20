@@ -671,7 +671,7 @@ body {
 
 .payment-link-btn {
   display: inline-block;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  background: linear-gradient(135deg, #6E3AFF 0%, #2563eb 100%);
   color: #ffffff;
   padding: 12px 24px;
   border-radius: var(--radius-md);
@@ -2126,7 +2126,7 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: #3b82f6;
+  background: #6E3AFF;
   color: white;
   border: none;
   padding: var(--spacing-sm) var(--spacing-md);
@@ -2269,7 +2269,7 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: #3b82f6;
+  background: #6E3AFF;
   color: white;
   border: none;
   padding: var(--spacing-xs) var(--spacing-sm);
