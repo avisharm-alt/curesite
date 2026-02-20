@@ -876,12 +876,12 @@ body {
 .research-tag,
 .activity-tag,
 .award-tag {
-  background: rgba(96, 165, 250, 0.15);
+  background: rgba(138, 90, 255, 0.15);
   color: var(--nsr-accent);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
-  border: 1px solid rgba(96, 165, 250, 0.3);
+  border: 1px solid rgba(138, 90, 255, 0.3);
 }
 
 .student-looking-for {
