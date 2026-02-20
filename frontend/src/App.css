@@ -2185,9 +2185,9 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: var(--slate-700);
+  background: var(--nsr-accent);
   color: var(--nsr-white);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   font-weight: 500;
@@ -2197,7 +2197,7 @@ a:focus {
 }
 
 .view-poster-btn:hover {
-  background: var(--slate-600);
+  background: var(--nsr-accent-dark);
 }
 
 .delete-poster-btn {
