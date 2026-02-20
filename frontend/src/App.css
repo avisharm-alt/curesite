@@ -7823,20 +7823,19 @@ body.onboarding-active .onboarding-page {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.875rem 1.75rem;
-  background: var(--nsr-accent);
-  color: var(--nsr-white);
+  padding: 0.75rem 1.5rem;
+  background: var(--nsr-white);
+  color: var(--slate-900);
   border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .submit-article-btn:hover {
-  background: var(--nsr-accent-dark);
-  transform: translateY(-1px);
+  background: var(--slate-200);
 }
 
 .journal-filters {
