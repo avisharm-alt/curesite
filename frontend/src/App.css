@@ -269,13 +269,14 @@ body {
 }
 
 .page-icon {
-  background: var(--nsr-accent);
-  color: var(--nsr-black);
+  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
+  color: var(--nsr-white);
   padding: var(--spacing-lg);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: var(--shadow-purple);
 }
 
 .page-title {
