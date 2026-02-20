@@ -411,7 +411,7 @@ body {
 }
 
 .accent-text {
-  color: var(--slate-400);
+  color: var(--nsr-accent-light);
 }
 
 .hero-description {
