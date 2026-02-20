@@ -1860,8 +1860,8 @@ a:focus {
 }
 
 .form-section {
-  background: rgba(138, 90, 255, 0.03);
-  border: 1px solid rgba(138, 90, 255, 0.1);
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
   margin-bottom: var(--spacing-xl);
@@ -1869,11 +1869,12 @@ a:focus {
 
 .form-section h3 {
   font-family: var(--font-accent);
-  color: var(--nsr-accent);
-  font-size: 1.25rem;
+  color: var(--nsr-white);
+  font-size: 1.125rem;
+  font-weight: 500;
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid rgba(138, 90, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .form-textarea {
