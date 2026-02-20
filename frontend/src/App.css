@@ -339,8 +339,8 @@ body {
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(138, 90, 255, 0.03);
+  border: 1px solid rgba(138, 90, 255, 0.1);
   border-radius: 16px;
   padding: var(--spacing-2xl);
   text-align: center;
@@ -349,23 +349,26 @@ body {
 }
 
 .feature-card:hover {
-  transform: translateY(-2px);
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.1);
+  transform: translateY(-4px);
+  background: rgba(138, 90, 255, 0.08);
+  border-color: rgba(138, 90, 255, 0.25);
+  box-shadow: var(--shadow-purple);
 }
 
 .feature-card .feature-icon {
-  background: var(--nsr-accent);
-  color: #0f0f0f;
+  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
+  color: #ffffff;
   padding: var(--spacing-lg);
   border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-bottom: var(--spacing-lg);
+  box-shadow: var(--shadow-purple);
 }
 
 .feature-card h3 {
+  font-family: var(--font-accent);
   font-size: 1.375rem;
   font-weight: 600;
   margin-bottom: var(--spacing-md);
