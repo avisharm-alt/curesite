@@ -1184,35 +1184,32 @@ body {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
-  color: var(--nsr-white);
+  background: var(--nsr-white);
+  color: var(--slate-900);
   text-decoration: none;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-weight: 500;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-purple);
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  border: none;
 }
 
 .contact-btn:hover,
 .phone-btn:hover {
-  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-purple-lg);
+  background: var(--slate-200);
 }
 
 .phone-btn {
   background: transparent;
-  color: var(--nsr-accent);
-  border: 1px solid var(--nsr-accent);
-  box-shadow: none;
+  color: var(--slate-300);
+  border: 1px solid var(--slate-600);
 }
 
 .phone-btn:hover {
-  background: var(--nsr-accent);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--slate-500);
   color: var(--nsr-white);
-  box-shadow: var(--shadow-purple);
 }
 
 /* EMPTY STATES */
