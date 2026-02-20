@@ -348,8 +348,8 @@ body {
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(110, 58, 255, 0.03);
+  border: 1px solid rgba(110, 58, 255, 0.08);
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
   text-align: center;
@@ -358,12 +358,12 @@ body {
 }
 
 .feature-card:hover {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(110, 58, 255, 0.06);
+  border-color: rgba(110, 58, 255, 0.15);
 }
 
 .feature-card .feature-icon {
-  background: var(--slate-800);
+  background: var(--nsr-accent);
   color: var(--nsr-white);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
@@ -371,7 +371,6 @@ body {
   align-items: center;
   justify-content: center;
   margin-bottom: var(--spacing-lg);
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .feature-card h3 {
