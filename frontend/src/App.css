@@ -2195,8 +2195,8 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: var(--nsr-accent);
-  color: var(--nsr-black);
+  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
+  color: var(--nsr-white);
   border: none;
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
@@ -2204,11 +2204,13 @@ a:focus {
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(110, 58, 255, 0.2);
 }
 
 .view-poster-btn:hover {
-  background: var(--nsr-accent-dark);
-  transform: translateY(-1px);
+  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-purple);
 }
 
 .delete-poster-btn {
