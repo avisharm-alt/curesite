@@ -1,14 +1,20 @@
-/* North Star Research Website Styles - Sleek Minimalist Design */
+/* North Star Foundation Website Styles - Professional Institutional Design */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-  /* North Star Research Brand Colors - Minimalist Theme */
+  /* North Star Foundation Brand Colors - Purple Institutional Theme */
   --nsr-black: #0a0a0a;
   --nsr-white: #ffffff;
-  --nsr-accent: #60a5fa;
-  --nsr-accent-dark: #3b82f6;
-  --nsr-accent-light: #93c5fd;
+  --nsr-accent: #8A5AFF;
+  --nsr-accent-dark: #6E3AFF;
+  --nsr-accent-light: #9D7AFF;
+  --nsr-accent-soft: #B794FF;
+  
+  /* Neural/Deep Colors */
+  --neural-dark: #1A1A2E;
+  --neural-medium: #2D2D44;
+  --neural-light: #E6E6FF;
   
   /* Neutral Colors */
   --gray-50: #fafafa;
@@ -26,7 +32,11 @@
   --success: #10b981;
   --warning: #fbbf24;
   --error: #ef4444;
-  --info: #3b82f6;
+  --info: #8A5AFF;
+  
+  /* Typography */
+  --font-main: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  --font-accent: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
   
   /* Spacing */
   --spacing-xs: 0.25rem;
@@ -48,10 +58,12 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-purple: 0 4px 20px rgba(110, 58, 255, 0.25);
+  --shadow-purple-lg: 0 8px 30px rgba(110, 58, 255, 0.35);
   
   /* Glass Effect */
   --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(138, 90, 255, 0.15);
   --glass-blur: blur(20px);
 }
 
