@@ -673,7 +673,7 @@ body {
 
 .payment-link-btn {
   display: inline-block;
-  background: linear-gradient(135deg, var(--slate-500) 0%, #4D1AD9 100%);
+  background: linear-gradient(135deg, var(--slate-500) 0%, var(--slate-600) 100%);
   color: #ffffff;
   padding: 12px 24px;
   border-radius: var(--radius-md);
@@ -686,7 +686,7 @@ body {
 }
 
 .payment-link-btn:hover {
-  background: linear-gradient(135deg, #4D1AD9 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, var(--slate-600) 0%, #1d4ed8 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(77, 26, 217, 0.5);
 }
@@ -2131,7 +2131,7 @@ a:focus {
 }
 
 .download-btn:hover {
-  background: #4D1AD9;
+  background: var(--slate-600);
   transform: translateY(-1px);
   color: white;
 }
@@ -2268,7 +2268,7 @@ a:focus {
 }
 
 .download-poster-btn:hover {
-  background: #4D1AD9;
+  background: var(--slate-600);
   transform: translateY(-1px);
 }
 
