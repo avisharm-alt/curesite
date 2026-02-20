@@ -630,7 +630,7 @@ body {
 }
 
 .status-approved {
-  background: rgba(96, 165, 250, 0.2);
+  background: rgba(138, 90, 255, 0.2);
   color: var(--nsr-accent);
   border: 1px solid var(--nsr-accent);
 }
