@@ -1856,8 +1856,8 @@ a:focus {
 }
 
 .form-section {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(110, 58, 255, 0.03);
+  border: 1px solid rgba(110, 58, 255, 0.08);
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
   margin-bottom: var(--spacing-xl);
@@ -1870,7 +1870,7 @@ a:focus {
   font-weight: 500;
   margin-bottom: var(--spacing-lg);
   padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(110, 58, 255, 0.15);
 }
 
 .form-textarea {
