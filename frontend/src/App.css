@@ -95,8 +95,7 @@ body {
   position: fixed;
   top: 0;
   width: 100%;
-  background: rgba(250, 249, 246, 0.98);
-  backdrop-filter: blur(12px);
+  background: #ffffff;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   z-index: 1000;
   padding: var(--spacing-md) 0;
