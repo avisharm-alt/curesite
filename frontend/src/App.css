@@ -275,14 +275,13 @@ body {
 }
 
 .page-icon {
-  background: var(--slate-800);
+  background: var(--nsr-accent);
   color: var(--nsr-white);
   padding: var(--spacing-md);
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .page-title {
