@@ -2194,22 +2194,19 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
+  background: var(--slate-700);
   color: var(--nsr-white);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   font-weight: 500;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 8px rgba(110, 58, 255, 0.2);
+  transition: all 0.2s ease;
 }
 
 .view-poster-btn:hover {
-  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-purple);
+  background: var(--slate-600);
 }
 
 .delete-poster-btn {
