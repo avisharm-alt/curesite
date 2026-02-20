@@ -9358,8 +9358,8 @@ body.onboarding-active .onboarding-page {
 }
 
 .contact-card {
-  background: rgba(110, 58, 255, 0.03);
-  border: 1px solid rgba(110, 58, 255, 0.08);
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: var(--radius-lg);
   padding: 2.5rem;
   text-align: center;
@@ -9370,8 +9370,8 @@ body.onboarding-active .onboarding-page {
 }
 
 .contact-card:hover {
-  background: rgba(110, 58, 255, 0.06);
-  border-color: rgba(110, 58, 255, 0.15);
+  border-color: var(--nsr-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .contact-icon {
@@ -9395,12 +9395,12 @@ body.onboarding-active .onboarding-page {
   font-size: 1.25rem;
   font-weight: 500;
   margin-bottom: 0.5rem;
-  color: #ffffff;
+  color: #1a1a2e;
 }
 
 .contact-value {
   font-size: 0.9375rem;
-  color: var(--nsr-accent-light);
+  color: var(--nsr-accent);
   font-weight: 500;
   margin-bottom: 1rem;
   word-break: break-all;
@@ -9408,7 +9408,7 @@ body.onboarding-active .onboarding-page {
 
 .contact-description {
   font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.5);
+  color: #64748b;
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -9417,13 +9417,13 @@ body.onboarding-active .onboarding-page {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--nsr-accent-light);
+  color: var(--nsr-accent);
   font-weight: 500;
   font-size: 0.875rem;
 }
 
 .contact-card:hover .contact-cta {
-  color: var(--nsr-white);
+  color: var(--nsr-accent-dark);
 }
 
 /* Location Section */
