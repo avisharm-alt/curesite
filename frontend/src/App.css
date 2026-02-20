@@ -212,8 +212,9 @@ body {
 
 .google-login-btn:hover {
   background: var(--nsr-accent);
+  color: var(--nsr-white);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-purple);
 }
 
 .google-icon {
