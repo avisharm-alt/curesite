@@ -807,9 +807,9 @@ body {
 
 .search-input {
   width: 100%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--nsr-white);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #1e1b4b;
   padding: var(--spacing-md) var(--spacing-md) var(--spacing-md) 48px;
   border-radius: var(--radius-md);
   font-size: 0.95rem;
@@ -819,7 +819,7 @@ body {
 .search-input:focus {
   outline: none;
   border-color: var(--nsr-accent);
-  background: rgba(255, 255, 255, 0.15);
+  background: #ffffff;
 }
 
 .search-input::placeholder {
@@ -835,6 +835,7 @@ body {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: var(--spacing-sm);
+  color: #1e1b4b;
 }
 
 .student-meta {
