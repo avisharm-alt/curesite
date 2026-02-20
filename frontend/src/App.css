@@ -9062,16 +9062,16 @@ body.onboarding-active .onboarding-page {
 
 /* Impact Card */
 .impact-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(110, 58, 255, 0.03);
+  border: 1px solid rgba(110, 58, 255, 0.08);
   border-radius: var(--radius-lg);
   padding: 2.5rem;
   margin-top: 1.5rem;
 }
 
 .impact-card.featured {
-  border-color: rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(110, 58, 255, 0.15);
+  background: rgba(110, 58, 255, 0.05);
 }
 
 .impact-card-header {
@@ -9082,18 +9082,17 @@ body.onboarding-active .onboarding-page {
 }
 
 .impact-icon {
-  background: var(--slate-800);
+  background: var(--nsr-accent);
   color: var(--nsr-white);
   padding: 0.875rem;
   border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .impact-badge {
-  background: var(--slate-700);
+  background: var(--nsr-accent);
   color: var(--nsr-white);
   padding: 0.375rem 0.875rem;
   border-radius: 50px;
@@ -9115,7 +9114,7 @@ body.onboarding-active .onboarding-page {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--slate-400);
+  color: var(--nsr-accent-light);
   font-weight: 500;
   margin-bottom: 1.25rem;
 }
@@ -9132,7 +9131,7 @@ body.onboarding-active .onboarding-page {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(110, 58, 255, 0.1);
 }
 
 .impact-detail {
