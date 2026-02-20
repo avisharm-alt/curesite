@@ -112,9 +112,9 @@ body {
 }
 
 .nav-brand .logo {
-  height: 44px;
+  height: 36px;
   width: auto;
-  filter: brightness(1.1);
+  opacity: 0.95;
 }
 
 .nav-links {
