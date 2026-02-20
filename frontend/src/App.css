@@ -752,9 +752,9 @@ body {
 
 .filter-select,
 .filter-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--nsr-white);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #1e1b4b;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-size: 0.9rem;
@@ -768,7 +768,7 @@ body {
 
 .submit-poster-btn {
   background: var(--nsr-accent);
-  color: var(--nsr-white);
+  color: #ffffff;
   border: none;
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-md);
@@ -779,6 +779,7 @@ body {
   gap: var(--spacing-sm);
   transition: all 0.2s ease;
   font-size: 0.875rem;
+  text-decoration: none;
 }
 
 .submit-poster-btn:hover {
