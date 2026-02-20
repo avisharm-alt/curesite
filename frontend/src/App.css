@@ -9003,27 +9003,28 @@ body.onboarding-active .onboarding-page {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--nsr-accent);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--slate-400);
   padding: 0.5rem 1rem;
   border-radius: 50px;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .about-hero-title {
-  font-size: 3.5rem;
-  font-weight: 700;
+  font-family: var(--font-accent);
+  font-size: 3rem;
+  font-weight: 600;
   line-height: 1.1;
   margin-bottom: 1.5rem;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .about-hero-description {
-  font-size: 1.25rem;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 1.125rem;
+  color: rgba(255, 255, 255, 0.6);
   line-height: 1.7;
   max-width: 700px;
   margin: 0 auto;
@@ -9048,18 +9049,19 @@ body.onboarding-active .onboarding-page {
 }
 
 .section-header h2 {
-  font-size: 2rem;
-  font-weight: 600;
+  font-family: var(--font-accent);
+  font-size: 1.75rem;
+  font-weight: 500;
   color: #ffffff;
 }
 
 .section-icon {
-  color: var(--nsr-accent);
+  color: var(--slate-500);
 }
 
 .mission-text {
-  font-size: 1.125rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 1.0625rem;
+  color: rgba(255, 255, 255, 0.7);
   line-height: 1.8;
 }
 
