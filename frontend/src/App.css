@@ -1237,8 +1237,8 @@ body {
 
 /* FOOTER */
 .footer {
-  background: #1a1a2e;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  background: #1e1b4b;
+  border-top: 1px solid rgba(110, 58, 255, 0.2);
   padding: var(--spacing-3xl) var(--spacing-xl) var(--spacing-xl);
   margin-top: var(--spacing-3xl);
 }
@@ -1251,10 +1251,22 @@ body {
   gap: var(--spacing-2xl);
 }
 
+.footer-section h3 {
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-md);
+}
+
 .footer-section h4 {
   color: var(--nsr-accent-light);
   font-size: 1.1rem;
   margin-bottom: var(--spacing-md);
+}
+
+.footer-section p {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
 }
 
 .footer-logo {
