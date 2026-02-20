@@ -2136,9 +2136,9 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: var(--slate-700);
+  background: var(--nsr-accent);
   color: var(--nsr-white);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: none;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-weight: 500;
@@ -2148,8 +2148,7 @@ a:focus {
 }
 
 .view-btn:hover {
-  background: var(--slate-600);
-  border-color: rgba(255, 255, 255, 0.15);
+  background: var(--nsr-accent-dark);
 }
 
 .admin-delete-btn {
