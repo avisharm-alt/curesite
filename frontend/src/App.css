@@ -7819,8 +7819,8 @@ body.onboarding-active .onboarding-page {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1.5rem;
-  background: var(--nsr-white);
-  color: var(--slate-900);
+  background: var(--nsr-accent);
+  color: var(--nsr-white);
   border: none;
   border-radius: var(--radius-md);
   font-size: 0.9375rem;
@@ -7830,7 +7830,7 @@ body.onboarding-active .onboarding-page {
 }
 
 .submit-article-btn:hover {
-  background: var(--slate-200);
+  background: var(--nsr-accent-dark);
 }
 
 .journal-filters {
