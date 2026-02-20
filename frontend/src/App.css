@@ -1516,7 +1516,7 @@ a:focus {
   align-items: center;
   margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-lg);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .section-actions {
@@ -1528,7 +1528,7 @@ a:focus {
 .section-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--nsr-white);
+  color: #1e1b4b;
 }
 
 .section-count {
@@ -1541,7 +1541,7 @@ a:focus {
   align-items: center;
   gap: var(--spacing-sm);
   background: var(--nsr-accent);
-  color: var(--nsr-white);
+  color: #ffffff;
   border: none;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
@@ -1581,9 +1581,9 @@ a:focus {
 }
 
 .form-input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--nsr-white);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: #1e1b4b;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-size: 0.95rem;
@@ -1593,16 +1593,16 @@ a:focus {
 .form-input:focus {
   outline: none;
   border-color: var(--nsr-accent);
-  background: rgba(255, 255, 255, 0.15);
+  background: #ffffff;
 }
 
 .form-input option {
-  background: var(--nsr-black);
-  color: var(--nsr-white);
+  background: #ffffff;
+  color: #1e1b4b;
 }
 
 .form-value {
-  color: var(--nsr-white);
+  color: #1e1b4b;
   font-size: 0.95rem;
   padding: var(--spacing-sm) 0;
 }
