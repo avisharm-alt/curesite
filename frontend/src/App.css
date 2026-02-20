@@ -1977,23 +1977,21 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
-  color: var(--nsr-white);
+  background: var(--nsr-white);
+  color: var(--slate-900);
   border: none;
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
   text-decoration: none;
-  transition: all 0.3s ease;
-  box-shadow: var(--shadow-purple);
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
 }
 
 .submit-poster-btn:hover {
-  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
-  transform: translateY(-2px);
-  color: var(--nsr-white);
-  box-shadow: var(--shadow-purple-lg);
+  background: var(--slate-200);
+  color: var(--slate-900);
 }
 
 /* ADMIN PANEL */
