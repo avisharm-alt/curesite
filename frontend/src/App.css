@@ -111,8 +111,16 @@ body {
   align-items: center;
 }
 
+.nav-brand {
+  background: #1a1a2e;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+}
+
 .nav-brand .logo {
-  height: 36px;
+  height: 32px;
   width: auto;
   filter: none;
 }
