@@ -428,8 +428,8 @@ body {
 }
 
 .cta-primary {
-  background: var(--nsr-white);
-  color: var(--slate-900);
+  background: var(--nsr-accent);
+  color: var(--nsr-white);
   border: none;
   padding: 0.875rem 1.75rem;
   border-radius: var(--radius-md);
@@ -441,8 +441,7 @@ body {
 }
 
 .cta-primary:hover {
-  background: var(--slate-200);
-  transform: translateY(-1px);
+  background: var(--nsr-accent-dark);
 }
 
 .cta-secondary {
