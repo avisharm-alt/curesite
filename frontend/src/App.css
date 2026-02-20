@@ -1955,20 +1955,21 @@ a:focus {
 }
 
 .submit-btn {
-  background: var(--nsr-accent);
-  color: var(--nsr-black);
+  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
+  color: var(--nsr-white);
   border: none;
   padding: var(--spacing-md) var(--spacing-2xl);
   border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
+  box-shadow: var(--shadow-purple);
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: var(--nsr-accent-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-purple-lg);
 }
 
 .submit-btn:disabled {
