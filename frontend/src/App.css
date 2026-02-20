@@ -348,8 +348,8 @@ body {
 }
 
 .feature-card {
-  background: rgba(110, 58, 255, 0.03);
-  border: 1px solid rgba(110, 58, 255, 0.08);
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: var(--radius-lg);
   padding: var(--spacing-2xl);
   text-align: center;
@@ -358,8 +358,8 @@ body {
 }
 
 .feature-card:hover {
-  background: rgba(110, 58, 255, 0.06);
-  border-color: rgba(110, 58, 255, 0.15);
+  border-color: var(--nsr-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .feature-card .feature-icon {
@@ -378,7 +378,7 @@ body {
   font-size: 1.125rem;
   font-weight: 500;
   margin-bottom: var(--spacing-sm);
-  color: var(--nsr-white);
+  color: #1a1a2e;
   letter-spacing: -0.01em;
 }
 
