@@ -1029,7 +1029,7 @@ body {
 .stat-card h4 {
   font-size: 1.1rem;
   margin-bottom: var(--spacing-md);
-  color: var(--nsr-white);
+  color: #1e1b4b;
 }
 
 .stat-details {
@@ -1095,7 +1095,7 @@ body {
 .stat-value {
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--nsr-white);
+  color: #1e1b4b;
 }
 
 .profile-activities,
