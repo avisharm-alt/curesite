@@ -1645,23 +1645,22 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: rgba(138, 90, 255, 0.15);
-  color: var(--nsr-accent);
-  border: 1px solid var(--nsr-accent);
+  background: transparent;
+  color: var(--slate-300);
+  border: 1px solid var(--slate-600);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-weight: 500;
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   text-decoration: none;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .add-btn:hover {
-  background: var(--nsr-accent);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--slate-500);
   color: var(--nsr-white);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-purple);
 }
 
 .poster-card.compact {
