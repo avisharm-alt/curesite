@@ -403,11 +403,12 @@ body {
 
 .hero-title {
   font-family: var(--font-accent);
-  font-size: 3.5rem;
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: 3.25rem;
+  font-weight: 600;
+  line-height: 1.15;
   margin-bottom: var(--spacing-lg);
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
+  color: var(--nsr-white);
 }
 
 .accent-text {
