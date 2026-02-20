@@ -80,8 +80,8 @@
 
 body {
   font-family: var(--font-main);
-  background: #0a0a0a;
-  color: #ffffff;
+  background: #ffffff;
+  color: #1a1a2e;
   line-height: 1.6;
   overflow-x: hidden;
 }
