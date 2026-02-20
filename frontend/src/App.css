@@ -1588,7 +1588,7 @@ a:focus {
 }
 
 .user-type-badge {
-  background: rgba(96, 165, 250, 0.2);
+  background: rgba(138, 90, 255, 0.2);
   color: var(--nsr-accent);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
