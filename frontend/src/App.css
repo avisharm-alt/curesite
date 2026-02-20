@@ -287,10 +287,11 @@ body {
 
 .page-title {
   font-family: var(--font-accent);
-  font-size: 2.5rem;
-  font-weight: 700;
+  font-size: 2rem;
+  font-weight: 600;
   margin-bottom: var(--spacing-sm);
   color: var(--nsr-white);
+  letter-spacing: -0.01em;
 }
 
 .page-description {
