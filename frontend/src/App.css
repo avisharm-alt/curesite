@@ -8998,14 +8998,14 @@ body.onboarding-active .onboarding-page {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--slate-400);
+  background: rgba(110, 58, 255, 0.1);
+  color: var(--nsr-accent-light);
   padding: 0.5rem 1rem;
   border-radius: 50px;
   font-size: 0.8125rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(110, 58, 255, 0.2);
 }
 
 .about-hero-title {
