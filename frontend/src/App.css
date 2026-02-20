@@ -9356,57 +9356,58 @@ body.onboarding-active .onboarding-page {
 }
 
 .contact-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-lg);
   padding: 2.5rem;
   text-align: center;
   text-decoration: none;
   color: inherit;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: block;
 }
 
 .contact-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.3);
-  transform: translateY(-4px);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .contact-icon {
-  background: var(--nsr-accent);
+  background: var(--slate-800);
   color: var(--nsr-white);
-  width: 70px;
-  height: 70px;
-  border-radius: 16px;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .contact-icon.instagram {
-  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  background: var(--slate-800);
 }
 
 .contact-card h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-family: var(--font-accent);
+  font-size: 1.25rem;
+  font-weight: 500;
   margin-bottom: 0.5rem;
   color: #ffffff;
 }
 
 .contact-value {
-  font-size: 1rem;
-  color: var(--nsr-accent);
+  font-size: 0.9375rem;
+  color: var(--slate-300);
   font-weight: 500;
   margin-bottom: 1rem;
   word-break: break-all;
 }
 
 .contact-description {
-  font-size: 0.9375rem;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.5);
   line-height: 1.6;
   margin-bottom: 1.5rem;
 }
@@ -9415,13 +9416,13 @@ body.onboarding-active .onboarding-page {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--nsr-accent);
+  color: var(--slate-400);
   font-weight: 500;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
 }
 
 .contact-card:hover .contact-cta {
-  gap: 0.75rem;
+  color: var(--nsr-white);
 }
 
 /* Location Section */
