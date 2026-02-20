@@ -333,11 +333,11 @@ body {
 .section-title {
   text-align: center;
   font-family: var(--font-accent);
-  font-size: 2.25rem;
-  font-weight: 600;
+  font-size: 1.75rem;
+  font-weight: 500;
   margin-bottom: var(--spacing-3xl);
-  color: #ffffff;
-  letter-spacing: -0.02em;
+  color: var(--nsr-white);
+  letter-spacing: -0.01em;
 }
 
 .features-grid {
