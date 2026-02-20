@@ -727,8 +727,8 @@ body {
 }
 
 .keyword-tag {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--nsr-white);
+  background: rgba(110, 58, 255, 0.1);
+  color: var(--nsr-accent);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: var(--radius-sm);
   font-size: 0.8rem;
