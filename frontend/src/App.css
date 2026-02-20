@@ -406,7 +406,7 @@ body {
   line-height: 1.15;
   margin-bottom: var(--spacing-lg);
   letter-spacing: -0.02em;
-  color: var(--nsr-white);
+  color: #1a1a2e;
 }
 
 .accent-text {
