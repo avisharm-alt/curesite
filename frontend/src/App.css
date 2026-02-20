@@ -620,7 +620,7 @@ body {
 .poster-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--nsr-white);
+  color: #1e1b4b;
   flex: 1;
   margin-right: var(--spacing-md);
 }
