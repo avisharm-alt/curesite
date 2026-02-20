@@ -2144,22 +2144,20 @@ a:focus {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  background: linear-gradient(135deg, var(--nsr-accent) 0%, var(--nsr-accent-dark) 100%);
+  background: var(--slate-700);
   color: var(--nsr-white);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.9rem;
-  box-shadow: var(--shadow-purple);
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
 }
 
 .view-btn:hover {
-  background: linear-gradient(135deg, var(--nsr-accent-light) 0%, var(--nsr-accent) 100%);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-purple-lg);
+  background: var(--slate-600);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .admin-delete-btn {
