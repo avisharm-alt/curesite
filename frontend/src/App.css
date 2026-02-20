@@ -590,8 +590,8 @@ body {
 .profile-card,
 .opportunity-card,
 .stat-card {
-  background: rgba(110, 58, 255, 0.03);
-  border: 1px solid rgba(110, 58, 255, 0.08);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: var(--radius-lg);
   padding: var(--spacing-xl);
   transition: all 0.2s ease;
@@ -602,8 +602,8 @@ body {
 .professor-card:hover,
 .profile-card:hover,
 .opportunity-card:hover {
-  background: rgba(110, 58, 255, 0.06);
-  border-color: rgba(110, 58, 255, 0.15);
+  border-color: var(--nsr-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* POSTER CARDS */
