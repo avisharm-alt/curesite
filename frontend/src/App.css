@@ -324,6 +324,7 @@ body {
 
 .section-title {
   text-align: center;
+  font-family: var(--font-accent);
   font-size: 2.25rem;
   font-weight: 600;
   margin-bottom: var(--spacing-3xl);
