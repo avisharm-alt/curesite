@@ -290,7 +290,7 @@ body {
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: var(--spacing-sm);
-  color: var(--nsr-white);
+  color: #1a1a2e;
   letter-spacing: -0.01em;
 }
 
