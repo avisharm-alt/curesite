@@ -1949,8 +1949,8 @@ a:focus {
 }
 
 .submit-btn {
-  background: var(--nsr-white);
-  color: var(--slate-900);
+  background: var(--nsr-accent);
+  color: var(--nsr-white);
   border: none;
   padding: var(--spacing-md) var(--spacing-2xl);
   border-radius: var(--radius-md);
@@ -1961,7 +1961,7 @@ a:focus {
 }
 
 .submit-btn:hover:not(:disabled) {
-  background: var(--slate-200);
+  background: var(--nsr-accent-dark);
 }
 
 .submit-btn:disabled {
