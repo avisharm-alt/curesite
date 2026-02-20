@@ -9064,16 +9064,16 @@ body.onboarding-active .onboarding-page {
 
 /* Impact Card */
 .impact-card {
-  background: rgba(110, 58, 255, 0.03);
-  border: 1px solid rgba(110, 58, 255, 0.08);
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: var(--radius-lg);
   padding: 2.5rem;
   margin-top: 1.5rem;
 }
 
 .impact-card.featured {
-  border-color: rgba(110, 58, 255, 0.15);
-  background: rgba(110, 58, 255, 0.05);
+  border-color: var(--nsr-accent);
+  border-left-width: 4px;
 }
 
 .impact-card-header {
@@ -9109,21 +9109,21 @@ body.onboarding-active .onboarding-page {
   font-size: 1.5rem;
   font-weight: 500;
   margin-bottom: 0.75rem;
-  color: #ffffff;
+  color: #1a1a2e;
 }
 
 .impact-location {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--nsr-accent-light);
+  color: var(--nsr-accent);
   font-weight: 500;
   margin-bottom: 1.25rem;
 }
 
 .impact-card p {
   font-size: 1rem;
-  color: rgba(255, 255, 255, 0.65);
+  color: #64748b;
   line-height: 1.7;
   margin-bottom: 1.5rem;
 }
@@ -9133,7 +9133,7 @@ body.onboarding-active .onboarding-page {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   padding-top: 1.5rem;
-  border-top: 1px solid rgba(110, 58, 255, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .impact-detail {
