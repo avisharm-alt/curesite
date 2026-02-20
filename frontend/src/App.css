@@ -1933,7 +1933,7 @@ a:focus {
   gap: var(--spacing-sm);
   margin-top: var(--spacing-sm);
   padding: var(--spacing-sm);
-  background: rgba(96, 165, 250, 0.1);
+  background: rgba(138, 90, 255, 0.1);
   border: 1px solid var(--nsr-accent);
   border-radius: var(--radius-sm);
 }
