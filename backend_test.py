@@ -142,14 +142,15 @@ class FellowshipAPITester:
         try:
             response = requests.post(f"{API_BASE}/fellowship/apply", json=invalid_data, timeout=10)
             # Should return 422 (validation error) or 403 (auth required)
-            if response.status_code in [422, 403]:
-                self.log_test("/api/fellowship/apply", "POST", "422 or 403", response.status_code,
-                             "- Validation working correctly")
+            # Since auth is required first, 403 is the expected response
+            if response.status_code == 403:
+                self.log_test("/api/fellowship/apply", "POST", 403, response.status_code,
+                             "- Auth protection working correctly")
             else:
-                self.log_test("/api/fellowship/apply", "POST", "422 or 403", response.status_code,
-                             "- Unexpected response for invalid data")
+                self.log_test("/api/fellowship/apply", "POST", 403, response.status_code,
+                             "- Unexpected response for unauthenticated request")
         except requests.exceptions.RequestException as e:
-            self.log_test("/api/fellowship/apply", "POST", "422 or 403", "ERROR", f"Connection error: {e}")
+            self.log_test("/api/fellowship/apply", "POST", 403, "ERROR", f"Connection error: {e}")
 
     def test_backend_availability(self):
         """Test if backend server is running and accessible"""
