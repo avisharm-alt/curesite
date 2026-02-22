@@ -10232,39 +10232,43 @@ a.publication-link:hover {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
-  padding: 16px 24px;
-  background: #1e293b;
+  padding: 20px 28px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   margin-bottom: 32px;
 }
 
 .cohort-badge {
-  background: #f59e0b;
   color: #1e293b;
-  padding: 6px 14px;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
+  border-left: 3px solid #1e293b;
+  padding-left: 12px;
 }
 
 .cohort-stats {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 24px;
 }
 
 .cohort-stats span {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: rgba(255,255,255,0.9);
+  color: #64748b;
   font-size: 0.9rem;
 }
 
+.cohort-stats svg {
+  color: #94a3b8;
+}
+
 .cohort-stats .seats-remaining {
-  color: #34d399;
+  color: #059669;
   font-weight: 600;
 }
 
