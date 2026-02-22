@@ -59,6 +59,12 @@ const AdminPanelPage = () => {
           console.log('Articles response:', articlesRes.data);
           setArticles(Array.isArray(articlesRes.data) ? articlesRes.data : []);
           break;
+        case 'internships':
+          console.log('Fetching internships from:', `${API}/admin/internships`);
+          const internshipsRes = await axios.get(`${API}/admin/internships`, { headers });
+          console.log('Internships response:', internshipsRes.data);
+          setInternships(Array.isArray(internshipsRes.data) ? internshipsRes.data : []);
+          break;
       }
       
       console.log(`Successfully loaded ${activeTab} data`);
