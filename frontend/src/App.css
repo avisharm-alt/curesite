@@ -9969,44 +9969,46 @@ a.publication-link:hover {
 }
 
 .admin-form-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
-  padding: 24px;
+  padding: 28px;
   margin-bottom: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .admin-form-card h3 {
-  color: #ffffff;
-  margin-bottom: 20px;
+  color: #1e293b;
+  margin-bottom: 24px;
   font-size: 1.25rem;
+  font-weight: 600;
 }
 
 .admin-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .admin-form .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .admin-form .form-group label {
-  color: rgba(255, 255, 255, 0.8);
+  color: #374151;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .admin-form .form-group input,
 .admin-form .form-group textarea {
   padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #f8fafc;
+  border: 1px solid #d1d5db;
   border-radius: 8px;
-  color: #ffffff;
+  color: #1e293b;
   font-size: 1rem;
   transition: all 0.2s ease;
 }
@@ -10015,18 +10017,19 @@ a.publication-link:hover {
 .admin-form .form-group textarea:focus {
   outline: none;
   border-color: var(--nsr-accent);
-  background: rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .admin-form .form-group input::placeholder,
 .admin-form .form-group textarea::placeholder {
-  color: rgba(255, 255, 255, 0.4);
+  color: #9ca3af;
 }
 
 .admin-form .form-actions {
   display: flex;
   gap: 12px;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .admin-form .save-btn {
@@ -10034,18 +10037,19 @@ a.publication-link:hover {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  background: var(--nsr-accent);
   color: #ffffff;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .admin-form .save-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+  background: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .admin-form .cancel-btn {
@@ -10053,17 +10057,18 @@ a.publication-link:hover {
   align-items: center;
   gap: 8px;
   padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .admin-form .cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: #e2e8f0;
+  border-color: #cbd5e1;
 }
 
 /* Internship Admin List */
