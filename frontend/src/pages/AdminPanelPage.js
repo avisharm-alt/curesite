@@ -136,6 +136,13 @@ const AdminPanelPage = () => {
             <Briefcase size={16} />
             Internships
           </button>
+          <button
+            onClick={() => setActiveTab('fellowship')}
+            className={`admin-tab ${activeTab === 'fellowship' ? 'active' : ''}`}
+          >
+            <GraduationCap size={16} />
+            Fellowship
+          </button>
         </div>
         
         <div className="admin-info">
