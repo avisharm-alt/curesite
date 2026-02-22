@@ -293,6 +293,38 @@ class InternshipOpportunityCreate(BaseModel):
     description: str
     application_link: Optional[str] = None
 
+# Fellowship Application Models
+class FellowshipApplication(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    full_name: str
+    email: str
+    university: str
+    program: str
+    year_of_study: str  # 1st, 2nd, 3rd, 4th, Other
+    research_interests: List[str]  # Life Sciences, Engineering, AI/CS, etc.
+    prior_experience: Optional[str] = None
+    statement_of_interest: str  # 250-400 words
+    proposed_research_idea: Optional[str] = None
+    resume_file_id: Optional[str] = None  # GridFS file ID
+    resume_filename: Optional[str] = None
+    commitment_confirmed: bool = False
+    status: str = "submitted"  # submitted, under_review, accepted, rejected
+    submitted_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    admin_notes: Optional[str] = None
+
+class FellowshipApplicationCreate(BaseModel):
+    full_name: str
+    university: str
+    program: str
+    year_of_study: str
+    research_interests: List[str]
+    prior_experience: Optional[str] = None
+    statement_of_interest: str
+    proposed_research_idea: Optional[str] = None
+    commitment_confirmed: bool = True
+
 class StudentNetwork(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
