@@ -42,7 +42,6 @@ const Header = () => {
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
     { name: 'About Us', href: '/about', icon: Heart },
-    { name: 'Contact', href: '/contact', icon: Mail },
     { name: 'Poster Journal', href: '/posters', icon: FileText },
     { name: 'North Star Journal', href: '/journal', icon: BookOpen },
     { name: 'Fellowship', href: '/fellowship', icon: Award },
