@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { 
-  Award, BookOpen, Users, Clock, CheckCircle, FileText, 
-  ChevronDown, ChevronUp, Lock, Upload, X, Linkedin, 
-  GraduationCap, Target, Lightbulb, Star
+  Award, BookOpen, Users, CheckCircle, FileText, 
+  ChevronDown, ChevronUp, Lock, Upload, X, 
+  GraduationCap, Clock
 } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 
@@ -16,10 +16,7 @@ const FellowshipPage = () => {
   const [existingApplication, setExistingApplication] = useState(null);
   const [stats, setStats] = useState(null);
   const [expandedPhase, setExpandedPhase] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const applicationRef = useRef(null);
-  const structureRef = useRef(null);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -37,14 +34,9 @@ const FellowshipPage = () => {
   const [customInterest, setCustomInterest] = useState('');
 
   const researchInterestOptions = [
-    'Life Sciences',
-    'Engineering', 
-    'AI / Computer Science',
-    'Social Sciences',
-    'Humanities',
-    'Health & Medicine',
-    'Policy & Public Health',
-    'Environmental Science'
+    'Life Sciences', 'Engineering', 'AI / Computer Science',
+    'Social Sciences', 'Humanities', 'Health & Medicine',
+    'Policy & Public Health', 'Environmental Science'
   ];
 
   const yearOptions = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year+', 'Graduate'];
@@ -53,66 +45,20 @@ const FellowshipPage = () => {
     {
       id: 1,
       title: 'Research Foundations',
-      duration: 'Weeks 1–3',
-      description: 'Build your research toolkit and refine your question.',
-      deliverables: [
-        'Complete research methods orientation',
-        'Finalize research question with mentor guidance',
-        'Submit annotated bibliography'
-      ],
-      expectations: [
-        'Attend weekly seminars',
-        'Complete assigned readings',
-        'Participate in peer discussion groups'
-      ]
+      duration: 'Week 1',
+      deliverables: ['Complete research methods orientation', 'Finalize research question', 'Submit annotated bibliography']
     },
     {
       id: 2,
       title: 'Manuscript Development',
-      duration: 'Weeks 4–6',
-      description: 'Draft your scholarly manuscript under structured guidance.',
-      deliverables: [
-        'Submit first draft of manuscript',
-        'Develop figures and data visualizations',
-        'Complete methods section review'
-      ],
-      expectations: [
-        'Meet bi-weekly with assigned mentor',
-        'Submit progress updates',
-        'Integrate feedback iteratively'
-      ]
+      duration: 'Week 2',
+      deliverables: ['Submit first draft of manuscript', 'Develop figures and visualizations', 'Peer review participation']
     },
     {
       id: 3,
-      title: 'Structured Peer Review',
-      duration: 'Weeks 7–8',
-      description: 'Experience rigorous academic peer review.',
-      deliverables: [
-        'Complete peer reviews of fellow manuscripts',
-        'Revise manuscript based on peer feedback',
-        'Submit response to reviewers document'
-      ],
-      expectations: [
-        'Provide constructive, academic-quality feedback',
-        'Engage with critique professionally',
-        'Demonstrate scholarly integrity'
-      ]
-    },
-    {
-      id: 4,
       title: 'Publication & Impact',
-      duration: 'Weeks 9–10',
-      description: 'Finalize your contribution and measure your impact.',
-      deliverables: [
-        'Submit final manuscript to North Star Journal',
-        'Complete impact reflection essay',
-        'Present at virtual symposium'
-      ],
-      expectations: [
-        'Address all editorial feedback',
-        'Participate in cohort celebration',
-        'Commit to knowledge mobilization'
-      ]
+      duration: 'Week 3',
+      deliverables: ['Final manuscript submission', 'Present at virtual symposium', 'Publication to North Star Journal']
     }
   ];
 
@@ -120,17 +66,9 @@ const FellowshipPage = () => {
     fetchStats();
     if (user) {
       fetchExistingApplication();
+      setFormData(prev => ({ ...prev, full_name: user.name || '' }));
     }
   }, [user]);
-
-  useEffect(() => {
-    if (user && !existingApplication) {
-      setFormData(prev => ({
-        ...prev,
-        full_name: user.name || ''
-      }));
-    }
-  }, [user, existingApplication]);
 
   const fetchStats = async () => {
     try {
@@ -155,14 +93,6 @@ const FellowshipPage = () => {
 
   const handleGoogleLogin = () => {
     window.location.href = `${API}/auth/google`;
-  };
-
-  const scrollToApplication = () => {
-    applicationRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
-  const scrollToStructure = () => {
-    structureRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleInterestToggle = (interest) => {
@@ -199,20 +129,13 @@ const FellowshipPage = () => {
     }
   };
 
-  const wordCount = (text) => {
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length;
-  };
+  const wordCount = (text) => text.trim().split(/\s+/).filter(word => word.length > 0).length;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
     if (wordCount(formData.statement_of_interest) < 200) {
       toast.error('Statement of interest must be at least 200 words');
-      return;
-    }
-    if (wordCount(formData.statement_of_interest) > 500) {
-      toast.error('Statement of interest must be under 500 words');
       return;
     }
     if (formData.research_interests.length === 0) {
@@ -229,7 +152,6 @@ const FellowshipPage = () => {
       const token = localStorage.getItem('token');
       const headers = { Authorization: `Bearer ${token}` };
 
-      // Upload resume first if provided
       if (resumeFile) {
         const formDataFile = new FormData();
         formDataFile.append('file', resumeFile);
@@ -238,14 +160,11 @@ const FellowshipPage = () => {
         });
       }
 
-      // Submit application
       await axios.post(`${API}/fellowship/apply`, formData, { headers });
-      
       toast.success('Application submitted successfully!');
       fetchExistingApplication();
       fetchStats();
     } catch (error) {
-      console.error('Error submitting application:', error);
       toast.error(error.response?.data?.detail || 'Failed to submit application');
     } finally {
       setSubmitting(false);
@@ -253,278 +172,60 @@ const FellowshipPage = () => {
   };
 
   const getStatusBadge = (status) => {
-    const statusStyles = {
+    const styles = {
       submitted: { bg: '#f0f9ff', color: '#0369a1', text: 'Submitted' },
       under_review: { bg: '#fef3c7', color: '#92400e', text: 'Under Review' },
       accepted: { bg: '#d1fae5', color: '#065f46', text: 'Accepted' },
       rejected: { bg: '#fee2e2', color: '#991b1b', text: 'Not Selected' }
     };
-    const style = statusStyles[status] || statusStyles.submitted;
-    return (
-      <span style={{ 
-        background: style.bg, 
-        color: style.color, 
-        padding: '6px 12px', 
-        borderRadius: '6px',
-        fontSize: '0.85rem',
-        fontWeight: '600'
-      }}>
-        {style.text}
-      </span>
-    );
+    const s = styles[status] || styles.submitted;
+    return <span className="status-badge" style={{ background: s.bg, color: s.color }}>{s.text}</span>;
   };
 
   return (
-    <div className="fellowship-page">
-      {/* Hero Section */}
-      <section className="fellowship-hero">
-        <div className="fellowship-hero-content">
-          <h1>North Star Fellowship Program</h1>
-          <p className="fellowship-hero-subtitle">
-            A guided undergraduate research fellowship culminating in peer-reviewed 
-            publication and measurable community impact.
+    <div className="page fellowship-page">
+      <div className="page-header">
+        <div className="page-icon"><Award size={32} /></div>
+        <div>
+          <h1 className="page-title">North Star Fellowship Program</h1>
+          <p className="page-description">
+            A selective 3-week guided research fellowship for Canadian undergraduates, 
+            culminating in peer-reviewed publication.
           </p>
-          <div className="fellowship-hero-actions">
-            <button onClick={scrollToApplication} className="btn-primary-fellowship">
-              Apply to the Fellowship
-            </button>
-            <button onClick={scrollToStructure} className="btn-secondary-fellowship">
-              View Program Structure
-            </button>
+        </div>
+      </div>
+
+      <div className="page-content">
+        {/* Cohort Info Banner */}
+        <div className="fellowship-cohort-banner">
+          <span className="cohort-badge">Founding Cohort</span>
+          <div className="cohort-stats">
+            <span><Clock size={16} /> 3 Weeks</span>
+            <span><Users size={16} /> 20-25 Fellows</span>
+            <span><GraduationCap size={16} /> Free</span>
+            {stats && stats.seats_remaining > 0 && (
+              <span className="seats-remaining">{stats.seats_remaining} seats remaining</span>
+            )}
           </div>
         </div>
-      </section>
 
-      {/* What It Is Section */}
-      <section className="fellowship-section">
-        <div className="fellowship-container">
-          <h2 className="fellowship-section-title">What is the North Star Fellowship?</h2>
-          <p className="fellowship-intro-text">
-            The North Star Fellowship is a selective 10-week guided research program designed for 
-            Canadian undergraduates passionate about scholarly inquiry. Fellows receive structured 
-            mentorship, engage in rigorous peer review, and culminate their experience with a 
-            submission to the North Star Journal — our peer-reviewed publication platform.
-          </p>
-          <div className="fellowship-highlights">
-            <div className="fellowship-highlight-item">
-              <BookOpen size={24} />
-              <span>Structured research training</span>
-            </div>
-            <div className="fellowship-highlight-item">
-              <FileText size={24} />
-              <span>Proposal development</span>
-            </div>
-            <div className="fellowship-highlight-item">
-              <Target size={24} />
-              <span>Manuscript drafting</span>
-            </div>
-            <div className="fellowship-highlight-item">
-              <Users size={24} />
-              <span>Peer review immersion</span>
-            </div>
-            <div className="fellowship-highlight-item">
-              <Award size={24} />
-              <span>Publication opportunity</span>
-            </div>
-            <div className="fellowship-highlight-item">
-              <Lightbulb size={24} />
-              <span>Impact-driven mission</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Program Structure Section */}
-      <section className="fellowship-section fellowship-section-alt" ref={structureRef}>
-        <div className="fellowship-container">
-          <h2 className="fellowship-section-title">Program Structure</h2>
-          <p className="fellowship-section-subtitle">
-            Four phases designed to guide you from research question to published scholar.
-          </p>
-          <div className="fellowship-timeline">
-            {programPhases.map((phase, index) => (
-              <div key={phase.id} className="fellowship-phase">
-                <div 
-                  className={`fellowship-phase-header ${expandedPhase === phase.id ? 'expanded' : ''}`}
-                  onClick={() => setExpandedPhase(expandedPhase === phase.id ? null : phase.id)}
-                >
-                  <div className="fellowship-phase-number">Phase {phase.id}</div>
-                  <div className="fellowship-phase-info">
-                    <h3>{phase.title}</h3>
-                    <span className="fellowship-phase-duration">{phase.duration}</span>
-                  </div>
-                  <div className="fellowship-phase-toggle">
-                    {expandedPhase === phase.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                  </div>
-                </div>
-                {expandedPhase === phase.id && (
-                  <div className="fellowship-phase-content">
-                    <p className="fellowship-phase-description">{phase.description}</p>
-                    <div className="fellowship-phase-details">
-                      <div className="fellowship-phase-column">
-                        <h4>Deliverables</h4>
-                        <ul>
-                          {phase.deliverables.map((item, i) => (
-                            <li key={i}><CheckCircle size={14} /> {item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="fellowship-phase-column">
-                        <h4>Expectations</h4>
-                        <ul>
-                          {phase.expectations.map((item, i) => (
-                            <li key={i}><CheckCircle size={14} /> {item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Who Should Apply Section */}
-      <section className="fellowship-section">
-        <div className="fellowship-container">
-          <h2 className="fellowship-section-title">Who Should Apply</h2>
-          <div className="fellowship-eligibility">
-            <div className="fellowship-eligibility-list">
-              <div className="fellowship-eligibility-item">
-                <CheckCircle size={20} />
-                <span>Canadian undergraduate student</span>
-              </div>
-              <div className="fellowship-eligibility-item">
-                <CheckCircle size={20} />
-                <span>Interest in academic research</span>
-              </div>
-              <div className="fellowship-eligibility-item">
-                <CheckCircle size={20} />
-                <span>Commitment to completing deliverables</span>
-              </div>
-              <div className="fellowship-eligibility-item">
-                <CheckCircle size={20} />
-                <span>Any discipline welcome</span>
-              </div>
-            </div>
-            <p className="fellowship-eligibility-note">
-              Prior research experience is not required. We value curiosity, dedication, and 
-              a willingness to learn.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="fellowship-section fellowship-section-alt">
-        <div className="fellowship-container">
-          <h2 className="fellowship-section-title">Fellowship Benefits</h2>
-          <div className="fellowship-benefits-grid">
-            <div className="fellowship-benefit">
-              <Award size={28} />
-              <h4>North Star Fellow Designation</h4>
-              <p>Official recognition as a North Star Fellow</p>
-            </div>
-            <div className="fellowship-benefit">
-              <BookOpen size={28} />
-              <h4>Publication Pathway</h4>
-              <p>Direct submission to peer-reviewed North Star Journal</p>
-            </div>
-            <div className="fellowship-benefit">
-              <FileText size={28} />
-              <h4>Digital Certificate</h4>
-              <p>Verified certificate of completion</p>
-            </div>
-            <div className="fellowship-benefit">
-              <Linkedin size={28} />
-              <h4>LinkedIn-Ready Badge</h4>
-              <p>Shareable credential for your profile</p>
-            </div>
-            <div className="fellowship-benefit">
-              <Star size={28} />
-              <h4>Featured Author Spotlight</h4>
-              <p>Highlight on our platform upon publication</p>
-            </div>
-            <div className="fellowship-benefit">
-              <Users size={28} />
-              <h4>Community Impact</h4>
-              <p>Contribute to knowledge mobilization</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Cohort Details Section */}
-      <section className="fellowship-section">
-        <div className="fellowship-container">
-          <h2 className="fellowship-section-title">Cohort Details</h2>
-          <div className="fellowship-cohort-box">
-            <div className="fellowship-cohort-badge">Founding Fellowship Cohort</div>
-            <div className="fellowship-cohort-grid">
-              <div className="fellowship-cohort-item">
-                <span className="label">Cohort Size</span>
-                <span className="value">20–25 Fellows</span>
-              </div>
-              <div className="fellowship-cohort-item">
-                <span className="label">Duration</span>
-                <span className="value">10 Weeks</span>
-              </div>
-              <div className="fellowship-cohort-item">
-                <span className="label">Format</span>
-                <span className="value">Hybrid / Remote</span>
-              </div>
-              <div className="fellowship-cohort-item">
-                <span className="label">Cost</span>
-                <span className="value">Free (Cohort I)</span>
-              </div>
-              <div className="fellowship-cohort-item">
-                <span className="label">Acceptance</span>
-                <span className="value">Selective</span>
-              </div>
-              {stats && stats.seats_remaining > 0 && (
-                <div className="fellowship-cohort-item highlight">
-                  <span className="label">Seats Remaining</span>
-                  <span className="value">{stats.seats_remaining}</span>
-                </div>
-              )}
-            </div>
-            <p className="fellowship-cohort-note">
-              Applications reviewed on a rolling basis. Early submission encouraged.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Application Form Section */}
-      <section className="fellowship-section fellowship-section-alt" ref={applicationRef}>
-        <div className="fellowship-container">
-          <h2 className="fellowship-section-title">Fellowship Application</h2>
+        {/* APPLICATION FORM - At the top */}
+        <div className="fellowship-application-section">
+          <h2>Fellowship Application</h2>
           
           {/* Already Applied */}
           {existingApplication && (
-            <div className="fellowship-existing-application">
-              <div className="fellowship-existing-header">
+            <div className="fellowship-status-card">
+              <div className="status-header">
                 <h3>Your Application</h3>
                 {getStatusBadge(existingApplication.status)}
               </div>
-              <p>
-                You submitted your fellowship application on{' '}
-                {new Date(existingApplication.submitted_at).toLocaleDateString('en-CA', {
-                  year: 'numeric', month: 'long', day: 'numeric'
-                })}.
-              </p>
+              <p>Submitted on {new Date(existingApplication.submitted_at).toLocaleDateString('en-CA', { year: 'numeric', month: 'long', day: 'numeric' })}.</p>
               {existingApplication.status === 'submitted' && (
-                <p className="fellowship-existing-note">
-                  Your application is being reviewed. We will notify you via email once a decision is made.
-                </p>
+                <p className="status-note">Your application is under review. We will notify you via email.</p>
               )}
               {existingApplication.status === 'accepted' && (
-                <p className="fellowship-existing-note success">
-                  Congratulations! You have been accepted to the North Star Fellowship. 
-                  Check your email for next steps.
-                </p>
+                <p className="status-note success">Congratulations! You've been accepted. Check your email for next steps.</p>
               )}
             </div>
           )}
@@ -532,204 +233,152 @@ const FellowshipPage = () => {
           {/* Login Gate */}
           {!authLoading && !user && !existingApplication && (
             <div className="fellowship-login-gate">
-              <div className="fellowship-form-blurred">
-                <div className="form-placeholder"></div>
-                <div className="form-placeholder short"></div>
-                <div className="form-placeholder"></div>
-                <div className="form-placeholder tall"></div>
-              </div>
-              <div className="fellowship-login-overlay">
-                <Lock size={32} />
-                <h3>Sign In Required</h3>
-                <p>Please sign in with Google to submit your fellowship application.</p>
-                <button onClick={handleGoogleLogin} className="google-login-btn-large">
-                  <img 
-                    src="https://developers.google.com/identity/images/g-logo.png" 
-                    alt="Google" 
-                    className="google-icon"
-                  />
-                  Sign in with Google
-                </button>
-              </div>
+              <Lock size={28} />
+              <h3>Sign In Required</h3>
+              <p>Please sign in with Google to submit your application.</p>
+              <button onClick={handleGoogleLogin} className="google-login-btn-large">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="google-icon" />
+                Sign in with Google
+              </button>
             </div>
           )}
 
           {/* Application Form */}
           {user && !existingApplication && (
             <form onSubmit={handleSubmit} className="fellowship-form">
-              <div className="fellowship-form-row">
-                <div className="fellowship-form-group">
+              <div className="form-row">
+                <div className="form-group">
                   <label>Full Name <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    value={formData.full_name}
-                    onChange={(e) => setFormData({...formData, full_name: e.target.value})}
-                    placeholder="Your full name"
-                    required
-                  />
+                  <input type="text" value={formData.full_name} onChange={(e) => setFormData({...formData, full_name: e.target.value})} required />
                 </div>
-                <div className="fellowship-form-group">
+                <div className="form-group">
                   <label>University <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    value={formData.university}
-                    onChange={(e) => setFormData({...formData, university: e.target.value})}
-                    placeholder="e.g., University of Toronto"
-                    required
-                  />
+                  <input type="text" value={formData.university} onChange={(e) => setFormData({...formData, university: e.target.value})} placeholder="e.g., University of Toronto" required />
                 </div>
               </div>
 
-              <div className="fellowship-form-row">
-                <div className="fellowship-form-group">
+              <div className="form-row">
+                <div className="form-group">
                   <label>Program / Major <span className="required">*</span></label>
-                  <input
-                    type="text"
-                    value={formData.program}
-                    onChange={(e) => setFormData({...formData, program: e.target.value})}
-                    placeholder="e.g., Life Sciences, Computer Science"
-                    required
-                  />
+                  <input type="text" value={formData.program} onChange={(e) => setFormData({...formData, program: e.target.value})} required />
                 </div>
-                <div className="fellowship-form-group">
+                <div className="form-group">
                   <label>Year of Study <span className="required">*</span></label>
-                  <select
-                    value={formData.year_of_study}
-                    onChange={(e) => setFormData({...formData, year_of_study: e.target.value})}
-                    required
-                  >
+                  <select value={formData.year_of_study} onChange={(e) => setFormData({...formData, year_of_study: e.target.value})} required>
                     <option value="">Select year...</option>
-                    {yearOptions.map(year => (
-                      <option key={year} value={year}>{year}</option>
-                    ))}
+                    {yearOptions.map(year => <option key={year} value={year}>{year}</option>)}
                   </select>
                 </div>
               </div>
 
-              <div className="fellowship-form-group">
+              <div className="form-group">
                 <label>Research Interests <span className="required">*</span></label>
-                <p className="fellowship-form-hint">Select all that apply</p>
-                <div className="fellowship-interests-grid">
+                <div className="interest-tags">
                   {researchInterestOptions.map(interest => (
-                    <button
-                      key={interest}
-                      type="button"
-                      className={`fellowship-interest-tag ${formData.research_interests.includes(interest) ? 'selected' : ''}`}
-                      onClick={() => handleInterestToggle(interest)}
-                    >
+                    <button key={interest} type="button" className={`interest-tag ${formData.research_interests.includes(interest) ? 'selected' : ''}`} onClick={() => handleInterestToggle(interest)}>
                       {interest}
                     </button>
                   ))}
                 </div>
-                <div className="fellowship-custom-interest">
-                  <input
-                    type="text"
-                    value={customInterest}
-                    onChange={(e) => setCustomInterest(e.target.value)}
-                    placeholder="Add other interest..."
-                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomInterest())}
-                  />
-                  <button type="button" onClick={addCustomInterest} className="add-interest-btn">Add</button>
+                <div className="custom-interest-row">
+                  <input type="text" value={customInterest} onChange={(e) => setCustomInterest(e.target.value)} placeholder="Add other..." onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomInterest())} />
+                  <button type="button" onClick={addCustomInterest} className="add-btn">Add</button>
                 </div>
-                {formData.research_interests.filter(i => !researchInterestOptions.includes(i)).length > 0 && (
-                  <div className="fellowship-custom-interests-list">
-                    {formData.research_interests.filter(i => !researchInterestOptions.includes(i)).map(interest => (
-                      <span key={interest} className="custom-interest-tag">
-                        {interest}
-                        <button type="button" onClick={() => handleInterestToggle(interest)}>
-                          <X size={14} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
 
-              <div className="fellowship-form-group">
+              <div className="form-group">
                 <label>Prior Research Experience <span className="optional">(Optional)</span></label>
-                <textarea
-                  value={formData.prior_experience}
-                  onChange={(e) => setFormData({...formData, prior_experience: e.target.value})}
-                  placeholder="Briefly describe any prior research experience, if applicable..."
-                  rows={3}
-                />
+                <textarea value={formData.prior_experience} onChange={(e) => setFormData({...formData, prior_experience: e.target.value})} rows={2} placeholder="Briefly describe any prior experience..." />
               </div>
 
-              <div className="fellowship-form-group">
+              <div className="form-group">
                 <label>Statement of Interest <span className="required">*</span></label>
-                <p className="fellowship-form-hint">
-                  In 250–400 words, explain why you wish to join the North Star Fellowship 
-                  and what research topic you hope to explore.
-                </p>
-                <textarea
-                  value={formData.statement_of_interest}
-                  onChange={(e) => setFormData({...formData, statement_of_interest: e.target.value})}
-                  placeholder="Your statement of interest..."
-                  rows={8}
-                  required
-                />
-                <div className={`word-count ${wordCount(formData.statement_of_interest) < 200 || wordCount(formData.statement_of_interest) > 500 ? 'warning' : ''}`}>
-                  {wordCount(formData.statement_of_interest)} / 250–400 words
+                <p className="form-hint">In 250–400 words, explain why you wish to join and what research topic you hope to explore.</p>
+                <textarea value={formData.statement_of_interest} onChange={(e) => setFormData({...formData, statement_of_interest: e.target.value})} rows={6} required />
+                <div className={`word-counter ${wordCount(formData.statement_of_interest) < 200 ? 'warning' : ''}`}>
+                  {wordCount(formData.statement_of_interest)} words
                 </div>
               </div>
 
-              <div className="fellowship-form-group">
-                <label>Proposed Research Idea <span className="optional">(Optional but Encouraged)</span></label>
-                <p className="fellowship-form-hint">
-                  Briefly describe a research question you may wish to develop.
-                </p>
-                <textarea
-                  value={formData.proposed_research_idea}
-                  onChange={(e) => setFormData({...formData, proposed_research_idea: e.target.value})}
-                  placeholder="Your proposed research idea..."
-                  rows={4}
-                />
+              <div className="form-group">
+                <label>Proposed Research Idea <span className="optional">(Optional)</span></label>
+                <textarea value={formData.proposed_research_idea} onChange={(e) => setFormData({...formData, proposed_research_idea: e.target.value})} rows={3} placeholder="Briefly describe a research question you may wish to develop..." />
               </div>
 
-              <div className="fellowship-form-group">
-                <label>Resume <span className="optional">(Optional)</span></label>
-                <p className="fellowship-form-hint">PDF only, max 5MB</p>
-                <div className="fellowship-file-upload">
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    onChange={handleFileChange}
-                    id="resume-upload"
-                    className="file-input-hidden"
-                  />
-                  <label htmlFor="resume-upload" className="file-upload-label">
-                    <Upload size={20} />
-                    {resumeFile ? resumeFile.name : 'Choose PDF file...'}
-                  </label>
-                  {resumeFile && (
-                    <button type="button" onClick={() => setResumeFile(null)} className="remove-file-btn">
-                      <X size={16} />
-                    </button>
-                  )}
+              <div className="form-group">
+                <label>Resume <span className="optional">(Optional, PDF only)</span></label>
+                <div className="file-upload-row">
+                  <input type="file" accept=".pdf" onChange={handleFileChange} id="resume" className="file-input-hidden" />
+                  <label htmlFor="resume" className="file-label"><Upload size={18} />{resumeFile ? resumeFile.name : 'Choose file...'}</label>
+                  {resumeFile && <button type="button" onClick={() => setResumeFile(null)} className="remove-file"><X size={16} /></button>}
                 </div>
               </div>
 
-              <div className="fellowship-form-group">
-                <label className="fellowship-checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={formData.commitment_confirmed}
-                    onChange={(e) => setFormData({...formData, commitment_confirmed: e.target.checked})}
-                  />
-                  <span>
-                    I understand the fellowship requires active participation and submission 
-                    of final deliverables. <span className="required">*</span>
-                  </span>
+              <div className="form-group">
+                <label className="checkbox-label">
+                  <input type="checkbox" checked={formData.commitment_confirmed} onChange={(e) => setFormData({...formData, commitment_confirmed: e.target.checked})} />
+                  <span>I commit to active participation and submission of deliverables. <span className="required">*</span></span>
                 </label>
               </div>
 
-              <button type="submit" className="fellowship-submit-btn" disabled={submitting}>
-                {submitting ? 'Submitting...' : 'Submit Fellowship Application'}
+              <button type="submit" className="submit-btn" disabled={submitting}>
+                {submitting ? 'Submitting...' : 'Submit Application'}
               </button>
             </form>
           )}
         </div>
-      </section>
+
+        {/* Program Structure */}
+        <div className="fellowship-info-section">
+          <h2>Program Structure</h2>
+          <p className="section-intro">An intensive 3-week program designed to guide you from research question to published scholar.</p>
+          
+          <div className="program-timeline">
+            {programPhases.map((phase) => (
+              <div key={phase.id} className="timeline-phase">
+                <div className="phase-header" onClick={() => setExpandedPhase(expandedPhase === phase.id ? null : phase.id)}>
+                  <div className="phase-number">{phase.id}</div>
+                  <div className="phase-info">
+                    <h3>{phase.title}</h3>
+                    <span>{phase.duration}</span>
+                  </div>
+                  {expandedPhase === phase.id ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </div>
+                {expandedPhase === phase.id && (
+                  <div className="phase-content">
+                    <ul>
+                      {phase.deliverables.map((d, i) => <li key={i}><CheckCircle size={14} /> {d}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Benefits */}
+        <div className="fellowship-info-section">
+          <h2>Fellowship Benefits</h2>
+          <div className="benefits-grid">
+            <div className="benefit-item"><Award size={24} /><span>North Star Fellow Designation</span></div>
+            <div className="benefit-item"><BookOpen size={24} /><span>Publication in North Star Journal</span></div>
+            <div className="benefit-item"><FileText size={24} /><span>Digital Certificate</span></div>
+            <div className="benefit-item"><Users size={24} /><span>Featured Author Spotlight</span></div>
+          </div>
+        </div>
+
+        {/* Eligibility */}
+        <div className="fellowship-info-section">
+          <h2>Eligibility</h2>
+          <div className="eligibility-list">
+            <span><CheckCircle size={16} /> Canadian undergraduate student</span>
+            <span><CheckCircle size={16} /> Interest in academic research</span>
+            <span><CheckCircle size={16} /> Commitment to deliverables</span>
+            <span><CheckCircle size={16} /> Any discipline welcome</span>
+          </div>
+          <p className="eligibility-note">Prior research experience not required.</p>
+        </div>
+      </div>
     </div>
   );
 };
