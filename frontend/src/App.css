@@ -10043,3 +10043,271 @@ a.publication-link:hover {
   }
 }
 
+
+
+/* ===============================================
+   INTERNSHIP ADMIN MANAGEMENT STYLES
+   =============================================== */
+
+.admin-section .section-header {
+  margin-bottom: 24px;
+}
+
+.admin-section .section-subtitle {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.9rem;
+  margin: 8px 0 16px;
+}
+
+.admin-section .add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: linear-gradient(135deg, var(--nsr-accent) 0%, #60a5fa 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-section .add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
+}
+
+.admin-form-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.admin-form-card h3 {
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-size: 1.25rem;
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.admin-form .form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-form .form-group label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.admin-form .form-group input,
+.admin-form .form-group textarea {
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.admin-form .form-group input:focus,
+.admin-form .form-group textarea:focus {
+  outline: none;
+  border-color: var(--nsr-accent);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.admin-form .form-group input::placeholder,
+.admin-form .form-group textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.admin-form .form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.admin-form .save-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-form .save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
+}
+
+.admin-form .cancel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.admin-form .cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Internship Admin List */
+.internships-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.internship-admin-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.internship-admin-card:hover {
+  border-color: var(--nsr-accent);
+}
+
+.internship-admin-header h3 {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.internship-admin-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.internship-admin-meta span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.internship-admin-meta .company {
+  color: var(--nsr-accent);
+}
+
+.internship-admin-meta .location {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.internship-admin-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 12px 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.internship-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--nsr-accent);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s ease;
+}
+
+.internship-link:hover {
+  color: #60a5fa;
+}
+
+.internship-admin-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.internship-admin-footer .posted-date {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+}
+
+.internship-admin-footer .admin-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.internship-admin-footer .edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--nsr-accent);
+  border: 1px solid var(--nsr-accent);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.internship-admin-footer .edit-btn:hover {
+  background: rgba(99, 102, 241, 0.3);
+}
+
+.internship-admin-footer .delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.internship-admin-footer .delete-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+}
+
+/* Admin tab button with icon */
+.admin-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
