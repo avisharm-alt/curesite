@@ -122,6 +122,13 @@ const AdminPanelPage = () => {
           >
             North Star Journal
           </button>
+          <button
+            onClick={() => setActiveTab('internships')}
+            className={`admin-tab ${activeTab === 'internships' ? 'active' : ''}`}
+          >
+            <Briefcase size={16} />
+            Internships
+          </button>
         </div>
         
         <div className="admin-info">
