@@ -18,6 +18,7 @@ import SubmitArticlePage from './pages/SubmitArticlePage';
 import AdminPanelPage from './pages/AdminPanelPage';
 import DebugPage from './pages/DebugPage';
 import TestConnectionPage from './pages/TestConnectionPage';
+import InternshipOpportunitiesPage from './pages/InternshipOpportunitiesPage';
 
 // Import hooks and components
 import { AuthProvider, useAuth } from './hooks/useAuth';
