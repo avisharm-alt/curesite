@@ -1976,6 +1976,13 @@ async def get_volunteer_opportunities(location: Optional[str] = None):
     opportunities = await db.volunteer_opportunities.find(query).to_list(100)
     return [VolunteerOpportunity(**parse_from_mongo(opportunity)) for opportunity in opportunities]
 
+# Internship Opportunity Routes (Protected - requires authentication)
+@api_router.get("/internships", response_model=List[InternshipOpportunity])
+async def get_internships(current_user: User = Depends(get_current_user)):
+    """Get internship opportunities - requires authentication (Google sign-in)"""
+    internships = await db.internship_opportunities.find({}).sort("created_at", -1).to_list(100)
+    return [InternshipOpportunity(**parse_from_mongo(internship)) for internship in internships]
+
 # Student Network Routes
 @api_router.post("/student-network", response_model=StudentNetwork)
 async def create_student_network_profile(profile: StudentNetworkCreate, current_user: User = Depends(get_current_user)):
