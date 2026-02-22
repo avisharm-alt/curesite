@@ -19,6 +19,7 @@ import AdminPanelPage from './pages/AdminPanelPage';
 import DebugPage from './pages/DebugPage';
 import TestConnectionPage from './pages/TestConnectionPage';
 import InternshipOpportunitiesPage from './pages/InternshipOpportunitiesPage';
+import FellowshipPage from './pages/FellowshipPage';
 
 // Import hooks and components
 import { AuthProvider, useAuth } from './hooks/useAuth';
