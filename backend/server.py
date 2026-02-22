@@ -1934,6 +1934,152 @@ async def admin_delete_internship(internship_id: str, current_user: User = Depen
     
     return {"message": "Internship opportunity deleted successfully"}
 
+# Fellowship Application Routes
+@api_router.post("/fellowship/apply", response_model=FellowshipApplication)
+async def submit_fellowship_application(application: FellowshipApplicationCreate, current_user: User = Depends(get_current_user)):
+    """Submit a fellowship application - requires authentication"""
+    # Check if user already has an application
+    existing = await db.fellowship_applications.find_one({"user_id": current_user.id})
+    if existing:
+        raise HTTPException(status_code=400, detail="You have already submitted a fellowship application")
+    
+    # Create application
+    application_data = application.dict()
+    application_obj = FellowshipApplication(
+        **application_data,
+        user_id=current_user.id,
+        email=current_user.email
+    )
+    application_dict = prepare_for_mongo(application_obj.dict())
+    await db.fellowship_applications.insert_one(application_dict)
+    
+    return application_obj
+
+@api_router.post("/fellowship/upload-resume")
+async def upload_fellowship_resume(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    """Upload resume for fellowship application"""
+    # Validate file type
+    if not file.filename.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    
+    # Check file size (max 5MB)
+    content = await file.read()
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File size must be less than 5MB")
+    
+    # Store in GridFS
+    file_id = await fs.upload_from_stream(
+        f"resume_{current_user.id}_{file.filename}",
+        io.BytesIO(content),
+        metadata={"user_id": current_user.id, "type": "fellowship_resume", "original_filename": file.filename}
+    )
+    
+    # Update application if exists
+    await db.fellowship_applications.update_one(
+        {"user_id": current_user.id},
+        {"$set": {"resume_file_id": str(file_id), "resume_filename": file.filename}}
+    )
+    
+    return {"file_id": str(file_id), "filename": file.filename}
+
+@api_router.get("/fellowship/applications/my")
+async def get_my_fellowship_application(current_user: User = Depends(get_current_user)):
+    """Get current user's fellowship application"""
+    application = await db.fellowship_applications.find_one({"user_id": current_user.id})
+    if not application:
+        return None
+    return FellowshipApplication(**parse_from_mongo(application))
+
+@api_router.get("/fellowship/stats")
+async def get_fellowship_stats():
+    """Get public fellowship statistics"""
+    total_applications = await db.fellowship_applications.count_documents({})
+    accepted_count = await db.fellowship_applications.count_documents({"status": "accepted"})
+    
+    return {
+        "total_applications": total_applications,
+        "accepted_fellows": accepted_count,
+        "cohort_size": 25,
+        "seats_remaining": max(0, 25 - accepted_count)
+    }
+
+# Admin Fellowship Routes
+@api_router.get("/admin/fellowship/applications")
+async def admin_get_fellowship_applications(
+    status: Optional[str] = None,
+    university: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Admin gets all fellowship applications"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    if university:
+        query["university"] = {"$regex": university, "$options": "i"}
+    
+    applications = await db.fellowship_applications.find(query).sort("submitted_at", -1).to_list(500)
+    return [FellowshipApplication(**parse_from_mongo(app)) for app in applications]
+
+@api_router.put("/admin/fellowship/applications/{application_id}/status")
+async def admin_update_fellowship_status(
+    application_id: str,
+    status: str,
+    admin_notes: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Admin updates fellowship application status"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    if status not in ["submitted", "under_review", "accepted", "rejected"]:
+        raise HTTPException(status_code=400, detail="Invalid status")
+    
+    update_data = {
+        "status": status,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    if admin_notes:
+        update_data["admin_notes"] = admin_notes
+    
+    result = await db.fellowship_applications.update_one(
+        {"id": application_id},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Application not found")
+    
+    return {"message": f"Application status updated to {status}"}
+
+@api_router.get("/admin/fellowship/applications/{application_id}/resume")
+async def admin_download_resume(application_id: str, current_user: User = Depends(get_current_user)):
+    """Admin downloads applicant's resume"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    application = await db.fellowship_applications.find_one({"id": application_id})
+    if not application:
+        raise HTTPException(status_code=404, detail="Application not found")
+    
+    if not application.get("resume_file_id"):
+        raise HTTPException(status_code=404, detail="No resume uploaded")
+    
+    from bson import ObjectId
+    try:
+        grid_out = await fs.open_download_stream(ObjectId(application["resume_file_id"]))
+        content = await grid_out.read()
+        
+        return StreamingResponse(
+            io.BytesIO(content),
+            media_type="application/pdf",
+            headers={"Content-Disposition": f"attachment; filename={application.get('resume_filename', 'resume.pdf')}"}
+        )
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Resume file not found")
+
 @api_router.get("/admin/ec-profiles", response_model=List[ECProfile])
 async def admin_get_all_ec_profiles(current_user: User = Depends(get_current_user)):
     """Admin gets all EC profiles"""
