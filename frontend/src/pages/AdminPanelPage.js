@@ -180,12 +180,39 @@ const AdminPanelPage = () => {
                   onRefresh={fetchData}
                 />
               )}
+              {activeTab === 'fellowship' && (
+                <FellowshipManagementTab 
+                  applications={fellowshipApplications}
+                  onUpdateStatus={handleUpdateFellowshipStatus}
+                  onRefresh={fetchData}
+                />
+              )}
             </>
           )}
         </div>
       </div>
     </div>
   );
+
+  // Fellowship handler
+  async function handleUpdateFellowshipStatus(applicationId, status, adminNotes) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token found');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.put(`${API}/admin/fellowship/applications/${applicationId}/status?status=${status}${adminNotes ? `&admin_notes=${encodeURIComponent(adminNotes)}` : ''}`, {}, { headers });
+      
+      toast.success(`Application status updated to ${status}`);
+      fetchData();
+    } catch (error) {
+      console.error('Update fellowship status error:', error);
+      toast.error(`Failed to update status: ${error.response?.data?.detail || error.message}`);
+    }
+  }
 
   // Handler functions
   async function handlePosterReview(posterId, status) {
