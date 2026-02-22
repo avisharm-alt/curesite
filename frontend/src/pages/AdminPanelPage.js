@@ -66,6 +66,12 @@ const AdminPanelPage = () => {
           console.log('Internships response:', internshipsRes.data);
           setInternships(Array.isArray(internshipsRes.data) ? internshipsRes.data : []);
           break;
+        case 'fellowship':
+          console.log('Fetching fellowship applications from:', `${API}/admin/fellowship/applications`);
+          const fellowshipRes = await axios.get(`${API}/admin/fellowship/applications`, { headers });
+          console.log('Fellowship applications response:', fellowshipRes.data);
+          setFellowshipApplications(Array.isArray(fellowshipRes.data) ? fellowshipRes.data : []);
+          break;
       }
       
       console.log(`Successfully loaded ${activeTab} data`);
