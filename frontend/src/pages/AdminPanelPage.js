@@ -606,5 +606,191 @@ const PosterManagementTab = ({ posters, onReview, onDelete, onMarkPayment }) => 
   </div>
 );
 
-// Volunteer Management Tab Component
+// Internship Management Tab Component
+const InternshipManagementTab = ({ internships, onAdd, onUpdate, onDelete, onRefresh }) => {
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    company: '',
+    location: '',
+    description: '',
+    application_link: ''
+  });
+
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      company: '',
+      location: '',
+      description: '',
+      application_link: ''
+    });
+    setShowAddForm(false);
+    setEditingId(null);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (editingId) {
+      await onUpdate(editingId, formData);
+    } else {
+      await onAdd(formData);
+    }
+    resetForm();
+  };
+
+  const startEdit = (internship) => {
+    setFormData({
+      title: internship.title,
+      company: internship.company,
+      location: internship.location,
+      description: internship.description,
+      application_link: internship.application_link || ''
+    });
+    setEditingId(internship.id);
+    setShowAddForm(true);
+  };
+
+  return (
+    <div className="admin-section">
+      <div className="section-header">
+        <h2>Internship Opportunities Management</h2>
+        <p className="section-subtitle">Manage internship opportunities for Canadian undergraduate students. Only signed-in users can view these.</p>
+        {!showAddForm && (
+          <button 
+            onClick={() => setShowAddForm(true)} 
+            className="add-btn"
+          >
+            <Plus size={16} />
+            Add Internship
+          </button>
+        )}
+      </div>
+
+      {showAddForm && (
+        <div className="admin-form-card">
+          <h3>{editingId ? 'Edit Internship' : 'Add New Internship'}</h3>
+          <form onSubmit={handleSubmit} className="admin-form">
+            <div className="form-group">
+              <label>Title *</label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({...formData, title: e.target.value})}
+                placeholder="e.g., Summer Research Intern"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Company/Organization *</label>
+              <input
+                type="text"
+                value={formData.company}
+                onChange={(e) => setFormData({...formData, company: e.target.value})}
+                placeholder="e.g., University Health Network"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Location *</label>
+              <input
+                type="text"
+                value={formData.location}
+                onChange={(e) => setFormData({...formData, location: e.target.value})}
+                placeholder="e.g., Toronto, ON"
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Description *</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                placeholder="Describe the internship opportunity, responsibilities, and requirements..."
+                rows={4}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Application Link</label>
+              <input
+                type="url"
+                value={formData.application_link}
+                onChange={(e) => setFormData({...formData, application_link: e.target.value})}
+                placeholder="https://..."
+              />
+            </div>
+            <div className="form-actions">
+              <button type="submit" className="save-btn">
+                <Save size={16} />
+                {editingId ? 'Update Internship' : 'Add Internship'}
+              </button>
+              <button type="button" onClick={resetForm} className="cancel-btn">
+                <X size={16} />
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {internships.length > 0 ? (
+        <div className="internships-admin-list">
+          {internships.map((internship) => (
+            <div key={internship.id} className="internship-admin-card">
+              <div className="internship-admin-header">
+                <h3>{internship.title}</h3>
+                <div className="internship-admin-meta">
+                  <span className="company">
+                    <Building2 size={14} />
+                    {internship.company}
+                  </span>
+                  <span className="location">
+                    <MapPin size={14} />
+                    {internship.location}
+                  </span>
+                </div>
+              </div>
+              <p className="internship-admin-description">{internship.description}</p>
+              {internship.application_link && (
+                <a 
+                  href={internship.application_link} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="internship-link"
+                >
+                  <ExternalLink size={14} />
+                  Application Link
+                </a>
+              )}
+              <div className="internship-admin-footer">
+                <span className="posted-date">
+                  Posted: {new Date(internship.created_at).toLocaleDateString()}
+                </span>
+                <div className="admin-actions">
+                  <button onClick={() => startEdit(internship)} className="edit-btn">
+                    <Edit3 size={14} />
+                    Edit
+                  </button>
+                  <button onClick={() => onDelete(internship.id)} className="delete-btn">
+                    <Trash2 size={14} />
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <Briefcase size={48} />
+          <h3>No internships yet</h3>
+          <p>Click "Add Internship" to create your first internship opportunity.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default AdminPanelPage;
