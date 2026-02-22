@@ -48,7 +48,7 @@ def log_test_result(test_name, passed, response=None, error=None):
 def test_health_endpoint():
     """Test health endpoint to verify backend is running"""
     try:
-        response = requests.get(f"{BACKEND_URL}/api/health", timeout=10)
+        response = requests.get(f"{BACKEND_URL}/health", timeout=10)
         log_test_result("Health endpoint accessible", response.status_code == 200, response)
     except Exception as e:
         log_test_result("Health endpoint accessible", False, error=str(e))
