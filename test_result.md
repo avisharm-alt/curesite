@@ -722,10 +722,48 @@ frontend:
 
 test_plan:
   current_focus:
-    - "arXiv-style individual article pages with unique identifiers"
+    - "Internship Opportunities section for Canadian undergraduate students"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
+
+backend:
+  - task: "Internship Opportunities API endpoints"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Created InternshipOpportunity and InternshipOpportunityCreate models with fields: title, company, location, description, application_link. Created CRUD endpoints: GET /api/internships (protected - requires authentication), GET /api/admin/internships (admin only), POST /api/admin/internships (admin only), PUT /api/admin/internships/{id} (admin only), DELETE /api/admin/internships/{id} (admin only). The public GET endpoint requires authentication to ensure only signed-in Google users can view internships."
+
+frontend:
+  - task: "Internship Opportunities page with login gate"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/InternshipOpportunitiesPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Created InternshipOpportunitiesPage.js with login gate for non-authenticated users. Shows 'Sign In Required' message with Google sign-in button when not logged in. When logged in, displays internship cards with title, company, location, description, and apply button. Added 'Internships' to main navigation bar. Added /internships route to App.js. Added comprehensive CSS styling."
+
+  - task: "Admin panel internship management"
+    implemented: true
+    working: "NA"
+    file: "frontend/src/pages/AdminPanelPage.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+          agent: "main"
+          comment: "IMPLEMENTED: Added 'Internships' tab to admin panel with InternshipManagementTab component. Admins can add new internships (title, company, location, description, application link), edit existing internships, and delete internships. Added all necessary handler functions and CSS styling."
 
   - task: "Poster viewing functionality in PosterViewerModal"
     implemented: true
