@@ -743,6 +743,18 @@ backend:
           agent: "testing"
           comment: "COMPREHENSIVE TESTING COMPLETED (9/9 tests passed - 100% success rate): ✅ HEALTH ENDPOINT: Backend server accessible and responding correctly. ✅ PROTECTED PUBLIC ENDPOINT: GET /api/internships properly returns 403 without authentication (correct behavior - requires login for signed-in Google users only). ✅ ADMIN ENDPOINTS: All 4 admin endpoints (GET/POST/PUT/DELETE /api/admin/internships) properly protected with 403 without admin auth. ✅ ENDPOINT STRUCTURE: All required fields (title, company, location, description) and optional application_link field validated. ✅ API SPECIFICATION: Test data matches exact requirements from review request (Summer Research Intern at University Health Network in Toronto). All internship API endpoints are working exactly as designed - ready for frontend integration."
 
+  - task: "Fellowship Application API endpoints"
+    implemented: true
+    working: true
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+          agent: "testing"
+          comment: "COMPREHENSIVE FELLOWSHIP API TESTING COMPLETED (9/9 tests passed - 100% success rate): ✅ HEALTH ENDPOINT: GET /health working correctly (200 OK) with proper service identification. ✅ PUBLIC STATS ENDPOINT: GET /api/fellowship/stats accessible without auth (200 OK) returning comprehensive stats (total_applications: 0, accepted_fellows: 0, cohort_size: 25, seats_remaining: 25). ✅ PROTECTED USER ENDPOINTS: All 3 endpoints (POST /api/fellowship/apply, POST /api/fellowship/upload-resume, GET /api/fellowship/applications/my) properly protected with 403 without authentication. ✅ ADMIN ENDPOINTS: All 3 admin endpoints (GET /api/admin/fellowship/applications, PUT /api/admin/fellowship/applications/{id}/status, GET /api/admin/fellowship/applications/{id}/resume) properly protected with 403 without admin auth. ✅ DATA VALIDATION: Auth protection working correctly - endpoints require authentication before data validation. ✅ FELLOWSHIP APPLICATION MODEL: Comprehensive model with all required fields (full_name, university, program, year_of_study, research_interests, statement_of_interest, commitment_confirmed) plus optional fields (prior_experience, proposed_research_idea). All Fellowship Application API endpoints are working exactly as designed and ready for frontend integration."
+
 frontend:
   - task: "Internship Opportunities page with login gate"
     implemented: true
