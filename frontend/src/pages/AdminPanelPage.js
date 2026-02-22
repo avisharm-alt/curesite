@@ -834,4 +834,174 @@ const InternshipManagementTab = ({ internships, onAdd, onUpdate, onDelete, onRef
   );
 };
 
+// Fellowship Management Tab Component
+const FellowshipManagementTab = ({ applications, onUpdateStatus, onRefresh }) => {
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [adminNotes, setAdminNotes] = useState('');
+
+  const filteredApplications = applications.filter(app => 
+    statusFilter === 'all' || app.status === statusFilter
+  );
+
+  const statusOptions = [
+    { value: 'submitted', label: 'Submitted', color: '#0369a1', bg: '#f0f9ff' },
+    { value: 'under_review', label: 'Under Review', color: '#92400e', bg: '#fef3c7' },
+    { value: 'accepted', label: 'Accepted', color: '#065f46', bg: '#d1fae5' },
+    { value: 'rejected', label: 'Rejected', color: '#991b1b', bg: '#fee2e2' }
+  ];
+
+  const getStatusStyle = (status) => {
+    const option = statusOptions.find(o => o.value === status) || statusOptions[0];
+    return { background: option.bg, color: option.color };
+  };
+
+  const handleStatusUpdate = (applicationId, newStatus) => {
+    onUpdateStatus(applicationId, newStatus, adminNotes);
+    setAdminNotes('');
+  };
+
+  const downloadResume = async (applicationId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API}/admin/fellowship/applications/${applicationId}/resume`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (!response.ok) throw new Error('Resume not found');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'resume.pdf';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Failed to download resume');
+    }
+  };
+
+  return (
+    <div className="admin-section">
+      <div className="section-header">
+        <h2>Fellowship Applications</h2>
+        <p className="section-subtitle">Review and manage North Star Fellowship applications.</p>
+      </div>
+
+      {/* Filters */}
+      <div className="fellowship-filters">
+        <select 
+          value={statusFilter} 
+          onChange={(e) => setStatusFilter(e.target.value)}
+          className="status-filter"
+        >
+          <option value="all">All Applications ({applications.length})</option>
+          {statusOptions.map(opt => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label} ({applications.filter(a => a.status === opt.value).length})
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {filteredApplications.length > 0 ? (
+        <div className="fellowship-applications-list">
+          {filteredApplications.map((app) => (
+            <div key={app.id} className="fellowship-app-card">
+              <div className="fellowship-app-header">
+                <div className="applicant-info">
+                  <h3>{app.full_name}</h3>
+                  <span className="applicant-email">{app.email}</span>
+                </div>
+                <span className="status-badge" style={getStatusStyle(app.status)}>
+                  {statusOptions.find(o => o.value === app.status)?.label || app.status}
+                </span>
+              </div>
+
+              <div className="fellowship-app-meta">
+                <span><GraduationCap size={14} /> {app.university}</span>
+                <span><FileText size={14} /> {app.program}</span>
+                <span><Clock size={14} /> {app.year_of_study}</span>
+              </div>
+
+              <div className="fellowship-app-interests">
+                {app.research_interests?.map((interest, i) => (
+                  <span key={i} className="interest-chip">{interest}</span>
+                ))}
+              </div>
+
+              <div className="fellowship-app-actions">
+                <button 
+                  onClick={() => setSelectedApplication(selectedApplication?.id === app.id ? null : app)}
+                  className="view-details-btn"
+                >
+                  <Eye size={14} />
+                  {selectedApplication?.id === app.id ? 'Hide Details' : 'View Details'}
+                </button>
+                {app.resume_file_id && (
+                  <button onClick={() => downloadResume(app.id)} className="download-resume-btn">
+                    <Download size={14} />
+                    Resume
+                  </button>
+                )}
+              </div>
+
+              {/* Expanded Details */}
+              {selectedApplication?.id === app.id && (
+                <div className="fellowship-app-details">
+                  {app.prior_experience && (
+                    <div className="detail-section">
+                      <h4>Prior Experience</h4>
+                      <p>{app.prior_experience}</p>
+                    </div>
+                  )}
+                  <div className="detail-section">
+                    <h4>Statement of Interest</h4>
+                    <p>{app.statement_of_interest}</p>
+                  </div>
+                  {app.proposed_research_idea && (
+                    <div className="detail-section">
+                      <h4>Proposed Research Idea</h4>
+                      <p>{app.proposed_research_idea}</p>
+                    </div>
+                  )}
+                  
+                  <div className="status-update-section">
+                    <h4>Update Status</h4>
+                    <div className="status-buttons">
+                      {statusOptions.map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => handleStatusUpdate(app.id, opt.value)}
+                          className={`status-btn ${app.status === opt.value ? 'active' : ''}`}
+                          style={app.status === opt.value ? getStatusStyle(opt.value) : {}}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="submitted-date">
+                    Submitted: {new Date(app.submitted_at).toLocaleDateString('en-CA', { 
+                      year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="empty-state">
+          <GraduationCap size={48} />
+          <h3>No applications yet</h3>
+          <p>Fellowship applications will appear here once submitted.</p>
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default AdminPanelPage;
