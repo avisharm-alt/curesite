@@ -275,6 +275,24 @@ class VolunteerOpportunityCreate(BaseModel):
     application_link: Optional[str] = None  # TypeForm or external application link
     expires_at: Optional[datetime] = None
 
+# Internship Opportunity Models (for Canadian Undergraduate Students)
+class InternshipOpportunity(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str
+    company: str  # Company/Organization name
+    location: str
+    description: str
+    application_link: Optional[str] = None  # External application link
+    posted_by: str  # admin user_id
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class InternshipOpportunityCreate(BaseModel):
+    title: str
+    company: str
+    location: str
+    description: str
+    application_link: Optional[str] = None
+
 class StudentNetwork(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str
