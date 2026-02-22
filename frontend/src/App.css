@@ -10079,20 +10079,22 @@ a.publication-link:hover {
 }
 
 .internship-admin-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
   border-radius: 12px;
   padding: 20px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .internship-admin-card:hover {
-  border-color: var(--nsr-accent);
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .internship-admin-header h3 {
-  color: #ffffff;
+  color: #1e293b;
   font-size: 1.1rem;
+  font-weight: 600;
   margin-bottom: 8px;
 }
 
@@ -10111,14 +10113,15 @@ a.publication-link:hover {
 
 .internship-admin-meta .company {
   color: var(--nsr-accent);
+  font-weight: 500;
 }
 
 .internship-admin-meta .location {
-  color: rgba(255, 255, 255, 0.6);
+  color: #64748b;
 }
 
 .internship-admin-description {
-  color: rgba(255, 255, 255, 0.7);
+  color: #475569;
   font-size: 0.9rem;
   line-height: 1.5;
   margin: 12px 0;
@@ -10139,7 +10142,7 @@ a.publication-link:hover {
 }
 
 .internship-link:hover {
-  color: #60a5fa;
+  color: #4f46e5;
 }
 
 .internship-admin-footer {
@@ -10148,11 +10151,11 @@ a.publication-link:hover {
   justify-content: space-between;
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid #f1f5f9;
 }
 
 .internship-admin-footer .posted-date {
-  color: rgba(255, 255, 255, 0.5);
+  color: #94a3b8;
   font-size: 0.8rem;
 }
 
@@ -10166,9 +10169,9 @@ a.publication-link:hover {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: rgba(99, 102, 241, 0.2);
+  background: #f1f5f9;
   color: var(--nsr-accent);
-  border: 1px solid var(--nsr-accent);
+  border: 1px solid #e2e8f0;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 500;
@@ -10177,7 +10180,8 @@ a.publication-link:hover {
 }
 
 .internship-admin-footer .edit-btn:hover {
-  background: rgba(99, 102, 241, 0.3);
+  background: #e2e8f0;
+  border-color: var(--nsr-accent);
 }
 
 .internship-admin-footer .delete-btn {
@@ -10185,9 +10189,9 @@ a.publication-link:hover {
   align-items: center;
   gap: 6px;
   padding: 8px 16px;
-  background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
-  border: 1px solid #ef4444;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 500;
@@ -10196,7 +10200,8 @@ a.publication-link:hover {
 }
 
 .internship-admin-footer .delete-btn:hover {
-  background: rgba(239, 68, 68, 0.3);
+  background: #fee2e2;
+  border-color: #dc2626;
 }
 
 /* Admin tab button with icon */
