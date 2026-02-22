@@ -95,8 +95,8 @@ const CureJournalPage = () => {
         ) : articles.length === 0 ? (
           <div className="empty-state">
             <BookOpen size={64} />
-            <h3>No Articles Yet</h3>
-            <p>Be the first to submit to North Star Journal</p>
+            <h3>Articles Under Review</h3>
+            <p>Submitted articles are currently being reviewed by our editorial team.</p>
             <button onClick={handleSubmit} className="submit-article-btn">
               Submit Article
             </button>
