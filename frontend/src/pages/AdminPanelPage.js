@@ -296,6 +296,66 @@ const AdminPanelPage = () => {
       toast.error(`Failed to delete article: ${error.response?.data?.detail || error.message}`);
     }
   }
+
+  // Internship handler functions
+  async function handleAddInternship(internshipData) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token found');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.post(`${API}/admin/internships`, internshipData, { headers });
+      
+      toast.success('Internship added successfully!');
+      fetchData();
+    } catch (error) {
+      console.error('Add internship error:', error);
+      toast.error(`Failed to add internship: ${error.response?.data?.detail || error.message}`);
+    }
+  }
+
+  async function handleUpdateInternship(internshipId, internshipData) {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token found');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.put(`${API}/admin/internships/${internshipId}`, internshipData, { headers });
+      
+      toast.success('Internship updated successfully!');
+      fetchData();
+    } catch (error) {
+      console.error('Update internship error:', error);
+      toast.error(`Failed to update internship: ${error.response?.data?.detail || error.message}`);
+    }
+  }
+
+  async function handleDeleteInternship(internshipId) {
+    if (!window.confirm('Are you sure you want to delete this internship? This action cannot be undone.')) return;
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No authentication token found');
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      await axios.delete(`${API}/admin/internships/${internshipId}`, { headers });
+      
+      toast.success('Internship deleted successfully');
+      fetchData();
+    } catch (error) {
+      console.error('Delete internship error:', error);
+      toast.error(`Failed to delete internship: ${error.response?.data?.detail || error.message}`);
+    }
+  }
 };
 
 // Poster Management Tab Component
