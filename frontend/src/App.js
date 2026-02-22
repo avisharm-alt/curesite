@@ -45,6 +45,7 @@ const Header = () => {
     { name: 'Poster Journal', href: '/posters', icon: FileText },
     { name: 'North Star Journal', href: '/journal', icon: BookOpen },
     { name: 'Student Network', href: '/students', icon: Users },
+    { name: 'Internships', href: '/internships', icon: Briefcase },
     ...(user ? [{ name: 'My Profile', href: '/profile', icon: User }] : []),
     ...(user?.user_type === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Award }] : []),
   ];
