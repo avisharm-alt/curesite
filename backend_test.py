@@ -42,12 +42,13 @@ class FellowshipAPITester:
         """Test the health endpoint"""
         print("\n=== Testing Health Endpoint ===")
         try:
-            response = requests.get(f"{API_BASE}/health", timeout=10)
-            self.log_test("/api/health", "GET", 200, response.status_code)
+            # Health endpoint is at root level, not under /api
+            response = requests.get(f"{BACKEND_URL}/health", timeout=10)
+            self.log_test("/health", "GET", 200, response.status_code)
             if response.status_code == 200:
                 print(f"Health check response: {response.json()}")
         except requests.exceptions.RequestException as e:
-            self.log_test("/api/health", "GET", 200, "ERROR", f"Connection error: {e}")
+            self.log_test("/health", "GET", 200, "ERROR", f"Connection error: {e}")
 
     def test_public_fellowship_stats(self):
         """Test public fellowship statistics endpoint"""
