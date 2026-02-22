@@ -157,6 +157,15 @@ const AdminPanelPage = () => {
                   onDelete={handleArticleDelete}
                 />
               )}
+              {activeTab === 'internships' && (
+                <InternshipManagementTab 
+                  internships={internships} 
+                  onAdd={handleAddInternship}
+                  onUpdate={handleUpdateInternship}
+                  onDelete={handleDeleteInternship}
+                  onRefresh={fetchData}
+                />
+              )}
             </>
           )}
         </div>
