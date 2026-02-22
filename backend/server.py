@@ -1851,6 +1851,57 @@ async def admin_get_all_volunteer_opportunities(current_user: User = Depends(get
     opportunities = await db.volunteer_opportunities.find({}).to_list(100)
     return [VolunteerOpportunity(**parse_from_mongo(opportunity)) for opportunity in opportunities]
 
+# Admin Internship Opportunity Routes
+@api_router.get("/admin/internships", response_model=List[InternshipOpportunity])
+async def admin_get_all_internships(current_user: User = Depends(get_current_user)):
+    """Admin gets all internship opportunities"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    internships = await db.internship_opportunities.find({}).to_list(100)
+    return [InternshipOpportunity(**parse_from_mongo(internship)) for internship in internships]
+
+@api_router.post("/admin/internships", response_model=InternshipOpportunity)
+async def admin_create_internship(internship: InternshipOpportunityCreate, current_user: User = Depends(get_current_user)):
+    """Admin creates internship opportunity"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    internship_data = internship.dict()
+    internship_obj = InternshipOpportunity(**internship_data, posted_by=current_user.id)
+    internship_dict = prepare_for_mongo(internship_obj.dict())
+    await db.internship_opportunities.insert_one(internship_dict)
+    return internship_obj
+
+@api_router.put("/admin/internships/{internship_id}", response_model=InternshipOpportunity)
+async def admin_update_internship(internship_id: str, internship: InternshipOpportunityCreate, current_user: User = Depends(get_current_user)):
+    """Admin updates internship opportunity"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    update_data = prepare_for_mongo(internship.dict())
+    update_data.pop('id', None)
+    
+    result = await db.internship_opportunities.update_one({"id": internship_id}, {"$set": update_data})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Internship opportunity not found")
+    
+    updated_internship = await db.internship_opportunities.find_one({"id": internship_id})
+    return InternshipOpportunity(**parse_from_mongo(updated_internship))
+
+@api_router.delete("/admin/internships/{internship_id}")
+async def admin_delete_internship(internship_id: str, current_user: User = Depends(get_current_user)):
+    """Admin deletes internship opportunity"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.internship_opportunities.delete_one({"id": internship_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Internship opportunity not found")
+    
+    return {"message": "Internship opportunity deleted successfully"}
+
 @api_router.get("/admin/ec-profiles", response_model=List[ECProfile])
 async def admin_get_all_ec_profiles(current_user: User = Depends(get_current_user)):
     """Admin gets all EC profiles"""
