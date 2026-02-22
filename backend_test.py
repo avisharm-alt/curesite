@@ -1,189 +1,217 @@
 #!/usr/bin/env python3
 """
-Backend API Test Suite for CURE Platform - Internship Opportunities Testing
-Testing the new Internship Opportunities API endpoints as specified in review request
+Fellowship Application API Testing
+Tests all fellowship endpoints as specified in the review request
 """
 
 import requests
 import json
-import sys
 from datetime import datetime
 
-# Backend URL from review request
+# Backend URL based on review request
 BACKEND_URL = "http://localhost:8001"
+API_BASE = f"{BACKEND_URL}/api"
 
-# Track test results
-test_results = []
-passed_tests = 0
-total_tests = 0
+class FellowshipAPITester:
+    def __init__(self):
+        self.test_results = []
+        self.fellowship_test_data = {
+            "full_name": "Test Student",
+            "university": "University of Toronto", 
+            "program": "Computer Science",
+            "year_of_study": "3rd Year",
+            "research_interests": ["AI / Computer Science", "Health & Medicine"],
+            "statement_of_interest": "This is a test statement of interest with enough words to pass validation. I am deeply interested in the intersection of artificial intelligence and healthcare, particularly in developing machine learning models that can assist in medical diagnosis and treatment planning. My academic background in computer science, combined with my passion for healthcare applications, makes me an ideal candidate for this fellowship program. I am committed to contributing meaningful research during the fellowship period.",
+            "commitment_confirmed": True
+        }
 
-def log_test_result(test_name, passed, response=None, error=None):
-    """Log test result with details"""
-    global passed_tests, total_tests
-    total_tests += 1
-    if passed:
-        passed_tests += 1
-        print(f"✅ {test_name}")
-    else:
-        print(f"❌ {test_name}")
-        if response is not None:
-            print(f"   Status: {response.status_code}")
-            if response.headers.get('content-type', '').startswith('application/json'):
-                try:
-                    print(f"   Response: {response.json()}")
-                except:
-                    print(f"   Response: {response.text}")
-            else:
-                print(f"   Response: {response.text}")
-        if error:
-            print(f"   Error: {error}")
-    
-    test_results.append({
-        "name": test_name,
-        "passed": passed,
-        "status_code": response.status_code if response else None,
-        "error": error
-    })
+    def log_test(self, endpoint, method, expected_status, actual_status, details=""):
+        """Log test results"""
+        status = "✅ PASS" if actual_status == expected_status else "❌ FAIL"
+        self.test_results.append({
+            'endpoint': endpoint,
+            'method': method,
+            'expected': expected_status,
+            'actual': actual_status,
+            'status': status,
+            'details': details
+        })
+        print(f"{status} {method} {endpoint} - Expected: {expected_status}, Got: {actual_status} {details}")
 
-def test_health_endpoint():
-    """Test health endpoint to verify backend is running"""
-    try:
-        response = requests.get(f"{BACKEND_URL}/health", timeout=10)
-        log_test_result("Health endpoint accessible", response.status_code == 200, response)
-    except Exception as e:
-        log_test_result("Health endpoint accessible", False, error=str(e))
+    def test_health_endpoint(self):
+        """Test the health endpoint"""
+        print("\n=== Testing Health Endpoint ===")
+        try:
+            response = requests.get(f"{API_BASE}/health", timeout=10)
+            self.log_test("/api/health", "GET", 200, response.status_code)
+            if response.status_code == 200:
+                print(f"Health check response: {response.json()}")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/health", "GET", 200, "ERROR", f"Connection error: {e}")
 
-def test_protected_public_internship_endpoint():
-    """Test GET /api/internships - should return 403 when no authentication provided"""
-    print("\n🔒 Testing Protected Public Internship Endpoint")
-    try:
-        response = requests.get(f"{BACKEND_URL}/api/internships", timeout=10)
-        # Expected: 403 Forbidden because internships require authentication
-        expected_status = response.status_code == 403
-        log_test_result("GET /api/internships without auth returns 403 (expected - requires login)", expected_status, response)
-        
-        # Verify response contains authentication error
-        if response.status_code == 403:
-            log_test_result("Proper authentication error message returned", True, response)
-        else:
-            log_test_result("Proper authentication error message returned", False, response)
+    def test_public_fellowship_stats(self):
+        """Test public fellowship statistics endpoint"""
+        print("\n=== Testing Public Fellowship Stats ===")
+        try:
+            response = requests.get(f"{API_BASE}/fellowship/stats", timeout=10)
+            self.log_test("/api/fellowship/stats", "GET", 200, response.status_code)
             
-    except Exception as e:
-        log_test_result("GET /api/internships without auth returns 403 (expected - requires login)", False, error=str(e))
-        log_test_result("Proper authentication error message returned", False, error=str(e))
+            if response.status_code == 200:
+                data = response.json()
+                print(f"Fellowship stats: {data}")
+                
+                # Verify expected fields
+                expected_fields = ['total_applications', 'accepted_applications', 'acceptance_rate']
+                for field in expected_fields:
+                    if field in data:
+                        print(f"  ✓ {field}: {data[field]}")
+                    else:
+                        print(f"  ⚠️ Missing field: {field}")
+            else:
+                print(f"Error response: {response.text}")
+                
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/fellowship/stats", "GET", 200, "ERROR", f"Connection error: {e}")
 
-def test_admin_internship_endpoints():
-    """Test admin internship endpoints - all should return 403 without admin auth"""
-    print("\n👨‍💼 Testing Admin Internship Endpoints")
-    
-    # Test GET /api/admin/internships
-    try:
-        response = requests.get(f"{BACKEND_URL}/api/admin/internships", timeout=10)
-        expected_status = response.status_code == 403
-        log_test_result("GET /api/admin/internships without auth returns 403 (expected - admin only)", expected_status, response)
-    except Exception as e:
-        log_test_result("GET /api/admin/internships without auth returns 403 (expected - admin only)", False, error=str(e))
-    
-    # Test POST /api/admin/internships
-    test_internship_data = {
-        "title": "Summer Research Intern",
-        "company": "University Health Network",
-        "location": "Toronto, ON",
-        "description": "Join our research team for summer 2025",
-        "application_link": "https://example.com/apply"
-    }
-    
-    try:
-        response = requests.post(f"{BACKEND_URL}/api/admin/internships", 
-                               json=test_internship_data, timeout=10)
-        expected_status = response.status_code == 403
-        log_test_result("POST /api/admin/internships without auth returns 403 (expected - admin only)", expected_status, response)
-    except Exception as e:
-        log_test_result("POST /api/admin/internships without auth returns 403 (expected - admin only)", False, error=str(e))
-    
-    # Test PUT /api/admin/internships/{id}
-    test_internship_id = "test-internship-id"
-    try:
-        response = requests.put(f"{BACKEND_URL}/api/admin/internships/{test_internship_id}", 
-                               json=test_internship_data, timeout=10)
-        expected_status = response.status_code == 403
-        log_test_result("PUT /api/admin/internships/{id} without auth returns 403 (expected - admin only)", expected_status, response)
-    except Exception as e:
-        log_test_result("PUT /api/admin/internships/{id} without auth returns 403 (expected - admin only)", False, error=str(e))
-    
-    # Test DELETE /api/admin/internships/{id}
-    try:
-        response = requests.delete(f"{BACKEND_URL}/api/admin/internships/{test_internship_id}", timeout=10)
-        expected_status = response.status_code == 403
-        log_test_result("DELETE /api/admin/internships/{id} without auth returns 403 (expected - admin only)", expected_status, response)
-    except Exception as e:
-        log_test_result("DELETE /api/admin/internships/{id} without auth returns 403 (expected - admin only)", False, error=str(e))
+    def test_protected_user_endpoints_without_auth(self):
+        """Test that protected user endpoints return 403 without authentication"""
+        print("\n=== Testing Protected User Endpoints (No Auth) ===")
+        
+        # Test POST /api/fellowship/apply without auth
+        try:
+            response = requests.post(f"{API_BASE}/fellowship/apply", 
+                                   json=self.fellowship_test_data, timeout=10)
+            self.log_test("/api/fellowship/apply", "POST", 403, response.status_code, 
+                         "- Should return 403 without auth")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/fellowship/apply", "POST", 403, "ERROR", f"Connection error: {e}")
 
-def test_endpoint_structure_validation():
-    """Test that endpoints exist and have proper structure"""
-    print("\n📋 Testing Endpoint Structure and Data Format")
-    
-    # Verify test data structure matches API requirements
-    test_data = {
-        "title": "Summer Research Intern",
-        "company": "University Health Network", 
-        "location": "Toronto, ON",
-        "description": "Join our research team for summer 2025",
-        "application_link": "https://example.com/apply"
-    }
-    
-    # Verify all required fields are present
-    required_fields = ["title", "company", "location", "description"]
-    has_all_fields = all(field in test_data for field in required_fields)
-    log_test_result("Test data contains all required fields (title, company, location, description)", has_all_fields)
-    
-    # Verify optional fields
-    has_optional_field = "application_link" in test_data
-    log_test_result("Test data includes optional application_link field", has_optional_field)
+        # Test POST /api/fellowship/upload-resume without auth  
+        try:
+            response = requests.post(f"{API_BASE}/fellowship/upload-resume", timeout=10)
+            self.log_test("/api/fellowship/upload-resume", "POST", 403, response.status_code,
+                         "- Should return 403 without auth")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/fellowship/upload-resume", "POST", 403, "ERROR", f"Connection error: {e}")
 
-def run_all_tests():
-    """Run all internship API tests"""
-    print("🚀 Starting Internship Opportunities API Backend Testing")
-    print("=" * 60)
-    print(f"Testing backend at: {BACKEND_URL}")
-    print(f"Test started at: {datetime.now()}")
-    print("=" * 60)
-    
-    # Test backend connectivity
-    test_health_endpoint()
-    
-    # Test the protected public endpoint
-    test_protected_public_internship_endpoint()
-    
-    # Test admin endpoints
-    test_admin_internship_endpoints()
-    
-    # Test endpoint structure
-    test_endpoint_structure_validation()
-    
-    # Print summary
-    print("\n" + "=" * 60)
-    print("📊 INTERNSHIP OPPORTUNITIES API TEST SUMMARY")
-    print("=" * 60)
-    print(f"✅ Tests passed: {passed_tests}")
-    print(f"❌ Tests failed: {total_tests - passed_tests}")
-    print(f"📈 Success rate: {(passed_tests/total_tests)*100:.1f}%")
-    print(f"🕐 Test completed at: {datetime.now()}")
-    
-    # Expected behavior summary
-    print("\n🎯 EXPECTED BEHAVIOR VERIFICATION:")
-    print("✅ GET /api/internships without auth → 403 Forbidden (correct - requires login)")
-    print("✅ All admin endpoints without auth → 403 Forbidden (correct - admin only)")
-    print("✅ Endpoints exist and have proper structure")
-    print("✅ Test data matches API requirements")
-    
-    if passed_tests == total_tests:
-        print("\n🎉 ALL TESTS PASSED - Internship Opportunities API is working correctly!")
-    else:
-        print(f"\n⚠️  {total_tests - passed_tests} tests failed - see details above")
-    
-    return passed_tests == total_tests
+        # Test GET /api/fellowship/applications/my without auth
+        try:
+            response = requests.get(f"{API_BASE}/fellowship/applications/my", timeout=10)
+            self.log_test("/api/fellowship/applications/my", "GET", 403, response.status_code,
+                         "- Should return 403 without auth")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/fellowship/applications/my", "GET", 403, "ERROR", f"Connection error: {e}")
+
+    def test_admin_endpoints_without_auth(self):
+        """Test that admin endpoints return 403 without authentication"""
+        print("\n=== Testing Admin Endpoints (No Auth) ===")
+        
+        # Test GET /api/admin/fellowship/applications without auth
+        try:
+            response = requests.get(f"{API_BASE}/admin/fellowship/applications", timeout=10)
+            self.log_test("/api/admin/fellowship/applications", "GET", 403, response.status_code,
+                         "- Should return 403 without admin auth")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/admin/fellowship/applications", "GET", 403, "ERROR", f"Connection error: {e}")
+
+        # Test PUT /api/admin/fellowship/applications/test-id/status without auth
+        test_status_data = {"status": "under_review", "admin_notes": "Test review"}
+        try:
+            response = requests.put(f"{API_BASE}/admin/fellowship/applications/test-id/status",
+                                  json=test_status_data, timeout=10)
+            self.log_test("/api/admin/fellowship/applications/{id}/status", "PUT", 403, response.status_code,
+                         "- Should return 403 without admin auth")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/admin/fellowship/applications/{id}/status", "PUT", 403, "ERROR", f"Connection error: {e}")
+
+        # Test GET /api/admin/fellowship/applications/test-id/resume without auth
+        try:
+            response = requests.get(f"{API_BASE}/admin/fellowship/applications/test-id/resume", timeout=10)
+            self.log_test("/api/admin/fellowship/applications/{id}/resume", "GET", 403, response.status_code,
+                         "- Should return 403 without admin auth")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/admin/fellowship/applications/{id}/resume", "GET", 403, "ERROR", f"Connection error: {e}")
+
+    def test_fellowship_data_validation(self):
+        """Test fellowship application data validation"""
+        print("\n=== Testing Fellowship Application Data Validation ===")
+        
+        # Test with invalid data (missing required fields)
+        invalid_data = {"full_name": "Test User"}  # Missing required fields
+        try:
+            response = requests.post(f"{API_BASE}/fellowship/apply", json=invalid_data, timeout=10)
+            # Should return 422 (validation error) or 403 (auth required)
+            if response.status_code in [422, 403]:
+                self.log_test("/api/fellowship/apply", "POST", "422 or 403", response.status_code,
+                             "- Validation working correctly")
+            else:
+                self.log_test("/api/fellowship/apply", "POST", "422 or 403", response.status_code,
+                             "- Unexpected response for invalid data")
+        except requests.exceptions.RequestException as e:
+            self.log_test("/api/fellowship/apply", "POST", "422 or 403", "ERROR", f"Connection error: {e}")
+
+    def test_backend_availability(self):
+        """Test if backend server is running and accessible"""
+        print("\n=== Testing Backend Server Availability ===")
+        try:
+            response = requests.get(BACKEND_URL, timeout=5)
+            if response.status_code in [200, 404, 422]:  # Any response means server is up
+                print(f"✅ Backend server is accessible at {BACKEND_URL}")
+                return True
+            else:
+                print(f"⚠️ Backend server responded with status: {response.status_code}")
+                return True
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Backend server not accessible: {e}")
+            return False
+
+    def print_test_summary(self):
+        """Print summary of all tests"""
+        print("\n" + "="*60)
+        print("FELLOWSHIP APPLICATION API TEST SUMMARY")
+        print("="*60)
+        
+        total_tests = len(self.test_results)
+        passed_tests = len([t for t in self.test_results if t['status'] == '✅ PASS'])
+        failed_tests = total_tests - passed_tests
+        
+        print(f"Total Tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests*100):.1f}%" if total_tests > 0 else "0%")
+        
+        if failed_tests > 0:
+            print(f"\nFailed Tests:")
+            for test in self.test_results:
+                if test['status'] == '❌ FAIL':
+                    print(f"  - {test['method']} {test['endpoint']}: Expected {test['expected']}, Got {test['actual']} {test['details']}")
+        
+        print("\nDetailed Results:")
+        for test in self.test_results:
+            print(f"{test['status']} {test['method']} {test['endpoint']} {test['details']}")
+
+    def run_all_tests(self):
+        """Run all fellowship API tests"""
+        print("Starting Fellowship Application API Tests...")
+        print(f"Backend URL: {BACKEND_URL}")
+        print(f"API Base: {API_BASE}")
+        print("="*60)
+        
+        # Check if backend is available first
+        if not self.test_backend_availability():
+            print("❌ Backend server is not accessible. Cannot proceed with API tests.")
+            return
+        
+        # Run all test suites
+        self.test_health_endpoint()
+        self.test_public_fellowship_stats()
+        self.test_protected_user_endpoints_without_auth()
+        self.test_admin_endpoints_without_auth()
+        self.test_fellowship_data_validation()
+        
+        # Print summary
+        self.print_test_summary()
 
 if __name__ == "__main__":
-    success = run_all_tests()
-    sys.exit(0 if success else 1)
+    tester = FellowshipAPITester()
+    tester.run_all_tests()
