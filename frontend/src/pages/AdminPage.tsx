@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { Check, X, Edit3, Star, StarOff, Eye, BarChart3, FileText, Users, Tag, Sparkles } from 'lucide-react';
+import { Check, X, Edit3, Star, StarOff, Eye, BarChart3, FileText, Users, Tag, Sparkles, ClipboardList } from 'lucide-react';
 import StatCard from '../components/StatCard.tsx';
 import TagPill from '../components/TagPill.tsx';
 import InstagramGenerator from './InstagramGenerator.tsx';
@@ -9,7 +9,7 @@ import { ADMIN_STORIES, ADMIN_STATS, HEALTH_TAGS, type AdminStory } from '../dat
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
-type TabType = 'overview' | 'review' | 'featured' | 'tags' | 'generator';
+type TabType = 'overview' | 'review' | 'featured' | 'tags' | 'applications' | 'generator';
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 
 interface AuthUser {
@@ -25,6 +25,8 @@ const AdminPage: React.FC = () => {
   const [tags, setTags] = useState(HEALTH_TAGS);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [applications, setApplications] = useState<any[]>([]);
+  const [appFilter, setAppFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -51,6 +53,38 @@ const AdminPage: React.FC = () => {
   }, [navigate]);
 
   const isAdminEmail = currentUser?.email === 'curejournal@gmail.com';
+
+  // Fetch applications when admin loads
+  useEffect(() => {
+    if (!isAdminEmail) return;
+    const token = localStorage.getItem('token');
+    fetch(`${API_URL}/api/admin/applications`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data) => setApplications(data))
+      .catch(() => {});
+  }, [isAdminEmail]);
+
+  const handleAppStatus = async (appId: string, status: 'approved' | 'rejected') => {
+    const token = localStorage.getItem('token');
+    try {
+      const resp = await fetch(`${API_URL}/api/admin/applications/${appId}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ status }),
+      });
+      if (resp.ok) {
+        setApplications((prev) =>
+          prev.map((a) => (a.id === appId ? { ...a, status } : a))
+        );
+      }
+    } catch {}
+  };
+
+  const filteredApplications = appFilter === 'all'
+    ? applications
+    : applications.filter((a) => a.status === appFilter);
 
   const handleApprove = (id: string) => {
     setStories((prev) =>
@@ -81,6 +115,7 @@ const AdminPage: React.FC = () => {
     { id: 'review' as TabType, label: 'Review Queue', icon: <FileText size={18} /> },
     { id: 'featured' as TabType, label: 'Featured', icon: <Star size={18} /> },
     { id: 'tags' as TabType, label: 'Tags', icon: <Tag size={18} /> },
+    ...(isAdminEmail ? [{ id: 'applications' as TabType, label: 'Applications', icon: <ClipboardList size={18} /> }] : []),
     ...(isAdminEmail ? [{ id: 'generator' as TabType, label: 'Post Generator', icon: <Sparkles size={18} /> }] : []),
   ];
 
@@ -308,6 +343,90 @@ const AdminPage: React.FC = () => {
               <button className="btn btn-secondary add-tag-btn">
                 Add New Tag
               </button>
+            </motion.div>
+          )}
+
+          {/* Applications Tab - Only for curejournal@gmail.com */}
+          {activeTab === 'applications' && isAdminEmail && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              data-testid="applications-tab"
+            >
+              <div className="section-header-row">
+                <h2>Review Board Applications</h2>
+                <span className="app-count">{applications.filter(a => a.status === 'pending').length} pending</span>
+              </div>
+
+              <div className="status-filters">
+                {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
+                  <button
+                    key={f}
+                    className={`filter-btn ${appFilter === f ? 'active' : ''}`}
+                    onClick={() => setAppFilter(f)}
+                    data-testid={`app-filter-${f}`}
+                  >
+                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                    {f !== 'all' && (
+                      <span className="filter-count">
+                        {applications.filter((a) => a.status === f).length}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {filteredApplications.length === 0 ? (
+                <div className="empty-state">
+                  <p>No {appFilter === 'all' ? '' : appFilter} applications yet.</p>
+                </div>
+              ) : (
+                <div className="applications-list">
+                  {filteredApplications.map((app) => (
+                    <div key={app.id} className="application-card" data-testid={`application-${app.id}`}>
+                      <div className="application-header">
+                        <div>
+                          <h3 className="application-name">{app.name}</h3>
+                          <p className="application-meta">
+                            {app.university} &middot; {app.program} &middot; Year {app.year}
+                          </p>
+                          <p className="application-email">{app.email}</p>
+                        </div>
+                        <span className={`application-status status-${app.status}`}>
+                          {app.status}
+                        </span>
+                      </div>
+                      <div className="application-body">
+                        <p>{app.why_join}</p>
+                      </div>
+                      <div className="application-footer">
+                        <span className="application-date">
+                          {app.submitted_at ? new Date(app.submitted_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                        </span>
+                        {app.status === 'pending' && (
+                          <div className="application-actions">
+                            <button
+                              className="btn btn-sm btn-approve"
+                              onClick={() => handleAppStatus(app.id, 'approved')}
+                              data-testid={`approve-app-${app.id}`}
+                            >
+                              <Check size={16} /> Approve
+                            </button>
+                            <button
+                              className="btn btn-sm btn-reject"
+                              onClick={() => handleAppStatus(app.id, 'rejected')}
+                              data-testid={`reject-app-${app.id}`}
+                            >
+                              <X size={16} /> Reject
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
@@ -673,6 +792,139 @@ const AdminPage: React.FC = () => {
           .table-row {
             min-width: 700px;
           }
+        }
+
+        /* Applications Tab */
+        .section-header-row {
+          display: flex;
+          align-items: baseline;
+          gap: var(--vs-space-3);
+          margin-bottom: var(--vs-space-6);
+        }
+
+        .section-header-row h2 {
+          font-size: 1.25rem;
+          font-weight: 600;
+        }
+
+        .app-count {
+          font-size: 0.875rem;
+          color: var(--vs-coral);
+          font-weight: 500;
+        }
+
+        .applications-list {
+          display: flex;
+          flex-direction: column;
+          gap: var(--vs-space-4);
+        }
+
+        .application-card {
+          background: var(--vs-white);
+          border: 1px solid var(--vs-border);
+          border-radius: var(--vs-radius-lg);
+          padding: var(--vs-space-6);
+        }
+
+        .application-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: var(--vs-space-4);
+        }
+
+        .application-name {
+          font-size: 1.0625rem;
+          font-weight: 600;
+          margin-bottom: var(--vs-space-1);
+        }
+
+        .application-meta {
+          font-size: 0.875rem;
+          color: var(--vs-text-secondary);
+        }
+
+        .application-email {
+          font-size: 0.8125rem;
+          color: var(--vs-text-tertiary);
+          margin-top: 2px;
+        }
+
+        .application-status {
+          font-size: 0.75rem;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+          padding: var(--vs-space-1) var(--vs-space-3);
+          border-radius: var(--vs-radius-full);
+        }
+
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+
+        .application-body {
+          font-size: 0.9375rem;
+          line-height: 1.7;
+          color: var(--vs-text-secondary);
+          margin-bottom: var(--vs-space-4);
+          border-top: 1px solid var(--vs-border);
+          padding-top: var(--vs-space-4);
+        }
+
+        .application-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .application-date {
+          font-size: 0.8125rem;
+          color: var(--vs-text-tertiary);
+        }
+
+        .application-actions {
+          display: flex;
+          gap: var(--vs-space-2);
+        }
+
+        .btn-approve {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--vs-space-1);
+          padding: var(--vs-space-2) var(--vs-space-4);
+          background: #059669;
+          color: white;
+          border: none;
+          border-radius: var(--vs-radius-md);
+          font-size: 0.8125rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background var(--vs-transition-fast);
+        }
+        .btn-approve:hover { background: #047857; }
+
+        .btn-reject {
+          display: inline-flex;
+          align-items: center;
+          gap: var(--vs-space-1);
+          padding: var(--vs-space-2) var(--vs-space-4);
+          background: var(--vs-white);
+          color: #dc2626;
+          border: 1px solid #dc2626;
+          border-radius: var(--vs-radius-md);
+          font-size: 0.8125rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all var(--vs-transition-fast);
+        }
+        .btn-reject:hover { background: #fef2f2; }
+
+        .empty-state {
+          text-align: center;
+          padding: var(--vs-space-12) 0;
+          color: var(--vs-text-tertiary);
+          font-size: 0.9375rem;
         }
       `}</style>
     </div>

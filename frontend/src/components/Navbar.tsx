@@ -43,6 +43,7 @@ const Navbar: React.FC = () => {
   const navLinks = [
     { href: '/stories', label: 'Read Stories' },
     { href: '/submit', label: 'Share Your Story' },
+    { href: '/join', label: 'Join Us' },
     { href: '/about', label: 'About' },
   ];
 

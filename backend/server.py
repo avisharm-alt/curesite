@@ -854,6 +854,66 @@ async def get_current_user_info(request: Request):
         raise HTTPException(status_code=401, detail="Invalid token")
 
 # User Routes
+
+# --- Review Board Application Model & Endpoints ---
+class ApplicationCreate(BaseModel):
+    name: str
+    email: str
+    university: str
+    program: str
+    year: int
+    why_join: str  # 200 word max, enforced on frontend
+
+@api_router.post("/applications")
+async def submit_application(app_data: ApplicationCreate):
+    """Public endpoint — anyone can apply to the review board."""
+    # Check for duplicate email
+    existing = await db.applications.find_one({"email": app_data.email}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="An application with this email already exists")
+
+    doc = {
+        "id": str(uuid.uuid4()),
+        "name": app_data.name,
+        "email": app_data.email,
+        "university": app_data.university,
+        "program": app_data.program,
+        "year": app_data.year,
+        "why_join": app_data.why_join,
+        "status": "pending",
+        "submitted_at": datetime.now(timezone.utc).isoformat(),
+        "reviewed_at": None,
+    }
+    await db.applications.insert_one(doc)
+    return {"id": doc["id"], "message": "Application submitted successfully"}
+
+@api_router.get("/admin/applications")
+async def list_applications(current_user: User = Depends(get_current_user)):
+    """Admin-only — list all review board applications."""
+    if current_user.email != "curejournal@gmail.com":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    apps = await db.applications.find({}, {"_id": 0}).sort("submitted_at", -1).to_list(500)
+    return apps
+
+@api_router.put("/admin/applications/{app_id}/status")
+async def update_application_status(app_id: str, request: Request, current_user: User = Depends(get_current_user)):
+    """Admin-only — approve or reject an application."""
+    if current_user.email != "curejournal@gmail.com":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    body = await request.json()
+    new_status = body.get("status")
+    if new_status not in ("approved", "rejected"):
+        raise HTTPException(status_code=400, detail="Status must be 'approved' or 'rejected'")
+    result = await db.applications.update_one(
+        {"id": app_id},
+        {"$set": {"status": new_status, "reviewed_at": datetime.now(timezone.utc).isoformat()}},
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Application not found")
+    return {"message": f"Application {new_status}"}
+
+# --- End Review Board ---
+
 @api_router.put("/users/profile")
 async def update_profile(user_update: UserUpdate, current_user: User = Depends(get_current_user)):
     update_data = prepare_for_mongo(user_update.dict(exclude_unset=True))

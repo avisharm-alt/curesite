@@ -18,6 +18,7 @@ import SubmitStoryPage from './pages/SubmitStoryPage.tsx';
 import AboutPage from './pages/AboutPage.tsx';
 import SignInPage from './pages/SignInPage.tsx';
 import AdminPage from './pages/AdminPage.tsx';
+import JoinUsPage from './pages/JoinUsPage.tsx';
 
 /** Picks up ?token=...&user=... from Google OAuth callback redirect */
 function OAuthTokenHandler() {
@@ -84,6 +85,7 @@ function AppRouter() {
                 <Route path="/stories" element={<StoriesPage />} />
                 <Route path="/stories/:id" element={<StoryDetailPage />} />
                 <Route path="/submit" element={<SubmitStoryPage />} />
+                <Route path="/join" element={<JoinUsPage />} />
                 <Route path="/about" element={<AboutPage />} />
               </Routes>
             </main>
