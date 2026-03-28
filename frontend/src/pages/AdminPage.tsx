@@ -33,6 +33,10 @@ const AdminPage: React.FC = () => {
     // Check if user was passed via route state (from AuthCallback)
     if (location.state && (location.state as any).user) {
       const u = (location.state as any).user;
+      if (u.user_type !== 'admin') {
+        navigate('/', { replace: true });
+        return;
+      }
       setCurrentUser(u);
       setLoading(false);
       return;
@@ -41,7 +45,14 @@ const AdminPage: React.FC = () => {
     // Check session via /auth/me
     fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => { setCurrentUser(data); setLoading(false); })
+      .then((data) => {
+        if (data.user_type !== 'admin') {
+          navigate('/', { replace: true });
+          return;
+        }
+        setCurrentUser(data);
+        setLoading(false);
+      })
       .catch(() => { setLoading(false); navigate('/signin'); });
   }, [location.state, navigate]);
 
