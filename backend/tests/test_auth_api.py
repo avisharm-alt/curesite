@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://vital-admin-stage.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://signin-integration-1.preview.emergentagent.com')
 
 # Test session tokens created in MongoDB
 ADMIN_SESSION_TOKEN = "admin_session_token_123"

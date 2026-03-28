@@ -21,4 +21,4 @@
 
 ## Important: Google Console Setup
 User must add this authorized redirect URI in Google Cloud Console:
-`https://vital-admin-stage.preview.emergentagent.com/api/auth/google/callback`
+`https://signin-integration-1.preview.emergentagent.com/api/auth/google/callback`

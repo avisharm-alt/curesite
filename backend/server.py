@@ -20,6 +20,8 @@ import secrets
 from urllib.parse import quote
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 import io
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -96,7 +98,7 @@ allowed_origins = [
     "https://www.cureproject.ca",  # Custom domain with www
     "http://www.cureproject.ca",  # Custom domain with www HTTP
     "https://curesite-production.up.railway.app",  # Production Railway backend
-    "https://vital-admin-stage.preview.emergentagent.com",  # Preview environment
+    "https://signin-integration-1.preview.emergentagent.com",  # Preview environment
 ]
 
 # Add any additional frontend URL from environment
@@ -824,6 +826,59 @@ async def google_callback(request: Request):
 @api_router.post("/auth/logout")
 async def logout():
     return {"message": "Logged out successfully"}
+
+class GoogleTokenRequest(BaseModel):
+    """Request model for Google ID token verification"""
+    credential: str
+
+@api_router.post("/auth/google/verify")
+async def verify_google_token(request: GoogleTokenRequest):
+    """
+    Verify Google ID token from Google Identity Services (GIS) popup.
+    This endpoint receives the credential (ID token) from the frontend GIS popup
+    and verifies it using google-auth library.
+    """
+    try:
+        # Verify the Google ID token
+        idinfo = id_token.verify_oauth2_token(
+            request.credential,
+            google_requests.Request(),
+            google_client_id
+        )
+        
+        # Extract user info from the verified token
+        user_info = {
+            'email': idinfo.get('email'),
+            'name': idinfo.get('name'),
+            'picture': idinfo.get('picture'),
+            'sub': idinfo.get('sub')  # Google's unique user ID
+        }
+        
+        if not user_info['email']:
+            raise HTTPException(status_code=400, detail="Email not found in token")
+        
+        # Upsert user in database (same as OAuth callback)
+        user = await upsert_user_from_oauth(user_info)
+        
+        # Create JWT token
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user.id}, expires_delta=access_token_expires
+        )
+        
+        # Return token and user data
+        return {
+            "token": access_token,
+            "user": user.dict()
+        }
+        
+    except ValueError as e:
+        # Invalid token
+        print(f"❌ Google token verification failed: {e}")
+        raise HTTPException(status_code=401, detail=f"Invalid Google token: {str(e)}")
+    except Exception as e:
+        print(f"❌ Error verifying Google token: {e}")
+        raise HTTPException(status_code=500, detail=f"Error verifying token: {str(e)}")
 
 @api_router.get("/auth/me")
 async def get_current_user_info(request: Request):

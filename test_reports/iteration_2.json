@@ -36,7 +36,7 @@
       "returns_302": true,
       "redirects_to_accounts_google_com": true,
       "correct_client_id": "492483192809-ktal7sbtjgvqn6fp1cmp1ebkdjpkrg7g.apps.googleusercontent.com",
-      "https_redirect_uri": "https://vital-admin-stage.preview.emergentagent.com/api/auth/google/callback"
+      "https_redirect_uri": "https://signin-integration-1.preview.emergentagent.com/api/auth/google/callback"
     },
     "jwt_authentication": {
       "401_without_token": true,

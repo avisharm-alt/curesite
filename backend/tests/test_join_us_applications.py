@@ -7,7 +7,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://vital-admin-stage.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://signin-integration-1.preview.emergentagent.com')
 
 # JWT tokens for testing
 ADMIN_JWT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi1qd3QtdXNlciIsImV4cCI6OTk5OTk5OTk5OX0.OblF8mVLgtze7x2mCkqkksZSgP7ppN6SEfaq9G7sY6s"

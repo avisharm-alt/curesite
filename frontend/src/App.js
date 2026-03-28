@@ -12,6 +12,7 @@ import StoryDetailPage from './pages/StoryDetailPage';
 import SubmitStoryPage from './pages/SubmitStoryPage';
 import AdminStoriesPage from './pages/AdminStoriesPage';
 import ProfilePage from './pages/ProfilePage';
+import SignInPage from './pages/SignInPage';
 
 // Import hooks
 import { AuthProvider, useAuth } from './hooks/useAuth';
@@ -185,6 +186,7 @@ const App = () => {
               <Route path="/about" element={<VitalSignsAboutPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/admin" element={<AdminStoriesPage />} />
+              <Route path="/signin" element={<SignInPage />} />
               
               {/* Legacy Route Redirects */}
               <Route path="/posters" element={<LegacyRedirect />} />

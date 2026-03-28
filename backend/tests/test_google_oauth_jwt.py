@@ -13,7 +13,7 @@ import requests
 import os
 from urllib.parse import urlparse, parse_qs
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://vital-admin-stage.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://signin-integration-1.preview.emergentagent.com')
 
 # JWT tokens for test users (created in MongoDB)
 TEST_JWT_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LWp3dC11c2VyIiwiZXhwIjoxNzc1MzM4MDQxfQ.bnhydGXBB8PSSUA4EfMEnCzH-i_msVK3Ql4EwToVDWc"
