@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Heart, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import type { Story } from '../data/mockData.ts';
 import TagPill from './TagPill.tsx';
 
@@ -11,16 +11,6 @@ interface StoryCardProps {
 }
 
 const StoryCard: React.FC<StoryCardProps> = ({ story, index = 0 }) => {
-  const [resonated, setResonated] = useState(false);
-  const [resonanceCount, setResonanceCount] = useState(story.resonanceCount);
-
-  const handleResonate = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setResonated(!resonated);
-    setResonanceCount(prev => resonated ? prev - 1 : prev + 1);
-  };
-
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -36,6 +26,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index = 0 }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
+      data-testid={`story-card-${story.id}`}
     >
       <Link to={`/stories/${story.id}`} className="story-card-link">
         {story.hasContentWarning && (
@@ -58,17 +49,9 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index = 0 }) => {
           <span className="story-card-author">
             {story.isAnonymous ? 'Anonymous' : story.authorName}
           </span>
-          <span className="story-card-separator">·</span>
+          <span className="story-card-separator">&middot;</span>
           <span className="story-card-date">{formatDate(story.publishedAt)}</span>
         </div>
-
-        <button
-          className={`story-card-resonate ${resonated ? 'active' : ''}`}
-          onClick={handleResonate}
-        >
-          <Heart size={16} fill={resonated ? 'currentColor' : 'none'} />
-          <span>{resonanceCount}</span>
-        </button>
       </Link>
 
       <style>{`
@@ -146,35 +129,6 @@ const StoryCard: React.FC<StoryCardProps> = ({ story, index = 0 }) => {
 
         .story-card-separator {
           opacity: 0.5;
-        }
-
-        .story-card-resonate {
-          position: absolute;
-          bottom: var(--vs-space-6);
-          right: var(--vs-space-6);
-          display: flex;
-          align-items: center;
-          gap: var(--vs-space-1);
-          padding: var(--vs-space-2) var(--vs-space-3);
-          background: var(--vs-bg-subtle);
-          border: 1px solid var(--vs-border);
-          border-radius: var(--vs-radius-full);
-          font-size: 0.8125rem;
-          font-weight: 500;
-          color: var(--vs-text-secondary);
-          cursor: pointer;
-          transition: all var(--vs-transition-fast);
-        }
-
-        .story-card-resonate:hover {
-          border-color: var(--vs-coral);
-          color: var(--vs-coral);
-        }
-
-        .story-card-resonate.active {
-          background: rgba(255, 90, 95, 0.1);
-          border-color: var(--vs-coral);
-          color: var(--vs-coral);
         }
       `}</style>
     </motion.article>

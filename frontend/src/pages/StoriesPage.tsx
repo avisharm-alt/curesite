@@ -15,7 +15,6 @@ const StoriesPage: React.FC = () => {
 
   const sortOptions = [
     { value: 'recent', label: 'Most Recent' },
-    { value: 'resonated', label: 'Most Resonated' },
   ];
 
   const filteredStories = useMemo(() => {
@@ -49,11 +48,7 @@ const StoriesPage: React.FC = () => {
     }
 
     // Sort
-    if (sortBy === 'resonated') {
-      stories.sort((a, b) => b.resonanceCount - a.resonanceCount);
-    } else {
-      stories.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
-    }
+    stories.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 
     return stories;
   }, [searchQuery, selectedTag, authorFilter, selectedUniversity, sortBy]);

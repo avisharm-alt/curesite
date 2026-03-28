@@ -1,11 +1,51 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, LogOut } from 'lucide-react';
+
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
+interface AuthUser {
+  user_id: string;
+  email: string;
+  name: string;
+  user_type: string;
+  profile_picture?: string;
+}
 
 const Navbar: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Skip auth check if returning from OAuth callback
+    if (window.location.hash?.includes('session_id=')) return;
+
+    // Check if user was passed via route state (from AuthCallback)
+    if (location.state && (location.state as any).user) {
+      setUser((location.state as any).user);
+      return;
+    }
+
+    // Check session via /auth/me
+    fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => setUser(data))
+      .catch(() => setUser(null));
+  }, [location.state]);
+
+  const handleSignOut = async () => {
+    try {
+      await fetch(`${API_URL}/api/auth/signout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch {}
+    setUser(null);
+    navigate('/');
+  };
 
   const navLinks = [
     { href: '/stories', label: 'Read Stories' },
@@ -37,11 +77,25 @@ const Navbar: React.FC = () => {
           ))}
         </div>
 
-        {/* Sign In Button */}
+        {/* Sign In / User Actions */}
         <div className="navbar-actions">
-          <Link to="/signin" className="btn btn-secondary btn-sm">
-            Sign In
-          </Link>
+          {user ? (
+            <div className="navbar-user" data-testid="navbar-user">
+              <span className="navbar-user-name">{user.name}</span>
+              {user.user_type === 'admin' && (
+                <Link to="/admin" className="btn btn-secondary btn-sm" data-testid="admin-link">
+                  Admin
+                </Link>
+              )}
+              <button className="navbar-signout" onClick={handleSignOut} data-testid="signout-btn" title="Sign out">
+                <LogOut size={18} />
+              </button>
+            </div>
+          ) : (
+            <Link to="/signin" className="btn btn-secondary btn-sm" data-testid="signin-btn">
+              Sign In
+            </Link>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -74,13 +128,26 @@ const Navbar: React.FC = () => {
                 {link.label}
               </Link>
             ))}
-            <Link
-              to="/signin"
-              className="navbar-mobile-link navbar-mobile-signin"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Sign In
-            </Link>
+            {user ? (
+              <>
+                {user.user_type === 'admin' && (
+                  <Link to="/admin" className="navbar-mobile-link" onClick={() => setIsMobileMenuOpen(false)}>
+                    Admin Dashboard
+                  </Link>
+                )}
+                <button className="navbar-mobile-link navbar-mobile-signin" onClick={() => { setIsMobileMenuOpen(false); handleSignOut(); }}>
+                  Sign Out
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/signin"
+                className="navbar-mobile-link navbar-mobile-signin"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Sign In
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -171,6 +238,37 @@ const Navbar: React.FC = () => {
         }
 
         .navbar-mobile-signin {
+          color: var(--vs-coral);
+        }
+
+        .navbar-user {
+          display: flex;
+          align-items: center;
+          gap: var(--vs-space-3);
+        }
+
+        .navbar-user-name {
+          font-size: 0.875rem;
+          font-weight: 500;
+          color: var(--vs-text-primary);
+        }
+
+        .navbar-signout {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          background: transparent;
+          border: 1px solid var(--vs-border);
+          border-radius: var(--vs-radius-md);
+          color: var(--vs-text-secondary);
+          cursor: pointer;
+          transition: all var(--vs-transition-fast);
+        }
+
+        .navbar-signout:hover {
+          border-color: var(--vs-coral);
           color: var(--vs-coral);
         }
 

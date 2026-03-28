@@ -1,24 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Check, X, Edit3, Star, StarOff, Eye, BarChart3, FileText, Users, Heart, Tag, Sparkles } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { Check, X, Edit3, Star, StarOff, Eye, BarChart3, FileText, Users, Tag, Sparkles } from 'lucide-react';
 import StatCard from '../components/StatCard.tsx';
 import TagPill from '../components/TagPill.tsx';
 import InstagramGenerator from './InstagramGenerator.tsx';
 import { ADMIN_STORIES, ADMIN_STATS, HEALTH_TAGS, type AdminStory } from '../data/mockData.ts';
 
+const API_URL = process.env.REACT_APP_BACKEND_URL;
+
 type TabType = 'overview' | 'review' | 'featured' | 'tags' | 'generator';
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
+
+interface AuthUser {
+  user_id: string;
+  email: string;
+  name: string;
+  user_type: string;
+}
 
 const AdminPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<TabType>('overview');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending');
   const [stories, setStories] = useState(ADMIN_STORIES);
   const [tags, setTags] = useState(HEALTH_TAGS);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  // TODO: Replace with actual authentication - for now using mock email
-  // This should come from your auth context/state management
-  const currentUserEmail = 'curejournal@gmail.com'; // Replace with actual auth state
-  const isAdminEmail = currentUserEmail === 'curejournal@gmail.com';
+  useEffect(() => {
+    // Check if user was passed via route state (from AuthCallback)
+    if (location.state && (location.state as any).user) {
+      const u = (location.state as any).user;
+      setCurrentUser(u);
+      setLoading(false);
+      return;
+    }
+
+    // Check session via /auth/me
+    fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data) => { setCurrentUser(data); setLoading(false); })
+      .catch(() => { setLoading(false); navigate('/signin'); });
+  }, [location.state, navigate]);
+
+  const isAdminEmail = currentUser?.email === 'curejournal@gmail.com';
 
   const handleApprove = (id: string) => {
     setStories((prev) =>
@@ -52,8 +79,16 @@ const AdminPage: React.FC = () => {
     ...(isAdminEmail ? [{ id: 'generator' as TabType, label: 'Post Generator', icon: <Sparkles size={18} /> }] : []),
   ];
 
+  if (loading) {
+    return (
+      <div className="admin-page" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <p style={{ color: 'var(--vs-text-secondary)' }}>Loading...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="admin-page">
+    <div className="admin-page" data-testid="admin-dashboard">
       {/* Header */}
       <header className="admin-header">
         <div className="container">
@@ -112,11 +147,6 @@ const AdminPage: React.FC = () => {
                   label="Rejected"
                   value={ADMIN_STATS.rejected}
                   icon={<X size={20} />}
-                />
-                <StatCard
-                  label="Total Resonances"
-                  value={ADMIN_STATS.totalResonances}
-                  icon={<Heart size={20} />}
                 />
               </div>
             </motion.div>
@@ -230,8 +260,6 @@ const AdminPage: React.FC = () => {
                       <h3>{story.title}</h3>
                       <div className="featured-meta">
                         {story.isAnonymous ? 'Anonymous' : story.authorName}
-                        <span className="meta-separator">·</span>
-                        {story.resonanceCount} resonances
                       </div>
                     </div>
                     <button
@@ -356,7 +384,7 @@ const AdminPage: React.FC = () => {
 
         .stats-grid {
           display: grid;
-          grid-template-columns: repeat(5, 1fr);
+          grid-template-columns: repeat(4, 1fr);
           gap: var(--vs-space-4);
         }
 

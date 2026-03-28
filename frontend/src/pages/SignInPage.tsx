@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 
 const SignInPage: React.FC = () => {
   const handleGoogleSignIn = () => {
-    // Mock sign in
-    console.log('Google sign in clicked');
+    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
+    const redirectUrl = window.location.origin + '/';
+    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
 
   return (

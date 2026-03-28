@@ -3,7 +3,6 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Share2 } from 'lucide-react';
 import StoryMeta from '../components/StoryMeta.tsx';
-import ResonanceButton from '../components/ResonanceButton.tsx';
 import ContentWarningBanner from '../components/ContentWarningBanner.tsx';
 import StoryCard from '../components/StoryCard.tsx';
 import SectionHeader from '../components/SectionHeader.tsx';
@@ -95,8 +94,7 @@ const StoryDetailPage: React.FC = () => {
 
           <footer className="story-footer">
             <div className="story-actions">
-              <ResonanceButton initialCount={story.resonanceCount} size="lg" />
-              <button className="btn btn-secondary" onClick={handleShare}>
+              <button className="btn btn-secondary" onClick={handleShare} data-testid="share-story-btn">
                 <Share2 size={18} />
                 Share
               </button>

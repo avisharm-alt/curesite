@@ -8,6 +8,7 @@ from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorGridFSBucket
 from authlib.integrations.starlette_client import OAuth
 import os
 import logging
+import httpx
 from pathlib import Path
 import shutil
 from pydantic import BaseModel, Field, EmailStr
@@ -96,6 +97,7 @@ allowed_origins = [
     "https://www.cureproject.ca",  # Custom domain with www
     "http://www.cureproject.ca",  # Custom domain with www HTTP
     "https://curesite-production.up.railway.app",  # Production Railway backend
+    "https://vital-admin-stage.preview.emergentagent.com",  # Preview environment
 ]
 
 # Add any additional frontend URL from environment
@@ -826,8 +828,133 @@ async def logout():
     return {"message": "Logged out successfully"}
 
 @api_router.get("/auth/me")
-async def get_current_user_info(current_user: User = Depends(get_current_user)):
-    return current_user
+async def get_current_user_info(request: Request):
+    """Get current user - checks session cookie first, then Bearer token."""
+    # Check session_token cookie first
+    session_token = request.cookies.get("session_token")
+    if not session_token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            session_token = auth_header.split(" ")[1]
+
+    if not session_token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    # Try Emergent session lookup first
+    session_doc = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
+    if session_doc:
+        expires_at = session_doc.get("expires_at")
+        if isinstance(expires_at, str):
+            expires_at = datetime.fromisoformat(expires_at)
+        if expires_at and expires_at.tzinfo is None:
+            expires_at = expires_at.replace(tzinfo=timezone.utc)
+        if expires_at and expires_at < datetime.now(timezone.utc):
+            raise HTTPException(status_code=401, detail="Session expired")
+
+        user_doc = await db.users.find_one({"id": session_doc["user_id"]}, {"_id": 0})
+        if not user_doc:
+            raise HTTPException(status_code=401, detail="User not found")
+        return {
+            "user_id": user_doc.get("id"),
+            "email": user_doc.get("email"),
+            "name": user_doc.get("name"),
+            "user_type": user_doc.get("user_type", "student"),
+            "profile_picture": user_doc.get("profile_picture"),
+        }
+
+    # Fallback to JWT-based auth
+    try:
+        payload = jwt.decode(session_token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("sub")
+        if user_id:
+            user_doc = await db.users.find_one({"id": user_id}, {"_id": 0})
+            if user_doc:
+                return {
+                    "user_id": user_doc.get("id"),
+                    "email": user_doc.get("email"),
+                    "name": user_doc.get("name"),
+                    "user_type": user_doc.get("user_type", "student"),
+                    "profile_picture": user_doc.get("profile_picture"),
+                }
+    except Exception:
+        pass
+
+    raise HTTPException(status_code=401, detail="Invalid session")
+
+
+# Emergent Auth - Session exchange endpoint
+@api_router.post("/auth/session")
+async def exchange_session(request: Request):
+    """Exchange Emergent Auth session_id for user data and set cookie."""
+    body = await request.json()
+    session_id = body.get("session_id")
+    if not session_id:
+        raise HTTPException(status_code=400, detail="session_id required")
+
+    # Call Emergent Auth to get session data
+    async with httpx.AsyncClient() as http_client:
+        resp = await http_client.get(
+            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+            headers={"X-Session-ID": session_id},
+        )
+        if resp.status_code != 200:
+            raise HTTPException(status_code=401, detail="Invalid session")
+        session_data = resp.json()
+
+    email = session_data["email"]
+    name = session_data.get("name", email)
+    picture = session_data.get("picture")
+    session_token = session_data["session_token"]
+
+    # Upsert user via existing helper
+    user_info = {"email": email, "name": name, "picture": picture}
+    user = await upsert_user_from_oauth(user_info)
+
+    # Store session
+    await db.user_sessions.update_one(
+        {"session_token": session_token},
+        {
+            "$set": {
+                "user_id": user.id,
+                "session_token": session_token,
+                "expires_at": (datetime.now(timezone.utc) + timedelta(days=7)).isoformat(),
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }
+        },
+        upsert=True,
+    )
+
+    response = JSONResponse(
+        content={
+            "user_id": user.id,
+            "email": user.email,
+            "name": user.name,
+            "user_type": user.user_type,
+            "profile_picture": user.profile_picture,
+        }
+    )
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7 * 24 * 60 * 60,
+    )
+    return response
+
+
+# Emergent Auth - Logout with cookie clearing
+@api_router.post("/auth/signout")
+async def signout(request: Request):
+    """Logout by clearing session cookie and deleting session from DB."""
+    session_token = request.cookies.get("session_token")
+    if session_token:
+        await db.user_sessions.delete_one({"session_token": session_token})
+    response = JSONResponse(content={"message": "Signed out"})
+    response.delete_cookie(key="session_token", path="/", secure=True, samesite="none")
+    return response
 
 # User Routes
 @api_router.put("/users/profile")
