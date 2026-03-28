@@ -1,113 +1,94 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
-import axios from 'axios';
 import './App.css';
+import './VitalSigns.css';
 
-// Import pages
-import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
-import ContactPage from './pages/ContactPage';
-import PosterJournalPage from './pages/PosterJournalPage';
-import CureJournalPage from './pages/CureJournalPage';
-import ArticleDetailPage from './pages/ArticleDetailPage';
-import StudentNetworkPage from './pages/StudentNetworkPage';
+// Import Vital Signs pages
+import VitalSignsHomePage from './pages/VitalSignsHomePage';
+import VitalSignsAboutPage from './pages/VitalSignsAboutPage';
+import StoriesPage from './pages/StoriesPage';
+import StoryDetailPage from './pages/StoryDetailPage';
+import SubmitStoryPage from './pages/SubmitStoryPage';
+import AdminStoriesPage from './pages/AdminStoriesPage';
 import ProfilePage from './pages/ProfilePage';
-import SubmitPosterPage from './pages/SubmitPosterPage';
-import SubmitArticlePage from './pages/SubmitArticlePage';
-import AdminPanelPage from './pages/AdminPanelPage';
-import DebugPage from './pages/DebugPage';
-import TestConnectionPage from './pages/TestConnectionPage';
-import InternshipOpportunitiesPage from './pages/InternshipOpportunitiesPage';
-import FellowshipPage from './pages/FellowshipPage';
 
-// Import hooks and components
+// Import hooks
 import { AuthProvider, useAuth } from './hooks/useAuth';
 
 // Import Lucide React icons
 import { 
-  BookOpen, Users, GraduationCap, FileText, 
-  User, LogOut, Menu, X, Home, Award, BarChart3, MessageSquare, Heart, Mail, Briefcase
+  BookOpen, Heart, PenLine, User, LogOut, Menu, X, Home, Settings
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Header Component
-const Header = () => {
+// Vital Signs Header Component
+const VitalSignsHeader = () => {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   const navigation = [
     { name: 'Home', href: '/', icon: Home },
-    { name: 'About Us', href: '/about', icon: Heart },
-    { name: 'Poster Journal', href: '/posters', icon: FileText },
-    { name: 'North Star Journal', href: '/journal', icon: BookOpen },
-    { name: 'Fellowship', href: '/fellowship', icon: Award },
-    { name: 'Student Network', href: '/students', icon: Users },
-    { name: 'Internships', href: '/internships', icon: Briefcase },
+    { name: 'Stories', href: '/stories', icon: BookOpen },
+    { name: 'About', href: '/about', icon: Heart },
+    ...(user ? [{ name: 'Share Story', href: '/submit', icon: PenLine }] : []),
     ...(user ? [{ name: 'My Profile', href: '/profile', icon: User }] : []),
-    ...(user?.user_type === 'admin' ? [{ name: 'Admin Panel', href: '/admin', icon: Award }] : []),
+    ...(user?.user_type === 'admin' ? [{ name: 'Admin', href: '/admin', icon: Settings }] : []),
   ];
 
   const handleGoogleLogin = () => {
-    // Redirect to backend Google OAuth endpoint
     window.location.href = `${API}/auth/google`;
   };
 
   return (
-    <header className="header">
-      <nav className="nav-container">
-        <div className="nav-brand">
-          <Link to="/">
-            <img 
-              src="https://customer-assets.emergentagent.com/job_3be4fd70-8998-4db9-a2fc-b3d2cf57510f/artifacts/t20acu3q_Logo%20maker%20project%20%289%29.png" 
-              alt="North Star Foundation Logo" 
-              className="logo"
-            />
+    <header className="vs-header">
+      <nav className="vs-nav-container">
+        <div className="vs-nav-brand">
+          <Link to="/" className="vs-logo-link">
+            <span className="vs-logo-text">Vital<span className="vs-logo-accent">Signs</span></span>
           </Link>
         </div>
 
         {/* Desktop Navigation */}
-        <div className="nav-links">
+        <div className="vs-nav-links">
           {navigation.map((item) => (
             <Link 
               key={item.name} 
               to={item.href} 
-              className={`nav-link ${location.pathname === item.href ? 'active' : ''}`}
+              className={`vs-nav-link ${location.pathname === item.href ? 'active' : ''}`}
             >
+              <item.icon size={18} />
               {item.name}
             </Link>
           ))}
         </div>
 
         {/* User Menu */}
-        <div className="nav-user">
+        <div className="vs-nav-user">
           {user ? (
-            <div className="user-menu">
-              <div className="user-info">
-                <span className="user-name">{user.name}</span>
-                <span className="user-type">{user.user_type}</span>
-              </div>
-              <button onClick={logout} className="logout-btn">
+            <div className="vs-user-menu">
+              <span className="vs-user-name">{user.name}</span>
+              <button onClick={logout} className="vs-logout-btn" title="Sign out">
                 <LogOut size={18} />
               </button>
             </div>
           ) : (
-            <button onClick={handleGoogleLogin} className="google-login-btn">
+            <button onClick={handleGoogleLogin} className="vs-login-btn">
               <img 
                 src="https://developers.google.com/identity/images/g-logo.png" 
                 alt="Google" 
-                className="google-icon"
+                className="vs-google-icon"
               />
-              Sign in with Google
+              Sign in
             </button>
           )}
         </div>
 
         {/* Mobile Menu Button */}
-        <div className="mobile-menu-btn">
+        <div className="vs-mobile-menu-btn">
           <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
@@ -116,102 +97,110 @@ const Header = () => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="mobile-menu">
+        <div className="vs-mobile-menu">
           {navigation.map((item) => (
             <Link 
               key={item.name} 
               to={item.href} 
-              className="mobile-nav-link"
+              className="vs-mobile-nav-link"
               onClick={() => setMobileMenuOpen(false)}
             >
               <item.icon size={18} />
               {item.name}
             </Link>
           ))}
+          {!user && (
+            <button onClick={handleGoogleLogin} className="vs-mobile-login-btn">
+              <img 
+                src="https://developers.google.com/identity/images/g-logo.png" 
+                alt="Google" 
+                className="vs-google-icon"
+              />
+              Sign in with Google
+            </button>
+          )}
         </div>
       )}
     </header>
   );
 };
 
-// Footer Component
-const Footer = () => {
+// Vital Signs Footer Component
+const VitalSignsFooter = () => {
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        <div className="footer-section">
-          <h3>North Star Foundation</h3>
-          <p>Guiding Communities Forward</p>
-          <p>All proceeds are donated to community-centered projects helping those in need.</p>
+    <footer className="vs-footer">
+      <div className="vs-footer-content">
+        <div className="vs-footer-brand">
+          <span className="vs-footer-logo">Vital<span className="vs-logo-accent">Signs</span></span>
+          <p className="vs-footer-tagline">Real stories. Real health. Real people.</p>
         </div>
         
-        <div className="footer-section">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><Link to="/posters">Poster Journal</Link></li>
-            <li><Link to="/students">Student Network</Link></li>
-            <li><Link to="/profiles">EC Profiles</Link></li>
-          </ul>
+        <div className="vs-footer-links">
+          <Link to="/stories">Read Stories</Link>
+          <Link to="/submit">Share Your Story</Link>
+          <Link to="/about">About Us</Link>
         </div>
         
-        <div className="footer-section">
-          <h4>Resources</h4>
-          <ul>
-            <li><a href="#" target="_blank" rel="noopener noreferrer">Research Guidelines</a></li>
-            <li><a href="#" target="_blank" rel="noopener noreferrer">Medical School Prep</a></li>
-            <li><a href="#" target="_blank" rel="noopener noreferrer">Contact Support</a></li>
-          </ul>
+        <div className="vs-footer-bottom">
+          <p>&copy; {new Date().getFullYear()} Vital Signs. All rights reserved.</p>
         </div>
-      </div>
-      
-      <div className="footer-bottom">
-        <p>&copy; 2024 North Star Foundation. All rights reserved.</p>
       </div>
     </footer>
   );
 };
 
+// Legacy Route Redirects
+const LegacyRedirect = () => {
+  return <Navigate to="/" replace />;
+};
+
 // Main App Component
 const App = () => {
-  // Force set document title immediately
-  document.title = "North Star Foundation";
-  
+  // Set document title for Vital Signs
   React.useEffect(() => {
-    document.title = "North Star Foundation";
-    // Also update favicon
-    let link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-    link.type = 'image/png';
-    link.rel = 'shortcut icon';
-    link.href = 'https://customer-assets.emergentagent.com/job_northstar-hub/artifacts/2811jplu_Logo%20maker%20project%20%2811%29.png';
-    document.getElementsByTagName('head')[0].appendChild(link);
+    document.title = "Vital Signs - Real stories. Real health. Real people.";
+    
+    // Update meta description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.name = 'description';
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.content = 'A community where people share their health experiences to build empathy, reduce stigma, and connect with others who understand.';
   }, []);
 
   return (
     <AuthProvider>
       <BrowserRouter>
-        <div className="App">
-          <Header />
-          <main>
+        <div className="vs-app">
+          <VitalSignsHeader />
+          <main className="vs-main">
             <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/contact" element={<ContactPage />} />
-              <Route path="/posters" element={<PosterJournalPage />} />
-              <Route path="/journal" element={<CureJournalPage />} />
-              <Route path="/journal/article/:identifier" element={<ArticleDetailPage />} />
-              <Route path="/students" element={<StudentNetworkPage />} />
-              <Route path="/internships" element={<InternshipOpportunitiesPage />} />
-              <Route path="/fellowship" element={<FellowshipPage />} />
+              {/* Vital Signs Routes */}
+              <Route path="/" element={<VitalSignsHomePage />} />
+              <Route path="/stories" element={<StoriesPage />} />
+              <Route path="/stories/:storyId" element={<StoryDetailPage />} />
+              <Route path="/submit" element={<SubmitStoryPage />} />
+              <Route path="/about" element={<VitalSignsAboutPage />} />
               <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/submit-poster" element={<SubmitPosterPage />} />
-              <Route path="/submit-article" element={<SubmitArticlePage />} />
-              <Route path="/admin" element={<AdminPanelPage />} />
-              <Route path="/debug" element={<DebugPage />} />
-              <Route path="/test" element={<TestConnectionPage />} />
-              <Route path="*" element={<HomePage />} />
+              <Route path="/admin" element={<AdminStoriesPage />} />
+              
+              {/* Legacy Route Redirects */}
+              <Route path="/posters" element={<LegacyRedirect />} />
+              <Route path="/journal" element={<LegacyRedirect />} />
+              <Route path="/journal/*" element={<LegacyRedirect />} />
+              <Route path="/fellowship" element={<LegacyRedirect />} />
+              <Route path="/internships" element={<LegacyRedirect />} />
+              <Route path="/students" element={<LegacyRedirect />} />
+              <Route path="/submit-poster" element={<LegacyRedirect />} />
+              <Route path="/submit-article" element={<LegacyRedirect />} />
+              
+              {/* Catch all */}
+              <Route path="*" element={<VitalSignsHomePage />} />
             </Routes>
           </main>
-          <Footer />
+          <VitalSignsFooter />
           <Toaster position="top-right" />
         </div>
       </BrowserRouter>

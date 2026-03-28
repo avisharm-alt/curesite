@@ -75,7 +75,7 @@ else:
     print("⚠️  Google OAuth not configured - set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET")
 
 # Create the main app
-app = FastAPI(title="CURE - Canadian Undergraduate Research Exchange")
+app = FastAPI(title="Vital Signs - Real stories. Real health. Real people.")
 
 # Add session middleware
 app.add_middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32))
@@ -84,6 +84,12 @@ app.add_middleware(SessionMiddleware, secret_key=secrets.token_urlsafe(32))
 allowed_origins = [
     "http://localhost:3000",  # Local development
     "https://localhost:3000",  # Local development HTTPS
+    "https://vitalsigns.ca",  # Future custom domain
+    "http://vitalsigns.ca",
+    "https://www.vitalsigns.ca",
+    "http://www.vitalsigns.ca",
+    "https://northstarfoundation.ca",  # Current domain (redirect)
+    "http://northstarfoundation.ca",
     "https://curesite-olive.vercel.app",  # Production Vercel frontend
     "https://cureproject.ca",  # Custom domain
     "http://cureproject.ca",  # Custom domain HTTP (redirects to HTTPS)
@@ -108,7 +114,7 @@ app.add_middleware(
 # Health check endpoint for Railway
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "North Star Foundation Backend"}
+    return {"status": "healthy", "service": "Vital Signs Backend"}
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -468,6 +474,108 @@ class Like(BaseModel):
     user_id: str
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
+# ============================================================================
+# VITAL SIGNS - HEALTH STORYTELLING PLATFORM MODELS
+# ============================================================================
+
+# Pre-defined health topic tags
+HEALTH_TOPIC_TAGS = [
+    "Mental Health",
+    "Chronic Illness", 
+    "Rare Disease",
+    "Caregiving",
+    "Disability",
+    "Surgical Experience",
+    "Addiction & Recovery",
+    "Reproductive Health",
+    "Other"
+]
+
+# Canadian universities list for optional affiliation
+CANADIAN_UNIVERSITIES = [
+    "University of Toronto",
+    "McGill University",
+    "University of British Columbia",
+    "McMaster University",
+    "Queen's University",
+    "Western University",
+    "University of Alberta",
+    "University of Calgary",
+    "University of Ottawa",
+    "University of Waterloo",
+    "Dalhousie University",
+    "University of Manitoba",
+    "University of Saskatchewan",
+    "Memorial University",
+    "University of Victoria",
+    "Simon Fraser University",
+    "York University",
+    "Ryerson University",
+    "Carleton University",
+    "University of Guelph",
+    "Other"
+]
+
+class Story(BaseModel):
+    """Health story submission for Vital Signs"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    title: str  # Max 120 characters
+    body: str  # Rich text (HTML or Markdown)
+    author_id: str  # Google OAuth user ID
+    author_name: str  # Display name from Google
+    author_email: str  # For admin moderation purposes
+    is_anonymous: bool = True  # Default to anonymous
+    university: Optional[str] = None  # Optional Canadian university affiliation
+    tags: List[str] = []  # From pre-defined health topics
+    has_content_warning: bool = False  # Author flagged as potentially distressing
+    status: str = "pending"  # pending, approved, rejected, edit_requested
+    admin_feedback: Optional[str] = None  # Feedback when requesting edits
+    is_featured: bool = False  # Pinned to homepage
+    resonance_count: int = 0  # Number of "This resonated with me" clicks
+    resonated_by: List[str] = []  # User IDs who resonated (prevents duplicates)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    published_at: Optional[datetime] = None  # Set when approved
+
+class StoryCreate(BaseModel):
+    """Request model for submitting a story"""
+    title: str  # Max 120 chars
+    body: str  # Rich text
+    tags: List[str] = []  # Health topic tags
+    is_anonymous: bool = True
+    university: Optional[str] = None
+    has_content_warning: bool = False
+    consent_given: bool = True  # Must be true to submit
+
+class StoryUpdate(BaseModel):
+    """Request model for updating a story (by author before approval)"""
+    title: Optional[str] = None
+    body: Optional[str] = None
+    tags: Optional[List[str]] = None
+    is_anonymous: Optional[bool] = None
+    university: Optional[str] = None
+    has_content_warning: Optional[bool] = None
+
+class StoryAdminAction(BaseModel):
+    """Admin action on a story"""
+    status: str  # approved, rejected, edit_requested
+    feedback: Optional[str] = None  # Required when requesting edits
+
+class HealthTag(BaseModel):
+    """Health topic tag for categorizing stories"""
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    name: str
+    slug: str
+    description: Optional[str] = None
+    story_count: int = 0
+    is_active: bool = True
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class HealthTagCreate(BaseModel):
+    """Request model for creating/updating a health tag"""
+    name: str
+    description: Optional[str] = None
+    is_active: bool = True
+
 # JWT Functions
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
@@ -533,6 +641,8 @@ def prepare_for_mongo(data):
             data['expires_at'] = data['expires_at'].isoformat()
         if 'payment_completed_at' in data and isinstance(data['payment_completed_at'], datetime):
             data['payment_completed_at'] = data['payment_completed_at'].isoformat()
+        if 'published_at' in data and isinstance(data['published_at'], datetime):
+            data['published_at'] = data['published_at'].isoformat()
     return data
 
 def parse_from_mongo(item):
@@ -550,6 +660,8 @@ def parse_from_mongo(item):
             item['expires_at'] = datetime.fromisoformat(item['expires_at'])
         if 'payment_completed_at' in item and isinstance(item['payment_completed_at'], str):
             item['payment_completed_at'] = datetime.fromisoformat(item['payment_completed_at'])
+        if 'published_at' in item and isinstance(item['published_at'], str):
+            item['published_at'] = datetime.fromisoformat(item['published_at'])
     return item
 
 # ============================================================================
@@ -2774,6 +2886,469 @@ async def update_social_profile(
     
     updated_user = await db.users.find_one({"id": current_user.id})
     return parse_from_mongo(updated_user)
+
+# ============================================================================
+# VITAL SIGNS - HEALTH STORYTELLING PLATFORM API ENDPOINTS
+# ============================================================================
+
+def slugify(text: str) -> str:
+    """Convert text to URL-friendly slug"""
+    import re
+    text = text.lower().strip()
+    text = re.sub(r'[^\w\s-]', '', text)
+    text = re.sub(r'[\s_-]+', '-', text)
+    return text
+
+# --- Public Story Endpoints ---
+
+@api_router.get("/stories")
+async def get_stories(
+    page: int = 1,
+    limit: int = 12,
+    tag: Optional[str] = None,
+    sort: str = "newest"  # newest, oldest, most_resonated
+):
+    """Get approved stories (public, paginated, filterable)"""
+    query = {"status": "approved"}
+    
+    # Filter by tag if provided
+    if tag:
+        query["tags"] = tag
+    
+    # Sorting
+    sort_order = -1 if sort == "newest" else 1
+    sort_field = "published_at"
+    if sort == "most_resonated":
+        sort_field = "resonance_count"
+        sort_order = -1
+    
+    skip = (page - 1) * limit
+    
+    cursor = db.stories.find(query).sort(sort_field, sort_order).skip(skip).limit(limit)
+    stories = []
+    async for story in cursor:
+        story = parse_from_mongo(story)
+        # Hide author info for anonymous stories in public view
+        if story.get("is_anonymous", True):
+            story["author_name"] = "Anonymous"
+            story.pop("author_email", None)
+        else:
+            story.pop("author_email", None)  # Never expose email publicly
+        stories.append(story)
+    
+    # Get total count
+    total = await db.stories.count_documents(query)
+    
+    return {
+        "stories": stories,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "has_more": (page * limit) < total
+    }
+
+@api_router.get("/stories/featured")
+async def get_featured_stories():
+    """Get featured stories for homepage"""
+    # First try to get admin-pinned featured stories
+    featured_query = {"status": "approved", "is_featured": True}
+    cursor = db.stories.find(featured_query).sort("published_at", -1).limit(4)
+    stories = []
+    async for story in cursor:
+        story = parse_from_mongo(story)
+        if story.get("is_anonymous", True):
+            story["author_name"] = "Anonymous"
+        story.pop("author_email", None)
+        stories.append(story)
+    
+    # If not enough featured, fill with most resonated
+    if len(stories) < 4:
+        remaining = 4 - len(stories)
+        featured_ids = [s["id"] for s in stories]
+        top_query = {"status": "approved", "id": {"$nin": featured_ids}}
+        cursor = db.stories.find(top_query).sort("resonance_count", -1).limit(remaining)
+        async for story in cursor:
+            story = parse_from_mongo(story)
+            if story.get("is_anonymous", True):
+                story["author_name"] = "Anonymous"
+            story.pop("author_email", None)
+            stories.append(story)
+    
+    return stories
+
+@api_router.get("/stories/{story_id}")
+async def get_story(story_id: str):
+    """Get a single approved story"""
+    story = await db.stories.find_one({"id": story_id, "status": "approved"})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    story = parse_from_mongo(story)
+    if story.get("is_anonymous", True):
+        story["author_name"] = "Anonymous"
+    story.pop("author_email", None)
+    
+    return story
+
+# --- Authenticated Story Endpoints ---
+
+@api_router.post("/stories")
+async def submit_story(story_data: StoryCreate, current_user: User = Depends(get_current_user)):
+    """Submit a new story (requires authentication)"""
+    # Validate title length
+    if len(story_data.title) > 120:
+        raise HTTPException(status_code=400, detail="Title must be 120 characters or less")
+    
+    # Validate consent
+    if not story_data.consent_given:
+        raise HTTPException(status_code=400, detail="You must consent to the terms to submit a story")
+    
+    # Validate tags are from allowed list
+    for tag in story_data.tags:
+        if tag not in HEALTH_TOPIC_TAGS:
+            raise HTTPException(status_code=400, detail=f"Invalid tag: {tag}. Must be one of: {HEALTH_TOPIC_TAGS}")
+    
+    # Validate university if provided
+    if story_data.university and story_data.university not in CANADIAN_UNIVERSITIES:
+        raise HTTPException(status_code=400, detail=f"Invalid university. Must be from the Canadian universities list")
+    
+    # Create story
+    story = Story(
+        title=story_data.title,
+        body=story_data.body,
+        author_id=current_user.id,
+        author_name=current_user.name,
+        author_email=current_user.email,
+        is_anonymous=story_data.is_anonymous,
+        university=story_data.university,
+        tags=story_data.tags,
+        has_content_warning=story_data.has_content_warning,
+        status="pending"
+    )
+    
+    await db.stories.insert_one(prepare_for_mongo(story.dict()))
+    print(f"✅ New story submitted: '{story.title}' by {current_user.email}")
+    
+    return {"message": "Story submitted successfully! It will be reviewed before publication.", "story_id": story.id}
+
+@api_router.get("/stories/my/submissions")
+async def get_my_stories(current_user: User = Depends(get_current_user)):
+    """Get current user's submitted stories"""
+    cursor = db.stories.find({"author_id": current_user.id}).sort("created_at", -1)
+    stories = []
+    async for story in cursor:
+        stories.append(parse_from_mongo(story))
+    return stories
+
+@api_router.put("/stories/{story_id}")
+async def update_my_story(story_id: str, story_data: StoryUpdate, current_user: User = Depends(get_current_user)):
+    """Update own story (only if pending or edit_requested)"""
+    story = await db.stories.find_one({"id": story_id, "author_id": current_user.id})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    if story["status"] not in ["pending", "edit_requested"]:
+        raise HTTPException(status_code=400, detail="Cannot edit a story that has been approved or rejected")
+    
+    update_data = {}
+    if story_data.title is not None:
+        if len(story_data.title) > 120:
+            raise HTTPException(status_code=400, detail="Title must be 120 characters or less")
+        update_data["title"] = story_data.title
+    if story_data.body is not None:
+        update_data["body"] = story_data.body
+    if story_data.tags is not None:
+        for tag in story_data.tags:
+            if tag not in HEALTH_TOPIC_TAGS:
+                raise HTTPException(status_code=400, detail=f"Invalid tag: {tag}")
+        update_data["tags"] = story_data.tags
+    if story_data.is_anonymous is not None:
+        update_data["is_anonymous"] = story_data.is_anonymous
+    if story_data.university is not None:
+        update_data["university"] = story_data.university
+    if story_data.has_content_warning is not None:
+        update_data["has_content_warning"] = story_data.has_content_warning
+    
+    # Reset to pending if was edit_requested
+    if story["status"] == "edit_requested":
+        update_data["status"] = "pending"
+        update_data["admin_feedback"] = None
+    
+    if update_data:
+        await db.stories.update_one({"id": story_id}, {"$set": update_data})
+    
+    updated = await db.stories.find_one({"id": story_id})
+    return parse_from_mongo(updated)
+
+@api_router.delete("/stories/{story_id}")
+async def delete_my_story(story_id: str, current_user: User = Depends(get_current_user)):
+    """Delete own story (only if not approved)"""
+    story = await db.stories.find_one({"id": story_id, "author_id": current_user.id})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    if story["status"] == "approved":
+        raise HTTPException(status_code=400, detail="Cannot delete an approved story. Please contact admin.")
+    
+    await db.stories.delete_one({"id": story_id})
+    return {"message": "Story deleted successfully"}
+
+# --- Resonance (Reaction) Endpoint ---
+
+@api_router.post("/stories/{story_id}/resonate")
+async def toggle_resonance(story_id: str, current_user: User = Depends(get_current_user)):
+    """Toggle 'This resonated with me' on a story"""
+    story = await db.stories.find_one({"id": story_id, "status": "approved"})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    resonated_by = story.get("resonated_by", [])
+    
+    if current_user.id in resonated_by:
+        # Remove resonance
+        await db.stories.update_one(
+            {"id": story_id},
+            {
+                "$pull": {"resonated_by": current_user.id},
+                "$inc": {"resonance_count": -1}
+            }
+        )
+        action = "removed"
+    else:
+        # Add resonance
+        await db.stories.update_one(
+            {"id": story_id},
+            {
+                "$push": {"resonated_by": current_user.id},
+                "$inc": {"resonance_count": 1}
+            }
+        )
+        action = "added"
+    
+    updated = await db.stories.find_one({"id": story_id})
+    return {
+        "message": f"Resonance {action}",
+        "resonance_count": updated.get("resonance_count", 0),
+        "user_resonated": action == "added"
+    }
+
+# --- Health Tags Endpoints ---
+
+@api_router.get("/tags")
+async def get_health_tags():
+    """Get all active health topic tags"""
+    # First check if tags exist in database
+    tags_count = await db.health_tags.count_documents({})
+    
+    if tags_count == 0:
+        # Seed default tags
+        for tag_name in HEALTH_TOPIC_TAGS:
+            tag = HealthTag(
+                name=tag_name,
+                slug=slugify(tag_name),
+                description=f"Stories about {tag_name.lower()}",
+                is_active=True
+            )
+            await db.health_tags.insert_one(prepare_for_mongo(tag.dict()))
+        print("✅ Seeded default health topic tags")
+    
+    cursor = db.health_tags.find({"is_active": True}).sort("name", 1)
+    tags = []
+    async for tag in cursor:
+        # Get story count for this tag
+        story_count = await db.stories.count_documents({"status": "approved", "tags": tag["name"]})
+        tag["story_count"] = story_count
+        tags.append(parse_from_mongo(tag))
+    
+    return tags
+
+# --- Admin Story Management Endpoints ---
+
+@api_router.get("/admin/stories")
+async def admin_get_all_stories(
+    status: Optional[str] = None,
+    page: int = 1,
+    limit: int = 20,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all stories for admin review (shows author identity even for anonymous)"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    query = {}
+    if status:
+        query["status"] = status
+    
+    skip = (page - 1) * limit
+    cursor = db.stories.find(query).sort("created_at", -1).skip(skip).limit(limit)
+    stories = []
+    async for story in cursor:
+        stories.append(parse_from_mongo(story))
+    
+    total = await db.stories.count_documents(query)
+    
+    # Get counts by status
+    pending_count = await db.stories.count_documents({"status": "pending"})
+    approved_count = await db.stories.count_documents({"status": "approved"})
+    rejected_count = await db.stories.count_documents({"status": "rejected"})
+    edit_requested_count = await db.stories.count_documents({"status": "edit_requested"})
+    
+    return {
+        "stories": stories,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "counts": {
+            "pending": pending_count,
+            "approved": approved_count,
+            "rejected": rejected_count,
+            "edit_requested": edit_requested_count
+        }
+    }
+
+@api_router.put("/admin/stories/{story_id}/status")
+async def admin_update_story_status(
+    story_id: str,
+    action: StoryAdminAction,
+    current_user: User = Depends(get_current_user)
+):
+    """Approve, reject, or request edit for a story"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    story = await db.stories.find_one({"id": story_id})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    if action.status not in ["approved", "rejected", "edit_requested"]:
+        raise HTTPException(status_code=400, detail="Invalid status. Must be: approved, rejected, or edit_requested")
+    
+    if action.status == "edit_requested" and not action.feedback:
+        raise HTTPException(status_code=400, detail="Feedback is required when requesting edits")
+    
+    update_data = {"status": action.status}
+    
+    if action.status == "approved":
+        update_data["published_at"] = datetime.now(timezone.utc).isoformat()
+        update_data["admin_feedback"] = None
+    elif action.status == "edit_requested":
+        update_data["admin_feedback"] = action.feedback
+    elif action.status == "rejected":
+        update_data["admin_feedback"] = action.feedback
+    
+    await db.stories.update_one({"id": story_id}, {"$set": update_data})
+    
+    updated = await db.stories.find_one({"id": story_id})
+    print(f"✅ Story '{story['title']}' status updated to {action.status} by admin {current_user.email}")
+    
+    return parse_from_mongo(updated)
+
+@api_router.put("/admin/stories/{story_id}/feature")
+async def admin_toggle_featured(story_id: str, current_user: User = Depends(get_current_user)):
+    """Toggle featured status for a story"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    story = await db.stories.find_one({"id": story_id})
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    if story["status"] != "approved":
+        raise HTTPException(status_code=400, detail="Only approved stories can be featured")
+    
+    new_featured_status = not story.get("is_featured", False)
+    await db.stories.update_one({"id": story_id}, {"$set": {"is_featured": new_featured_status}})
+    
+    return {"message": f"Story {'featured' if new_featured_status else 'unfeatured'}", "is_featured": new_featured_status}
+
+# --- Admin Tag Management Endpoints ---
+
+@api_router.post("/admin/tags")
+async def admin_create_tag(tag_data: HealthTagCreate, current_user: User = Depends(get_current_user)):
+    """Create or update a health topic tag"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    existing = await db.health_tags.find_one({"name": tag_data.name})
+    if existing:
+        # Update existing tag
+        await db.health_tags.update_one(
+            {"name": tag_data.name},
+            {"$set": {"description": tag_data.description, "is_active": tag_data.is_active}}
+        )
+        return {"message": "Tag updated", "action": "updated"}
+    
+    # Create new tag
+    tag = HealthTag(
+        name=tag_data.name,
+        slug=slugify(tag_data.name),
+        description=tag_data.description,
+        is_active=tag_data.is_active
+    )
+    await db.health_tags.insert_one(prepare_for_mongo(tag.dict()))
+    
+    # Add to allowed list
+    if tag_data.name not in HEALTH_TOPIC_TAGS:
+        HEALTH_TOPIC_TAGS.append(tag_data.name)
+    
+    return {"message": "Tag created", "action": "created", "tag": tag.dict()}
+
+@api_router.delete("/admin/tags/{tag_name}")
+async def admin_retire_tag(tag_name: str, current_user: User = Depends(get_current_user)):
+    """Retire (deactivate) a health topic tag"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    result = await db.health_tags.update_one({"name": tag_name}, {"$set": {"is_active": False}})
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Tag not found")
+    
+    return {"message": f"Tag '{tag_name}' retired"}
+
+# --- Admin Analytics Endpoints ---
+
+@api_router.get("/admin/stories/analytics")
+async def admin_get_analytics(current_user: User = Depends(get_current_user)):
+    """Get basic story analytics"""
+    if current_user.user_type != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    total_submitted = await db.stories.count_documents({})
+    total_approved = await db.stories.count_documents({"status": "approved"})
+    total_rejected = await db.stories.count_documents({"status": "rejected"})
+    total_pending = await db.stories.count_documents({"status": "pending"})
+    
+    # Get total resonance count
+    pipeline = [
+        {"$match": {"status": "approved"}},
+        {"$group": {"_id": None, "total_resonance": {"$sum": "$resonance_count"}}}
+    ]
+    resonance_result = await db.stories.aggregate(pipeline).to_list(1)
+    total_resonance = resonance_result[0]["total_resonance"] if resonance_result else 0
+    
+    # Get most used tags
+    tag_pipeline = [
+        {"$match": {"status": "approved"}},
+        {"$unwind": "$tags"},
+        {"$group": {"_id": "$tags", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}},
+        {"$limit": 10}
+    ]
+    tag_stats = await db.stories.aggregate(tag_pipeline).to_list(10)
+    
+    return {
+        "total_submitted": total_submitted,
+        "total_approved": total_approved,
+        "total_rejected": total_rejected,
+        "total_pending": total_pending,
+        "total_resonance": total_resonance,
+        "top_tags": [{"tag": t["_id"], "count": t["count"]} for t in tag_stats]
+    }
+
+@api_router.get("/universities")
+async def get_universities():
+    """Get list of Canadian universities for story submission"""
+    return CANADIAN_UNIVERSITIES
 
 # Include the router in the main app
 app.include_router(api_router)
