@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, X, Edit3, Star, StarOff, Eye, BarChart3, FileText, Users, Heart, Tag } from 'lucide-react';
+import { Check, X, Edit3, Star, StarOff, Eye, BarChart3, FileText, Users, Heart, Tag, Sparkles } from 'lucide-react';
 import StatCard from '../components/StatCard.tsx';
 import TagPill from '../components/TagPill.tsx';
+import InstagramGenerator from './InstagramGenerator.tsx';
 import { ADMIN_STORIES, ADMIN_STATS, HEALTH_TAGS, type AdminStory } from '../data/mockData.ts';
 
-type TabType = 'overview' | 'review' | 'featured' | 'tags';
+type TabType = 'overview' | 'review' | 'featured' | 'tags' | 'generator';
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 
 const AdminPage: React.FC = () => {
@@ -13,6 +14,11 @@ const AdminPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('pending');
   const [stories, setStories] = useState(ADMIN_STORIES);
   const [tags, setTags] = useState(HEALTH_TAGS);
+
+  // TODO: Replace with actual authentication - for now using mock email
+  // This should come from your auth context/state management
+  const currentUserEmail = 'curejournal@gmail.com'; // Replace with actual auth state
+  const isAdminEmail = currentUserEmail === 'curejournal@gmail.com';
 
   const handleApprove = (id: string) => {
     setStories((prev) =>
@@ -43,6 +49,7 @@ const AdminPage: React.FC = () => {
     { id: 'review' as TabType, label: 'Review Queue', icon: <FileText size={18} /> },
     { id: 'featured' as TabType, label: 'Featured', icon: <Star size={18} /> },
     { id: 'tags' as TabType, label: 'Tags', icon: <Tag size={18} /> },
+    ...(isAdminEmail ? [{ id: 'generator' as TabType, label: 'Post Generator', icon: <Sparkles size={18} /> }] : []),
   ];
 
   return (
@@ -268,6 +275,17 @@ const AdminPage: React.FC = () => {
               <button className="btn btn-secondary add-tag-btn">
                 Add New Tag
               </button>
+            </motion.div>
+          )}
+
+          {/* Post Generator Tab - Only for curejournal@gmail.com */}
+          {activeTab === 'generator' && isAdminEmail && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <InstagramGenerator />
             </motion.div>
           )}
         </div>

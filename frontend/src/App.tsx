@@ -17,7 +17,6 @@ import SubmitStoryPage from './pages/SubmitStoryPage.tsx';
 import AboutPage from './pages/AboutPage.tsx';
 import SignInPage from './pages/SignInPage.tsx';
 import AdminPage from './pages/AdminPage.tsx';
-import InstagramGenerator from './pages/InstagramGenerator.tsx';
 
 const App: React.FC = () => {
   // Set document title
@@ -37,14 +36,6 @@ const App: React.FC = () => {
             <>
               <Navbar />
               <AdminPage />
-            </>
-          } />
-          
-          {/* Instagram Generator */}
-          <Route path="/instagram" element={
-            <>
-              <Navbar />
-              <InstagramGenerator />
             </>
           } />
           
