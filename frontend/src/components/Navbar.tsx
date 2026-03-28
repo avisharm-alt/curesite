@@ -11,6 +11,7 @@ const Navbar: React.FC = () => {
     { href: '/stories', label: 'Read Stories' },
     { href: '/submit', label: 'Share Your Story' },
     { href: '/about', label: 'About' },
+    { href: '/instagram', label: 'Post Generator' },
   ];
 
   const isActive = (path: string) => location.pathname === path;
