@@ -1,34 +1,24 @@
 # Test Credentials
 
-## Google Auth (Emergent Managed)
-- Admin email: curejournal@gmail.com (gets admin access)
-- Regular users: any Google account (gets student access)
+## Google OAuth (Direct - No Middleman)
+- **Client ID**: 492483192809-ktal7sbtjgvqn6fp1cmp1ebkdjpkrg7g.apps.googleusercontent.com
+- **Admin email**: curejournal@gmail.com (gets `user_type: admin`)
+- **Regular users**: any Google account (gets `user_type: student`)
 
 ## Auth Flow
-- Uses Emergent managed Google OAuth
-- Sign in redirects to: https://auth.emergentagent.com/
-- After auth, user returns to app with session_id in URL hash
-- Backend exchanges session_id for session_token cookie
+1. "Continue with Google" → `/api/auth/google` → Google OAuth → callback → frontend with `?token=JWT&user=...`
+2. JWT stored in `localStorage` as `token` key
+3. User data stored in `localStorage` as `user` key
 
-## Mock/Test Session Creation
-To create a test session for automated testing:
-```
-mongosh --eval "
-use('cure_db');
-var userId = 'test-user-123';
-var sessionToken = 'test_session_token_123';
-db.users.updateOne({id: userId}, {\$set: {id: userId, email: 'test@example.com', name: 'Test User', user_type: 'student', created_at: new Date()}}, {upsert: true});
-db.user_sessions.updateOne({session_token: sessionToken}, {\$set: {user_id: userId, session_token: sessionToken, expires_at: new Date(Date.now() + 7*24*60*60*1000).toISOString(), created_at: new Date().toISOString()}}, {upsert: true});
-"
-```
+## JWT Secret
+- `fallback_secret_key` (from `os.environ.get('JWT_SECRET_KEY', 'fallback_secret_key')`)
 
-## Admin Test Session
-```
-mongosh --eval "
-use('cure_db');
-var userId = 'admin-user-123';
-var sessionToken = 'admin_session_token_123';
-db.users.updateOne({id: userId}, {\$set: {id: userId, email: 'curejournal@gmail.com', name: 'CURE Admin', user_type: 'admin', created_at: new Date()}}, {upsert: true});
-db.user_sessions.updateOne({session_token: sessionToken}, {\$set: {user_id: userId, session_token: sessionToken, expires_at: new Date(Date.now() + 7*24*60*60*1000).toISOString(), created_at: new Date().toISOString()}}, {upsert: true});
-"
-```
+## Test JWT Tokens (for automated testing)
+- **Student**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0ZXN0LWp3dC11c2VyIiwiZXhwIjoxNzc1MzM4MDQxfQ.bnhydGXBB8PSSUA4EfMEnCzH-i_msVK3Ql4EwToVDWc`
+  - email: test@example.com, user_type: student
+- **Admin**: `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZG1pbi1qd3QtdXNlciIsImV4cCI6MTc3NTMzODA0MX0.ZO13KQirWv6nxp8xckscnxdl8jJQFk-v_P9wbgD7pEo`
+  - email: curejournal@gmail.com, user_type: admin
+
+## Important: Google Console Setup
+User must add this authorized redirect URI in Google Cloud Console:
+`https://vital-admin-stage.preview.emergentagent.com/api/auth/google/callback`
