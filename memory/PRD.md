@@ -26,27 +26,26 @@
 ## Authentication
 - **Direct Google OAuth** via authlib (no third-party middleman)
 - JWT tokens stored in localStorage
-- Google Client ID: `492483192809-ktal7sbtjgvqn6fp1cmp1ebkdjpkrg7g.apps.googleusercontent.com`
 - Admin email: `curejournal@gmail.com` → `user_type: admin`
 - All other users → `user_type: student`
 
 ## Features
 
-### Review Board Applications (NEW)
+### Post Generator (Upgraded)
+- **Canvas API rendering** — pixel-perfect output, no html2canvas artifacts
+- **3x resolution** downloads (3240x3240 for 1080x1080 posts) — print quality
+- Live canvas preview updates in real-time
+- Templates: Story Highlight, Call for Submissions, Logo
+- Background variants: White, Coral, Black
+- Logo sizes: Square (1080x1080), Horizontal (1920x1080), Story (1080x1920)
+
+### Review Board Applications
 - Public "Join Us" page with application form
 - Fields: name, email, university, program, year, why they want to join (200 word max)
-- Duplicate email prevention
-- Admin "Applications" tab (curejournal@gmail.com only)
-- Admin can filter by status (all/pending/approved/rejected)
-- Admin can approve/reject applications
+- Admin "Applications" tab with approve/reject
 
 ### Admin Dashboard
-- Overview tab with stats
-- Review Queue for story moderation
-- Featured stories management
-- Tags management
-- Applications tab (curejournal@gmail.com only)
-- Post Generator tab (curejournal@gmail.com only)
+- Overview, Review Queue, Featured, Tags, Applications, Post Generator
 
 ## Key Endpoints
 | Method | Endpoint | Description |
@@ -59,14 +58,14 @@
 | PUT | `/api/admin/applications/:id/status` | Approve/reject application (admin) |
 
 ## What's Implemented (as of Mar 2026)
-- [x] Full frontend with mock data (Home, Stories, Detail, Submit, About, Admin)
+- [x] Full frontend with mock data
 - [x] Direct Google OAuth sign-in
 - [x] JWT-based authentication
 - [x] Admin dashboard with auth gating
-- [x] Instagram Post & Logo Generator (admin only)
+- [x] Instagram Post Generator — Canvas API, 3x resolution output
 - [x] 3 stories with accurate tags, no likes/resonances
 - [x] Join Us page with review board application form
-- [x] Admin Applications tab with approve/reject functionality
+- [x] Admin Applications tab with approve/reject
 
 ## Backlog
 - P1: Connect frontend to live backend APIs for stories CRUD
