@@ -18,6 +18,7 @@
 | Stories | `/stories` | Done |
 | Story Detail | `/stories/:id` | Done |
 | Submit Story | `/submit` | Done (mock) |
+| Join Us | `/join` | Done |
 | About | `/about` | Done |
 | Sign In | `/signin` | Done |
 | Admin Dashboard | `/admin` | Done |
@@ -28,14 +29,24 @@
 - Google Client ID: `492483192809-ktal7sbtjgvqn6fp1cmp1ebkdjpkrg7g.apps.googleusercontent.com`
 - Admin email: `curejournal@gmail.com` → `user_type: admin`
 - All other users → `user_type: student`
-- Admin dashboard restricted to admin users only
-- Post Generator tab restricted to `curejournal@gmail.com` specifically
 
-## Current Data
-- **3 featured stories** with full body content (mock data)
-- **4 topic tags**: Mental Health (3), Chronic Illness (1), Caregiving (1), Addiction & Recovery (1)
-- Tag counts accurately reflect story content
-- Likes/resonances completely removed
+## Features
+
+### Review Board Applications (NEW)
+- Public "Join Us" page with application form
+- Fields: name, email, university, program, year, why they want to join (200 word max)
+- Duplicate email prevention
+- Admin "Applications" tab (curejournal@gmail.com only)
+- Admin can filter by status (all/pending/approved/rejected)
+- Admin can approve/reject applications
+
+### Admin Dashboard
+- Overview tab with stats
+- Review Queue for story moderation
+- Featured stories management
+- Tags management
+- Applications tab (curejournal@gmail.com only)
+- Post Generator tab (curejournal@gmail.com only)
 
 ## Key Endpoints
 | Method | Endpoint | Description |
@@ -43,24 +54,22 @@
 | GET | `/api/auth/google` | Initiates Google OAuth flow |
 | GET | `/api/auth/google/callback` | Handles Google callback, issues JWT |
 | GET | `/api/auth/me` | Get current user from JWT Bearer token |
-| POST | `/api/auth/logout` | Logout |
-| GET | `/health` | Health check |
+| POST | `/api/applications` | Submit review board application (public) |
+| GET | `/api/admin/applications` | List all applications (admin) |
+| PUT | `/api/admin/applications/:id/status` | Approve/reject application (admin) |
 
-## What's Implemented (as of Feb 2026)
+## What's Implemented (as of Mar 2026)
 - [x] Full frontend with mock data (Home, Stories, Detail, Submit, About, Admin)
-- [x] Direct Google OAuth sign-in (no middleman)
-- [x] JWT-based authentication with localStorage
-- [x] Admin dashboard with auth gating (admin only)
-- [x] Instagram Post & Logo Generator (admin only, curejournal@gmail.com)
+- [x] Direct Google OAuth sign-in
+- [x] JWT-based authentication
+- [x] Admin dashboard with auth gating
+- [x] Instagram Post & Logo Generator (admin only)
 - [x] 3 stories with accurate tags, no likes/resonances
-- [x] Responsive design with Framer Motion animations
+- [x] Join Us page with review board application form
+- [x] Admin Applications tab with approve/reject functionality
 
 ## Backlog
 - P1: Connect frontend to live backend APIs for stories CRUD
 - P2: Phase 2 features from vital_signs_brief.docx
 - P3: Backend refactoring (routes/models separation)
 - P4: Legacy .js file cleanup
-
-## Google Console Note
-The preview redirect URI must be added to Google Cloud Console:
-`https://vital-admin-stage.preview.emergentagent.com/api/auth/google/callback`
