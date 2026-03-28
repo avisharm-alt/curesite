@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Check, X, Edit3, Star, StarOff, Eye, BarChart3, FileText, Users, Tag, Sparkles } from 'lucide-react';
 import StatCard from '../components/StatCard.tsx';
 import TagPill from '../components/TagPill.tsx';
@@ -13,7 +13,6 @@ type TabType = 'overview' | 'review' | 'featured' | 'tags' | 'generator';
 type StatusFilter = 'all' | 'pending' | 'approved' | 'rejected';
 
 interface AuthUser {
-  user_id: string;
   email: string;
   name: string;
   user_type: string;
@@ -26,35 +25,30 @@ const AdminPage: React.FC = () => {
   const [tags, setTags] = useState(HEALTH_TAGS);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user was passed via route state (from AuthCallback)
-    if (location.state && (location.state as any).user) {
-      const u = (location.state as any).user;
-      if (u.user_type !== 'admin') {
-        navigate('/', { replace: true });
-        return;
-      }
-      setCurrentUser(u);
-      setLoading(false);
+    const token = localStorage.getItem('token');
+    const storedUser = localStorage.getItem('user');
+
+    if (!token || !storedUser) {
+      navigate('/signin', { replace: true });
       return;
     }
 
-    // Check session via /auth/me
-    fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => {
-        if (data.user_type !== 'admin') {
-          navigate('/', { replace: true });
-          return;
-        }
-        setCurrentUser(data);
-        setLoading(false);
-      })
-      .catch(() => { setLoading(false); navigate('/signin'); });
-  }, [location.state, navigate]);
+    try {
+      const userData = JSON.parse(storedUser) as AuthUser;
+      if (userData.user_type !== 'admin') {
+        navigate('/', { replace: true });
+        return;
+      }
+      setCurrentUser(userData);
+    } catch {
+      navigate('/signin', { replace: true });
+      return;
+    }
+    setLoading(false);
+  }, [navigate]);
 
   const isAdminEmail = currentUser?.email === 'curejournal@gmail.com';
 

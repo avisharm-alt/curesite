@@ -4,9 +4,8 @@ import { Link } from 'react-router-dom';
 
 const SignInPage: React.FC = () => {
   const handleGoogleSignIn = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
-    const redirectUrl = window.location.origin + '/';
-    window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+    // Direct Google OAuth — redirects to backend which initiates the OAuth flow
+    window.location.href = `${process.env.REACT_APP_BACKEND_URL}/api/auth/google`;
   };
 
   return (

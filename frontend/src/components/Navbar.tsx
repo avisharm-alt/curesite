@@ -6,7 +6,6 @@ import { Menu, X, LogOut } from 'lucide-react';
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
 interface AuthUser {
-  user_id: string;
   email: string;
   name: string;
   user_type: string;
@@ -20,29 +19,23 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Skip auth check if returning from OAuth callback
-    if (window.location.hash?.includes('session_id=')) return;
-
-    // Check if user was passed via route state (from AuthCallback)
-    if (location.state && (location.state as any).user) {
-      setUser((location.state as any).user);
-      return;
+    // Read user from localStorage (set by OAuthTokenHandler in App.tsx)
+    const storedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (storedUser && token) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch {
+        setUser(null);
+      }
+    } else {
+      setUser(null);
     }
+  }, [location]); // Re-check on every route change
 
-    // Check session via /auth/me
-    fetch(`${API_URL}/api/auth/me`, { credentials: 'include' })
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => setUser(data))
-      .catch(() => setUser(null));
-  }, [location.state]);
-
-  const handleSignOut = async () => {
-    try {
-      await fetch(`${API_URL}/api/auth/signout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
-    } catch {}
+  const handleSignOut = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setUser(null);
     navigate('/');
   };
