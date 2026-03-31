@@ -27,6 +27,7 @@ const AdminPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [applications, setApplications] = useState<any[]>([]);
   const [appFilter, setAppFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('pending');
+  const [selectedStory, setSelectedStory] = useState<AdminStory | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -249,7 +250,11 @@ const AdminPage: React.FC = () => {
                       {new Date(story.submittedAt).toLocaleDateString()}
                     </div>
                     <div className="col-actions">
-                      <button className="action-btn action-view" title="View">
+                      <button 
+                        className="action-btn action-view" 
+                        title="View Story"
+                        onClick={() => setSelectedStory(story)}
+                      >
                         <Eye size={16} />
                       </button>
                       {story.status === 'pending' && (
@@ -926,7 +931,254 @@ const AdminPage: React.FC = () => {
           color: var(--vs-text-tertiary);
           font-size: 0.9375rem;
         }
+
+        /* Story View Modal */
+        .story-modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.6);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          padding: 2rem;
+        }
+
+        .story-modal {
+          background: var(--vs-white);
+          border-radius: var(--vs-radius-xl);
+          width: 100%;
+          max-width: 720px;
+          max-height: 85vh;
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .story-modal-header {
+          padding: 1.5rem 1.5rem 1rem;
+          border-bottom: 1px solid var(--vs-border);
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 1rem;
+        }
+
+        .story-modal-header h2 {
+          font-size: 1.375rem;
+          font-weight: 600;
+          margin: 0 0 0.5rem 0;
+          line-height: 1.3;
+        }
+
+        .story-modal-meta {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+          align-items: center;
+          font-size: 0.875rem;
+          color: var(--vs-text-secondary);
+        }
+
+        .story-modal-close {
+          background: var(--vs-bg-subtle);
+          border: none;
+          border-radius: var(--vs-radius-md);
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          flex-shrink: 0;
+          transition: all 0.15s;
+        }
+
+        .story-modal-close:hover {
+          background: var(--vs-bg-hover);
+        }
+
+        .story-modal-body {
+          padding: 1.5rem;
+          overflow-y: auto;
+          flex: 1;
+        }
+
+        .story-modal-content {
+          font-size: 1rem;
+          line-height: 1.75;
+          color: var(--vs-text-primary);
+          white-space: pre-wrap;
+        }
+
+        .story-modal-content p {
+          margin-bottom: 1.25rem;
+        }
+
+        .story-modal-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-top: 1.5rem;
+          padding-top: 1.5rem;
+          border-top: 1px solid var(--vs-border);
+        }
+
+        .story-modal-footer {
+          padding: 1rem 1.5rem;
+          border-top: 1px solid var(--vs-border);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+          background: var(--vs-bg-subtle);
+        }
+
+        .story-modal-status {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          font-size: 0.875rem;
+        }
+
+        .story-modal-actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .story-modal-actions .btn {
+          padding: 0.5rem 1rem;
+          font-size: 0.875rem;
+          border-radius: var(--vs-radius-md);
+          font-weight: 500;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 0.375rem;
+          transition: all 0.15s;
+        }
+
+        .story-modal-actions .btn-approve {
+          background: #10b981;
+          color: white;
+          border: none;
+        }
+
+        .story-modal-actions .btn-approve:hover {
+          background: #059669;
+        }
+
+        .story-modal-actions .btn-reject {
+          background: white;
+          color: #ef4444;
+          border: 1px solid #fecaca;
+        }
+
+        .story-modal-actions .btn-reject:hover {
+          background: #fef2f2;
+        }
+
+        .content-warning-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.25rem;
+          padding: 0.25rem 0.5rem;
+          background: #fef3c7;
+          color: #92400e;
+          border-radius: var(--vs-radius-sm);
+          font-size: 0.75rem;
+          font-weight: 500;
+        }
       `}</style>
+
+      {/* Story View Modal */}
+      {selectedStory && (
+        <div className="story-modal-overlay" onClick={() => setSelectedStory(null)}>
+          <motion.div 
+            className="story-modal"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="story-modal-header">
+              <div>
+                <h2>{selectedStory.title}</h2>
+                <div className="story-modal-meta">
+                  <span>{selectedStory.isAnonymous ? 'Anonymous' : selectedStory.authorName}</span>
+                  <span>•</span>
+                  <span>{selectedStory.authorEmail}</span>
+                  {selectedStory.university && (
+                    <>
+                      <span>•</span>
+                      <span>{selectedStory.university}</span>
+                    </>
+                  )}
+                  {selectedStory.hasContentWarning && (
+                    <span className="content-warning-badge">⚠️ Content Warning</span>
+                  )}
+                </div>
+              </div>
+              <button className="story-modal-close" onClick={() => setSelectedStory(null)}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <div className="story-modal-body">
+              <div className="story-modal-content">
+                {selectedStory.body.split('\n\n').map((paragraph, i) => (
+                  <p key={i}>{paragraph}</p>
+                ))}
+              </div>
+              
+              {selectedStory.tags.length > 0 && (
+                <div className="story-modal-tags">
+                  {selectedStory.tags.map((tag) => (
+                    <TagPill key={tag} tag={tag} size="sm" />
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="story-modal-footer">
+              <div className="story-modal-status">
+                <span>Status:</span>
+                <span className={`status-badge status-${selectedStory.status}`}>
+                  {selectedStory.status}
+                </span>
+                <span>•</span>
+                <span>Submitted {new Date(selectedStory.submittedAt).toLocaleDateString()}</span>
+              </div>
+              
+              {selectedStory.status === 'pending' && (
+                <div className="story-modal-actions">
+                  <button 
+                    className="btn btn-approve"
+                    onClick={() => {
+                      handleApprove(selectedStory.id);
+                      setSelectedStory(null);
+                    }}
+                  >
+                    <Check size={16} /> Approve
+                  </button>
+                  <button 
+                    className="btn btn-reject"
+                    onClick={() => {
+                      handleReject(selectedStory.id);
+                      setSelectedStory(null);
+                    }}
+                  >
+                    <X size={16} /> Reject
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
