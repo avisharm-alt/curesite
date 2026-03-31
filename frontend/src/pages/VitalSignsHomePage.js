@@ -70,6 +70,10 @@ const VitalSignsHomePage = () => {
           <h1 className="vs-hero-title">
             Vital<span className="vs-accent">Signs</span>
           </h1>
+          <div className="vs-uoft-badge">
+            <span className="vs-uoft-logo">🏛️</span>
+            <span>UofT Affiliated</span>
+          </div>
           <p className="vs-hero-tagline">Real stories. Real health. Real people.</p>
           <p className="vs-hero-description">
             A community where people share their health experiences to build empathy, 

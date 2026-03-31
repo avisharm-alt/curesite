@@ -25,6 +25,10 @@ const HomePage: React.FC = () => {
               Real health.<br />
               Real people.
             </h1>
+            <div className="uoft-badge">
+              <span className="uoft-crest">🎓</span>
+              <span>UofT Affiliated</span>
+            </div>
             <p className="hero-subtitle">
               A platform for authentic health storytelling. Share your experience, 
               read others' stories, and connect with a community that understands.
@@ -141,6 +145,25 @@ const HomePage: React.FC = () => {
           letter-spacing: -0.03em;
           color: var(--vs-text-primary);
           margin-bottom: var(--vs-space-6);
+        }
+
+        .uoft-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          background: linear-gradient(135deg, #002A5C 0%, #1E3A5F 100%);
+          color: #FFFFFF;
+          padding: 0.5rem 1.25rem;
+          border-radius: 2rem;
+          font-size: 0.9375rem;
+          font-weight: 600;
+          margin-bottom: 1.25rem;
+          box-shadow: 0 2px 12px rgba(0, 42, 92, 0.3);
+          letter-spacing: 0.01em;
+        }
+
+        .uoft-crest {
+          font-size: 1.1rem;
         }
 
         .hero-subtitle {

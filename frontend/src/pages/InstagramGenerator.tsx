@@ -8,7 +8,9 @@ type BackgroundVariant = 'white' | 'coral' | 'black' | 'gradient' | 'teal';
 type LogoSize = 'square' | 'horizontal' | 'story';
 
 const SCALE = 3;
-const FONT = 'Inter, -apple-system, BlinkMacSystemFont, sans-serif';
+const FONT = 'Inter, system-ui, -apple-system, sans-serif';
+const CORAL = '#FF5A5F';
+const CORAL_LIGHT = '#FF8A8D';
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
@@ -41,565 +43,600 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function drawPill(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, opts: {
-  bg: string; color: string; fontSize: number; paddingX: number; paddingY: number; border?: string;
-}): number {
-  ctx.font = `600 ${opts.fontSize}px ${FONT}`;
-  const tw = ctx.measureText(text).width;
-  const pw = tw + opts.paddingX * 2;
-  const ph = opts.fontSize + opts.paddingY * 2;
-  const r = ph / 2;
-  roundRect(ctx, x, y, pw, ph, r);
-  ctx.fillStyle = opts.bg;
-  ctx.fill();
-  if (opts.border) { ctx.strokeStyle = opts.border; ctx.lineWidth = 2; ctx.stroke(); }
-  ctx.fillStyle = opts.color;
-  ctx.fillText(text, x + opts.paddingX, y + opts.paddingY + opts.fontSize * 0.78);
-  return pw;
-}
-
-function drawCenteredPills(ctx: CanvasRenderingContext2D, tags: string[], centerX: number, y: number, opts: {
-  bg: string; color: string; fontSize: number; paddingX: number; paddingY: number; gap: number; border?: string;
-}): number {
-  ctx.font = `600 ${opts.fontSize}px ${FONT}`;
-  const widths = tags.map((t) => ctx.measureText(t).width + opts.paddingX * 2);
-  const totalW = widths.reduce((a, b) => a + b, 0) + (tags.length - 1) * opts.gap;
-  let cx = centerX - totalW / 2;
-  const ph = opts.fontSize + opts.paddingY * 2;
-  for (let i = 0; i < tags.length; i++) {
-    drawPill(ctx, tags[i], cx, y, opts);
-    cx += widths[i] + opts.gap;
-  }
-  return ph;
-}
-
-function drawGradientBackground(ctx: CanvasRenderingContext2D, w: number, h: number, variant: BackgroundVariant) {
+function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, variant: BackgroundVariant) {
   if (variant === 'gradient') {
-    const gradient = ctx.createLinearGradient(0, 0, w, h);
-    gradient.addColorStop(0, '#FF6B6B');
-    gradient.addColorStop(1, '#FFA07A');
-    ctx.fillStyle = gradient;
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#FF5A5F');
+    grad.addColorStop(0.5, '#FF7A7E');
+    grad.addColorStop(1, '#FFA5A8');
+    ctx.fillStyle = grad;
   } else if (variant === 'teal') {
-    const gradient = ctx.createLinearGradient(0, 0, w, h);
-    gradient.addColorStop(0, '#20B2AA');
-    gradient.addColorStop(1, '#008B8B');
-    ctx.fillStyle = gradient;
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#0D9488');
+    grad.addColorStop(1, '#115E59');
+    ctx.fillStyle = grad;
   } else if (variant === 'coral') {
-    ctx.fillStyle = '#FF6B6B';
+    ctx.fillStyle = CORAL;
   } else if (variant === 'black') {
-    ctx.fillStyle = '#1a1a1a';
+    ctx.fillStyle = '#111111';
   } else {
     ctx.fillStyle = '#FFFFFF';
   }
   ctx.fillRect(0, 0, w, h);
 }
 
-function drawBranding(ctx: CanvasRenderingContext2D, cx: number, y: number, isLight: boolean) {
+function drawBranding(ctx: CanvasRenderingContext2D, cx: number, y: number, light: boolean, size: number = 28) {
+  ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = `700 26px ${FONT}`;
-  ctx.fillStyle = isLight ? '#1a1a1a' : '#FFFFFF';
+  ctx.font = `700 ${size}px ${FONT}`;
+  ctx.fillStyle = light ? '#1a1a1a' : '#FFFFFF';
   const text = 'Vital Signs';
   const tw = ctx.measureText(text).width;
-  ctx.fillText(text, cx - 4, y);
-  ctx.fillStyle = isLight ? '#FF6B6B' : '#FFFFFF';
-  ctx.fillText('.', cx + tw / 2 - 2, y);
-  ctx.textAlign = 'start';
+  ctx.fillText(text, cx, y);
+  ctx.fillStyle = light ? CORAL : '#FFFFFF';
+  ctx.fillText('.', cx + tw/2 + 2, y);
+  ctx.restore();
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+function drawPillCentered(ctx: CanvasRenderingContext2D, text: string, cx: number, y: number, opts: {
+  bg: string; color: string; fontSize: number; paddingX: number; paddingY: number; border?: string;
+}) {
+  ctx.font = `600 ${opts.fontSize}px ${FONT}`;
+  const tw = ctx.measureText(text).width;
+  const pw = tw + opts.paddingX * 2;
+  const ph = opts.fontSize + opts.paddingY * 2;
+  const x = cx - pw / 2;
+  
+  roundRect(ctx, x, y, pw, ph, ph / 2);
+  ctx.fillStyle = opts.bg;
+  ctx.fill();
+  if (opts.border) {
+    ctx.strokeStyle = opts.border;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  ctx.fillStyle = opts.color;
+  ctx.textAlign = 'center';
+  ctx.fillText(text, cx, y + opts.paddingY + opts.fontSize * 0.78);
+  return ph;
+}
+
+function drawTagsRow(ctx: CanvasRenderingContext2D, tags: string[], cx: number, y: number, opts: {
+  bg: string; color: string; fontSize: number; paddingX: number; paddingY: number; gap: number;
+}) {
+  if (tags.length === 0) return 0;
+  ctx.font = `600 ${opts.fontSize}px ${FONT}`;
+  const widths = tags.map(t => ctx.measureText(t).width + opts.paddingX * 2);
+  const totalW = widths.reduce((a, b) => a + b, 0) + (tags.length - 1) * opts.gap;
+  let x = cx - totalW / 2;
+  const ph = opts.fontSize + opts.paddingY * 2;
+  
+  tags.forEach((tag, i) => {
+    const pw = widths[i];
+    roundRect(ctx, x, y, pw, ph, ph / 2);
+    ctx.fillStyle = opts.bg;
+    ctx.fill();
+    ctx.fillStyle = opts.color;
+    ctx.textAlign = 'center';
+    ctx.fillText(tag, x + pw / 2, y + opts.paddingY + opts.fontSize * 0.78);
+    x += pw + opts.gap;
+  });
+  return ph;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // TEMPLATE RENDERERS
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 
 function renderStoryHighlight(ctx: CanvasRenderingContext2D, w: number, h: number, quote: string, author: string, isAnonymous: boolean, tags: string[]) {
-  // Warm cream background
-  ctx.fillStyle = '#FFF8F0';
+  // Warm background
+  const grad = ctx.createLinearGradient(0, 0, 0, h);
+  grad.addColorStop(0, '#FEF7F0');
+  grad.addColorStop(1, '#FFF5EE');
+  ctx.fillStyle = grad;
   ctx.fillRect(0, 0, w, h);
-
+  
   const cx = w / 2;
-
-  // Top accent bar
-  ctx.fillStyle = '#FF6B6B';
+  const margin = 80;
+  
+  // Decorative coral bar at top
   roundRect(ctx, cx - 50, 50, 100, 6, 3);
-  ctx.fill();
-
-  // Main card with shadow
-  const cardX = 60, cardY = 90, cardW = w - 120, cardH = h - 180;
-  
-  // Shadow
-  ctx.fillStyle = 'rgba(0,0,0,0.06)';
-  roundRect(ctx, cardX + 6, cardY + 6, cardW, cardH, 20);
+  ctx.fillStyle = CORAL;
   ctx.fill();
   
-  // Card
+  // Main card
+  const cardY = 100;
+  const cardH = h - 200;
+  
+  // Card shadow
+  ctx.shadowColor = 'rgba(0,0,0,0.08)';
+  ctx.shadowBlur = 40;
+  ctx.shadowOffsetY = 8;
+  roundRect(ctx, margin, cardY, w - margin * 2, cardH, 24);
   ctx.fillStyle = '#FFFFFF';
-  roundRect(ctx, cardX, cardY, cardW, cardH, 20);
   ctx.fill();
-
-  // Tags
+  ctx.shadowColor = 'transparent';
+  
+  // Tags inside card
+  let contentY = cardY + 50;
   if (tags.length > 0) {
-    drawCenteredPills(ctx, tags.slice(0, 3), cx, cardY + 45, {
-      bg: '#FFF0F0', color: '#FF6B6B', fontSize: 16, paddingX: 16, paddingY: 8, gap: 10
+    drawTagsRow(ctx, tags.slice(0, 3), cx, contentY, {
+      bg: '#FFF0F0', color: CORAL, fontSize: 18, paddingX: 20, paddingY: 10, gap: 12
     });
+    contentY += 55;
   }
-
-  // Large quote mark - more visible
-  ctx.font = `700 180px Georgia, serif`;
-  ctx.fillStyle = 'rgba(255,107,107,0.15)';
+  
+  // Large quote mark - MUCH more visible
+  ctx.font = `700 220px Georgia, serif`;
+  ctx.fillStyle = 'rgba(255, 90, 95, 0.25)';
   ctx.textAlign = 'center';
-  ctx.fillText('"', cx, cardY + 200);
-
+  ctx.fillText('"', cx, contentY + 130);
+  
   // Quote text
+  const maxQuoteW = w - margin * 2 - 100;
   const qLen = quote.length;
-  const fontSize = qLen > 120 ? 28 : qLen > 80 ? 34 : 40;
+  const fontSize = qLen > 120 ? 32 : qLen > 80 ? 38 : 44;
   ctx.font = `500 ${fontSize}px ${FONT}`;
   ctx.fillStyle = '#1a1a1a';
-  const lines = wrapText(ctx, quote, cardW - 80);
+  const lines = wrapText(ctx, quote, maxQuoteW);
   const lineH = fontSize * 1.55;
   const blockH = lines.length * lineH;
-  const startY = cardY + (cardH - blockH) / 2 + 30;
-
+  
+  // Center quote vertically in remaining space
+  const quoteStartY = cardY + (cardH - blockH) / 2 + (tags.length > 0 ? 25 : 0);
+  
   lines.forEach((line, i) => {
-    ctx.fillText(line, cx, startY + i * lineH);
+    ctx.fillText(line, cx, quoteStartY + i * lineH);
   });
-
-  // Author line
-  ctx.fillStyle = '#FF6B6B';
-  roundRect(ctx, cx - 30, startY + blockH + 25, 60, 3, 1.5);
+  
+  // Author attribution
+  const authorY = quoteStartY + blockH + 40;
+  
+  // Coral line above author
+  roundRect(ctx, cx - 30, authorY - 15, 60, 3, 1.5);
+  ctx.fillStyle = CORAL;
   ctx.fill();
-
-  ctx.font = `500 20px ${FONT}`;
+  
+  ctx.font = `500 22px ${FONT}`;
   ctx.fillStyle = '#666666';
-  ctx.fillText(isAnonymous ? 'Anonymous' : author, cx, startY + blockH + 60);
-
-  // Branding
-  drawBranding(ctx, cx, h - 55, true);
+  ctx.fillText(isAnonymous ? 'Anonymous' : author, cx, authorY + 15);
+  
+  // Bottom branding
+  drawBranding(ctx, cx, h - 60, true, 26);
+  
   ctx.textAlign = 'start';
 }
 
 function renderCallForSubmissions(ctx: CanvasRenderingContext2D, w: number, h: number, headline: string, subheadline: string, tags: string[], bg: BackgroundVariant) {
   const isLight = bg === 'white';
-  drawGradientBackground(ctx, w, h, bg);
-
+  drawBackground(ctx, w, h, bg);
+  
   const cx = w / 2;
   const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? '#666666' : 'rgba(255,255,255,0.85)';
-
-  // Badge
-  ctx.textAlign = 'center';
-  drawPill(ctx, '✦ NOW OPEN ✦', cx - 75, 70, {
-    bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.2)',
-    color: isLight ? '#FF6B6B' : '#FFFFFF',
-    fontSize: 16, paddingX: 22, paddingY: 12
+  const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.9)';
+  const accent = isLight ? CORAL : '#FFFFFF';
+  
+  // Top badge
+  drawPillCentered(ctx, '✦ NOW ACCEPTING STORIES', cx, 80, {
+    bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.15)',
+    color: accent, fontSize: 16, paddingX: 24, paddingY: 14
   });
-
-  // Headline
-  const hlSize = headline.length > 20 ? 52 : 64;
+  
+  // Main headline
+  const hlSize = headline.length > 18 ? 58 : 68;
   ctx.font = `800 ${hlSize}px ${FONT}`;
   ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
   const hlLines = wrapText(ctx, headline.toUpperCase(), w - 120);
-  let y = 200;
-  hlLines.forEach(line => { ctx.fillText(line, cx, y); y += hlSize * 1.1; });
-
+  let y = 220;
+  hlLines.forEach(line => { ctx.fillText(line, cx, y); y += hlSize * 1.12; });
+  
   // Subheadline
-  ctx.font = `400 24px ${FONT}`;
+  ctx.font = `400 26px ${FONT}`;
   ctx.fillStyle = subColor;
-  ctx.fillText(subheadline, cx, y + 20);
-
+  ctx.fillText(subheadline, cx, y + 25);
+  
   // Tags
   if (tags.length > 0) {
-    drawCenteredPills(ctx, tags.slice(0, 4), cx, y + 70, {
-      bg: 'transparent', color: textColor, fontSize: 15, paddingX: 18, paddingY: 10, gap: 10,
-      border: isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.4)'
+    drawTagsRow(ctx, tags.slice(0, 4), cx, y + 80, {
+      bg: 'transparent', color: textColor, fontSize: 16, paddingX: 20, paddingY: 12, gap: 12
+    });
+    // Draw borders for tags
+    ctx.font = `600 16px ${FONT}`;
+    const widths = tags.slice(0, 4).map(t => ctx.measureText(t).width + 40);
+    const totalW = widths.reduce((a, b) => a + b, 0) + (Math.min(tags.length, 4) - 1) * 12;
+    let tx = cx - totalW / 2;
+    tags.slice(0, 4).forEach((_, i) => {
+      roundRect(ctx, tx, y + 80, widths[i], 40, 20);
+      ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.3)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      tx += widths[i] + 12;
     });
   }
-
+  
   // CTA Button
-  const btnY = h - 160;
-  const btnW = 260, btnH = 54;
+  const btnY = h - 170;
+  const btnW = 280, btnH = 56;
   roundRect(ctx, cx - btnW/2, btnY, btnW, btnH, btnH/2);
   ctx.fillStyle = isLight ? '#1a1a1a' : '#FFFFFF';
   ctx.fill();
   ctx.font = `700 18px ${FONT}`;
   ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-  ctx.fillText('Submit Your Story →', cx, btnY + 35);
-
+  ctx.fillText('Submit Your Story →', cx, btnY + 36);
+  
   // Branding
-  drawBranding(ctx, cx, h - 55, isLight);
+  drawBranding(ctx, cx, h - 55, isLight, 24);
   ctx.textAlign = 'start';
 }
 
 function renderCallForReviewers(ctx: CanvasRenderingContext2D, w: number, h: number, headline: string, description: string, benefits: string[], bg: BackgroundVariant) {
   const isLight = bg === 'white';
-  drawGradientBackground(ctx, w, h, bg);
-
+  drawBackground(ctx, w, h, bg);
+  
   const cx = w / 2;
   const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
   const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? '#FF6B6B' : '#FFFFFF';
-
-  // Badge
-  ctx.textAlign = 'center';
-  drawPill(ctx, '📋 JOIN OUR TEAM', cx - 85, 60, {
-    bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.2)',
-    color: accent, fontSize: 16, paddingX: 22, paddingY: 12
+  const accent = isLight ? CORAL : '#FFFFFF';
+  
+  // Top badge
+  drawPillCentered(ctx, '📋 JOIN OUR REVIEW BOARD', cx, 70, {
+    bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.15)',
+    color: accent, fontSize: 16, paddingX: 24, paddingY: 14
   });
-
+  
   // Headline
-  const hlSize = headline.length > 25 ? 48 : 56;
+  const hlSize = headline.length > 22 ? 50 : 58;
   ctx.font = `800 ${hlSize}px ${FONT}`;
   ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
   const hlLines = wrapText(ctx, headline.toUpperCase(), w - 100);
-  let y = 180;
+  let y = 190;
   hlLines.forEach(line => { ctx.fillText(line, cx, y); y += hlSize * 1.1; });
-
+  
   // Description
-  ctx.font = `400 22px ${FONT}`;
+  ctx.font = `400 24px ${FONT}`;
   ctx.fillStyle = subColor;
   const descLines = wrapText(ctx, description, w - 140);
-  descLines.forEach(line => { ctx.fillText(line, cx, y + 25); y += 30; });
-
-  // Benefits with checkmarks - CENTERED
-  y += 50;
-  ctx.font = `500 20px ${FONT}`;
+  descLines.forEach(line => { ctx.fillText(line, cx, y + 20); y += 32; });
   
+  // Benefits with checkmarks - properly centered
+  y += 45;
   benefits.slice(0, 4).forEach((benefit, i) => {
-    const itemY = y + i * 48;
+    const itemY = y + i * 52;
     
-    // Calculate text width to center everything
+    ctx.font = `500 20px ${FONT}`;
     const textW = ctx.measureText(benefit).width;
-    const totalW = 32 + textW; // circle + gap + text
+    const totalW = 36 + textW;
     const startX = cx - totalW / 2;
     
     // Checkmark circle
     ctx.beginPath();
-    ctx.arc(startX + 14, itemY, 14, 0, Math.PI * 2);
+    ctx.arc(startX + 14, itemY, 16, 0, Math.PI * 2);
     ctx.fillStyle = accent;
     ctx.fill();
     
     // Checkmark
     ctx.font = `700 14px ${FONT}`;
     ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-    ctx.textAlign = 'center';
     ctx.fillText('✓', startX + 14, itemY + 5);
     
-    // Benefit text
+    // Text
     ctx.font = `500 20px ${FONT}`;
     ctx.fillStyle = textColor;
     ctx.textAlign = 'left';
-    ctx.fillText(benefit, startX + 38, itemY + 6);
+    ctx.fillText(benefit, startX + 42, itemY + 7);
+    ctx.textAlign = 'center';
   });
-
-  ctx.textAlign = 'center';
-
+  
   // CTA Button
-  const btnY = h - 150;
-  const btnW = 220, btnH = 52;
+  const btnY = h - 155;
+  const btnW = 240, btnH = 54;
   roundRect(ctx, cx - btnW/2, btnY, btnW, btnH, btnH/2);
   ctx.fillStyle = accent;
   ctx.fill();
-  ctx.font = `700 17px ${FONT}`;
+  ctx.font = `700 18px ${FONT}`;
   ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-  ctx.fillText('Apply Now →', cx, btnY + 33);
-
+  ctx.fillText('Apply Now →', cx, btnY + 35);
+  
   // Branding
-  drawBranding(ctx, cx, h - 50, isLight);
+  drawBranding(ctx, cx, h - 50, isLight, 24);
   ctx.textAlign = 'start';
 }
 
 function renderStatCard(ctx: CanvasRenderingContext2D, w: number, h: number, statNumber: string, statLabel: string, description: string, bg: BackgroundVariant) {
   const isLight = bg === 'white';
-  drawGradientBackground(ctx, w, h, bg);
-
+  drawBackground(ctx, w, h, bg);
+  
   const cx = w / 2;
   const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
   const subColor = isLight ? '#666666' : 'rgba(255,255,255,0.8)';
-
-  // Decorative circles
+  const accent = isLight ? CORAL : '#FFFFFF';
+  
+  // Decorative circles for dark backgrounds
   if (!isLight) {
     ctx.globalAlpha = 0.08;
-    ctx.beginPath(); ctx.arc(w * 0.15, h * 0.25, 180, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(w * 0.15, h * 0.3, 200, 0, Math.PI * 2);
     ctx.fillStyle = '#FFFFFF'; ctx.fill();
-    ctx.beginPath(); ctx.arc(w * 0.85, h * 0.75, 140, 0, Math.PI * 2);
+    ctx.beginPath(); ctx.arc(w * 0.85, h * 0.75, 150, 0, Math.PI * 2);
     ctx.fill();
     ctx.globalAlpha = 1;
   }
-
-  // Big number
+  
   ctx.textAlign = 'center';
-  ctx.font = `900 180px ${FONT}`;
+  
+  // Big number
+  ctx.font = `900 200px ${FONT}`;
   ctx.fillStyle = textColor;
-  ctx.fillText(statNumber, cx, h / 2 - 20);
-
+  ctx.fillText(statNumber, cx, h/2 - 20);
+  
   // Label
-  ctx.font = `700 30px ${FONT}`;
-  ctx.fillText(statLabel.toUpperCase(), cx, h / 2 + 50);
-
+  ctx.font = `700 32px ${FONT}`;
+  ctx.fillText(statLabel.toUpperCase(), cx, h/2 + 55);
+  
   // Accent line
-  ctx.fillStyle = isLight ? '#FF6B6B' : 'rgba(255,255,255,0.5)';
-  roundRect(ctx, cx - 40, h / 2 + 75, 80, 4, 2);
+  roundRect(ctx, cx - 40, h/2 + 80, 80, 4, 2);
+  ctx.fillStyle = accent;
   ctx.fill();
-
+  
   // Description
-  ctx.font = `400 21px ${FONT}`;
+  ctx.font = `400 22px ${FONT}`;
   ctx.fillStyle = subColor;
-  const lines = wrapText(ctx, description, w - 160);
+  const lines = wrapText(ctx, description, w - 180);
   lines.slice(0, 2).forEach((line, i) => {
-    ctx.fillText(line, cx, h / 2 + 125 + i * 30);
+    ctx.fillText(line, cx, h/2 + 130 + i * 32);
   });
-
-  // Branding
-  drawBranding(ctx, cx, h - 55, isLight);
+  
+  drawBranding(ctx, cx, h - 55, isLight, 26);
   ctx.textAlign = 'start';
 }
 
 function renderEventPromo(ctx: CanvasRenderingContext2D, w: number, h: number, eventTitle: string, eventDate: string, eventDescription: string, bg: BackgroundVariant) {
   const isLight = bg === 'white';
-  drawGradientBackground(ctx, w, h, bg);
-
+  drawBackground(ctx, w, h, bg);
+  
   const cx = w / 2;
   const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
   const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? '#FF6B6B' : '#FFFFFF';
-
-  // Calendar icon circle
+  const accent = isLight ? CORAL : '#FFFFFF';
+  
   ctx.textAlign = 'center';
+  
+  // Calendar icon in circle
   ctx.beginPath();
-  ctx.arc(cx, 120, 50, 0, Math.PI * 2);
-  ctx.fillStyle = isLight ? '#FFF0F0' : 'rgba(255,255,255,0.15)';
+  ctx.arc(cx, 125, 55, 0, Math.PI * 2);
+  ctx.fillStyle = isLight ? '#FFF0F0' : 'rgba(255,255,255,0.12)';
   ctx.fill();
-  ctx.font = `400 42px ${FONT}`;
-  ctx.fillText('📅', cx, 135);
-
+  ctx.font = `400 48px ${FONT}`;
+  ctx.fillText('📅', cx, 140);
+  
   // Label
   ctx.font = `700 14px ${FONT}`;
   ctx.fillStyle = accent;
-  ctx.fillText('UPCOMING EVENT', cx, 200);
-
+  ctx.fillText('UPCOMING EVENT', cx, 210);
+  
   // Title
-  const titleSize = eventTitle.length > 20 ? 48 : 56;
+  const titleSize = eventTitle.length > 18 ? 52 : 60;
   ctx.font = `800 ${titleSize}px ${FONT}`;
   ctx.fillStyle = textColor;
   const titleLines = wrapText(ctx, eventTitle, w - 120);
-  let y = 280;
+  let y = 295;
   titleLines.forEach(line => { ctx.fillText(line, cx, y); y += titleSize * 1.15; });
-
+  
   // Date pill
-  ctx.font = `700 20px ${FONT}`;
-  const dateW = ctx.measureText(eventDate).width + 50;
-  roundRect(ctx, cx - dateW/2, y + 10, dateW, 48, 24);
+  ctx.font = `700 22px ${FONT}`;
+  const dateW = ctx.measureText(eventDate).width + 60;
+  roundRect(ctx, cx - dateW/2, y + 15, dateW, 52, 26);
   ctx.fillStyle = accent;
   ctx.fill();
   ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-  ctx.fillText(eventDate, cx, y + 42);
-
+  ctx.fillText(eventDate, cx, y + 48);
+  
   // Description
-  ctx.font = `400 21px ${FONT}`;
+  ctx.font = `400 22px ${FONT}`;
   ctx.fillStyle = subColor;
   const descLines = wrapText(ctx, eventDescription, w - 140);
   descLines.slice(0, 2).forEach((line, i) => {
-    ctx.fillText(line, cx, y + 100 + i * 30);
+    ctx.fillText(line, cx, y + 110 + i * 32);
   });
-
-  // Branding
-  drawBranding(ctx, cx, h - 55, isLight);
+  
+  drawBranding(ctx, cx, h - 55, isLight, 26);
   ctx.textAlign = 'start';
 }
 
 function renderCommunitySpotlight(ctx: CanvasRenderingContext2D, w: number, h: number, memberName: string, memberStory: string, memberTags: string[], bg: BackgroundVariant) {
   const isLight = bg === 'white';
-  drawGradientBackground(ctx, w, h, bg);
-
+  drawBackground(ctx, w, h, bg);
+  
   const cx = w / 2;
   const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
   const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? '#FF6B6B' : '#FFFFFF';
-
-  // Header
+  const accent = isLight ? CORAL : '#FFFFFF';
+  
   ctx.textAlign = 'center';
-  ctx.font = `700 14px ${FONT}`;
+  
+  // Header
+  ctx.font = `700 15px ${FONT}`;
   ctx.fillStyle = accent;
-  ctx.fillText('★  COMMUNITY SPOTLIGHT  ★', cx, 80);
-
-  // Avatar with border
-  const avatarY = 175;
+  ctx.fillText('★  COMMUNITY SPOTLIGHT  ★', cx, 85);
+  
+  // Avatar
+  const avatarY = 185;
   ctx.beginPath();
-  ctx.arc(cx, avatarY, 68, 0, Math.PI * 2);
+  ctx.arc(cx, avatarY, 72, 0, Math.PI * 2);
   ctx.fillStyle = accent;
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(cx, avatarY, 62, 0, Math.PI * 2);
-  ctx.fillStyle = isLight ? '#FFF8F0' : 'rgba(255,255,255,0.15)';
+  ctx.arc(cx, avatarY, 66, 0, Math.PI * 2);
+  ctx.fillStyle = isLight ? '#FEF7F0' : 'rgba(255,255,255,0.1)';
   ctx.fill();
-
-  // Initials
+  
   const initials = memberName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-  ctx.font = `700 42px ${FONT}`;
+  ctx.font = `700 46px ${FONT}`;
   ctx.fillStyle = accent;
-  ctx.fillText(initials, cx, avatarY + 15);
-
+  ctx.fillText(initials, cx, avatarY + 17);
+  
   // Name
-  ctx.font = `700 38px ${FONT}`;
+  ctx.font = `700 42px ${FONT}`;
   ctx.fillStyle = textColor;
-  ctx.fillText(memberName, cx, avatarY + 95);
-
+  ctx.fillText(memberName, cx, avatarY + 105);
+  
   // Tags
   if (memberTags.length > 0) {
-    drawCenteredPills(ctx, memberTags.slice(0, 3), cx, avatarY + 125, {
-      bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.15)',
-      color: accent, fontSize: 14, paddingX: 14, paddingY: 7, gap: 8
+    drawTagsRow(ctx, memberTags.slice(0, 3), cx, avatarY + 135, {
+      bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.12)',
+      color: accent, fontSize: 15, paddingX: 16, paddingY: 9, gap: 10
     });
   }
-
-  // Quote marks
-  ctx.font = `700 100px Georgia, serif`;
-  ctx.fillStyle = isLight ? 'rgba(255,107,107,0.2)' : 'rgba(255,255,255,0.15)';
-  ctx.fillText('"', cx - 250, avatarY + 250);
-
+  
+  // Quote mark
+  ctx.font = `700 120px Georgia, serif`;
+  ctx.fillStyle = isLight ? 'rgba(255,90,95,0.2)' : 'rgba(255,255,255,0.12)';
+  ctx.fillText('"', cx - 260, avatarY + 280);
+  
   // Story
-  ctx.font = `500 24px ${FONT}`;
+  ctx.font = `500 26px ${FONT}`;
   ctx.fillStyle = subColor;
   const storyLines = wrapText(ctx, memberStory, w - 140);
   storyLines.slice(0, 3).forEach((line, i) => {
-    ctx.fillText(line, cx, avatarY + 230 + i * 36);
+    ctx.fillText(line, cx, avatarY + 250 + i * 38);
   });
-
-  // Branding
-  drawBranding(ctx, cx, h - 55, isLight);
+  
+  drawBranding(ctx, cx, h - 55, isLight, 26);
   ctx.textAlign = 'start';
 }
 
 function renderQuoteCarousel(ctx: CanvasRenderingContext2D, w: number, h: number, quote: string, slideNumber: string, totalSlides: string, bg: BackgroundVariant) {
   const isLight = bg === 'white';
-  drawGradientBackground(ctx, w, h, bg);
-
+  drawBackground(ctx, w, h, bg);
+  
   const cx = w / 2;
   const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
   const subColor = isLight ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.5)';
-  const accent = isLight ? '#FF6B6B' : '#FFFFFF';
-
-  // Slide indicator
+  const accent = isLight ? CORAL : '#FFFFFF';
+  
   ctx.textAlign = 'center';
-  ctx.font = `500 16px ${FONT}`;
+  
+  // Slide indicator
+  ctx.font = `500 17px ${FONT}`;
   ctx.fillStyle = subColor;
-  ctx.fillText(`${slideNumber} of ${totalSlides}`, cx, 70);
-
+  ctx.fillText(`${slideNumber} of ${totalSlides}`, cx, 75);
+  
   // Large quote marks
-  ctx.font = `700 300px Georgia, serif`;
-  ctx.fillStyle = isLight ? 'rgba(255,107,107,0.1)' : 'rgba(255,255,255,0.1)';
-  ctx.fillText('"', cx, 350);
-
+  ctx.font = `700 320px Georgia, serif`;
+  ctx.fillStyle = isLight ? 'rgba(255,90,95,0.12)' : 'rgba(255,255,255,0.1)';
+  ctx.fillText('"', cx, 380);
+  
   // Quote
   const qLen = quote.length;
-  const fontSize = qLen > 100 ? 32 : qLen > 60 ? 40 : 48;
+  const fontSize = qLen > 100 ? 36 : qLen > 60 ? 44 : 52;
   ctx.font = `600 ${fontSize}px ${FONT}`;
   ctx.fillStyle = textColor;
-  const lines = wrapText(ctx, quote, w - 120);
+  const lines = wrapText(ctx, quote, w - 130);
   const lineH = fontSize * 1.5;
   const blockH = lines.length * lineH;
   const startY = (h - blockH) / 2 + 30;
   lines.forEach((line, i) => {
     ctx.fillText(line, cx, startY + i * lineH);
   });
-
-  // Carousel dots
-  const dotsY = h - 120;
+  
+  // Dots
+  const dotsY = h - 130;
   const total = parseInt(totalSlides) || 5;
   const current = parseInt(slideNumber) || 1;
-  const spacing = 28;
+  const spacing = 30;
   let dotX = cx - ((total - 1) * spacing) / 2;
   for (let i = 1; i <= total; i++) {
     ctx.beginPath();
-    ctx.arc(dotX, dotsY, i === current ? 7 : 5, 0, Math.PI * 2);
+    ctx.arc(dotX, dotsY, i === current ? 8 : 5, 0, Math.PI * 2);
     ctx.fillStyle = i === current ? accent : subColor;
     ctx.fill();
     dotX += spacing;
   }
-
-  // Branding
-  drawBranding(ctx, cx, h - 55, isLight);
+  
+  drawBranding(ctx, cx, h - 55, isLight, 24);
   ctx.textAlign = 'start';
 }
 
 function renderTipOfDay(ctx: CanvasRenderingContext2D, w: number, h: number, tipTitle: string, tipContent: string, tipNumber: string, bg: BackgroundVariant) {
   const isLight = bg === 'white';
-  drawGradientBackground(ctx, w, h, bg);
-
+  drawBackground(ctx, w, h, bg);
+  
   const cx = w / 2;
   const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
   const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? '#FF6B6B' : '#FFFFFF';
-
-  // Icon circle
+  const accent = isLight ? CORAL : '#FFFFFF';
+  
   ctx.textAlign = 'center';
+  
+  // Icon
   ctx.beginPath();
-  ctx.arc(cx, 110, 45, 0, Math.PI * 2);
-  ctx.fillStyle = isLight ? '#FFF0F0' : 'rgba(255,255,255,0.15)';
+  ctx.arc(cx, 115, 50, 0, Math.PI * 2);
+  ctx.fillStyle = isLight ? '#FFF0F0' : 'rgba(255,255,255,0.12)';
   ctx.fill();
-  ctx.font = `400 38px ${FONT}`;
-  ctx.fillText('💡', cx, 125);
-
-  // Tip number badge
-  ctx.font = `700 14px ${FONT}`;
+  ctx.font = `400 44px ${FONT}`;
+  ctx.fillText('💡', cx, 132);
+  
+  // Badge
+  ctx.font = `700 15px ${FONT}`;
   ctx.fillStyle = accent;
-  ctx.fillText(`TIP #${tipNumber}`, cx, 190);
-
+  ctx.fillText(`TIP #${tipNumber}`, cx, 200);
+  
   // Title
-  const titleSize = tipTitle.length > 20 ? 44 : 52;
+  const titleSize = tipTitle.length > 18 ? 48 : 56;
   ctx.font = `800 ${titleSize}px ${FONT}`;
   ctx.fillStyle = textColor;
   const titleLines = wrapText(ctx, tipTitle, w - 120);
-  let y = 280;
+  let y = 290;
   titleLines.forEach(line => { ctx.fillText(line, cx, y); y += titleSize * 1.15; });
-
+  
   // Accent line
+  roundRect(ctx, cx - 40, y + 15, 80, 4, 2);
   ctx.fillStyle = accent;
-  roundRect(ctx, cx - 40, y + 10, 80, 4, 2);
   ctx.fill();
-
+  
   // Content
-  ctx.font = `400 23px ${FONT}`;
+  ctx.font = `400 24px ${FONT}`;
   ctx.fillStyle = subColor;
-  const contentLines = wrapText(ctx, tipContent, w - 140);
+  const contentLines = wrapText(ctx, tipContent, w - 150);
   contentLines.slice(0, 4).forEach((line, i) => {
-    ctx.fillText(line, cx, y + 60 + i * 34);
+    ctx.fillText(line, cx, y + 70 + i * 36);
   });
-
-  // Branding
-  drawBranding(ctx, cx, h - 55, isLight);
+  
+  drawBranding(ctx, cx, h - 55, isLight, 26);
   ctx.textAlign = 'start';
 }
 
-function renderLogo(ctx: CanvasRenderingContext2D, w: number, h: number, logoVariant: BackgroundVariant) {
-  const isWhite = logoVariant === 'white';
-  const isCoral = logoVariant === 'coral';
-
-  ctx.fillStyle = isWhite ? '#FFFFFF' : isCoral ? '#FF6B6B' : '#1a1a1a';
+function renderLogo(ctx: CanvasRenderingContext2D, w: number, h: number, variant: BackgroundVariant) {
+  const isWhite = variant === 'white';
+  const isCoral = variant === 'coral';
+  
+  ctx.fillStyle = isWhite ? '#FFFFFF' : isCoral ? CORAL : '#111111';
   ctx.fillRect(0, 0, w, h);
-
+  
   const cx = w / 2, cy = h / 2;
   const textColor = isWhite ? '#1a1a1a' : '#FFFFFF';
-  const dotColor = isCoral ? '#FFFFFF' : '#FF6B6B';
-  const subColor = isWhite ? 'rgba(0,0,0,0.45)' : 'rgba(255,255,255,0.6)';
-
-  const mainSize = Math.min(w, h) > 1200 ? 88 : Math.min(w, h) > 600 ? 68 : 60;
+  const dotColor = isCoral ? '#FFFFFF' : CORAL;
+  
+  const mainSize = Math.min(w, h) > 1200 ? 92 : Math.min(w, h) > 600 ? 72 : 64;
   ctx.font = `700 ${mainSize}px ${FONT}`;
   ctx.textAlign = 'center';
   ctx.fillStyle = textColor;
   const text = 'Vital Signs';
   const tw = ctx.measureText(text).width;
-  ctx.fillText(text, cx - 4, cy);
+  ctx.fillText(text, cx, cy);
   ctx.fillStyle = dotColor;
-  ctx.fillText('.', cx + tw / 2 - 2, cy);
-
-  ctx.font = `400 ${mainSize * 0.24}px ${FONT}`;
-  ctx.fillStyle = subColor;
+  ctx.fillText('.', cx + tw/2 + 3, cy);
+  
+  ctx.font = `400 ${mainSize * 0.26}px ${FONT}`;
+  ctx.fillStyle = isWhite ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.65)';
   ctx.fillText('Real stories. Real health. Real people.', cx, cy + mainSize * 0.55);
   ctx.textAlign = 'start';
 }
 
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 // COMPONENT
-// ═══════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
 
 const InstagramGenerator: React.FC = () => {
   const [template, setTemplate] = useState<TemplateType>('story-highlight');
@@ -640,15 +677,7 @@ const InstagramGenerator: React.FC = () => {
   const previewRef = useRef<HTMLCanvasElement>(null);
   const logoSizes = { square: { width: 1080, height: 1080 }, horizontal: { width: 1920, height: 1080 }, story: { width: 1080, height: 1920 } };
 
-  const drawPreview = useCallback(() => {
-    const canvas = previewRef.current;
-    if (!canvas) return;
-    let w: number, h: number;
-    if (template === 'logo') { const s = logoSizes[logoSize]; w = s.width; h = s.height; }
-    else { w = 1080; h = 1080; }
-    canvas.width = w; canvas.height = h;
-    const ctx = canvas.getContext('2d')!;
-
+  const renderToCanvas = useCallback((ctx: CanvasRenderingContext2D, w: number, h: number) => {
     switch (template) {
       case 'story-highlight': renderStoryHighlight(ctx, w, h, quote, author, isAnonymous, selectedTags); break;
       case 'call-for-submissions': renderCallForSubmissions(ctx, w, h, headline, subheadline, selectedTags, bgVariant); break;
@@ -660,9 +689,20 @@ const InstagramGenerator: React.FC = () => {
       case 'tip-of-day': renderTipOfDay(ctx, w, h, tipTitle, tipContent, tipNumber, bgVariant); break;
       case 'logo': renderLogo(ctx, w, h, logoVariant); break;
     }
-  }, [template, quote, author, isAnonymous, selectedTags, bgVariant, headline, subheadline, logoSize, logoVariant,
+  }, [template, quote, author, isAnonymous, selectedTags, bgVariant, headline, subheadline, logoVariant,
       statNumber, statLabel, statDescription, eventTitle, eventDate, eventDescription, memberName, memberStory,
-      slideNumber, totalSlides, carouselQuote, tipTitle, tipContent, tipNumber, reviewerHeadline, reviewerDescription, reviewerBenefits]); // eslint-disable-line
+      slideNumber, totalSlides, carouselQuote, tipTitle, tipContent, tipNumber, reviewerHeadline, reviewerDescription, reviewerBenefits]);
+
+  const drawPreview = useCallback(() => {
+    const canvas = previewRef.current;
+    if (!canvas) return;
+    let w: number, h: number;
+    if (template === 'logo') { const s = logoSizes[logoSize]; w = s.width; h = s.height; }
+    else { w = 1080; h = 1080; }
+    canvas.width = w; canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+    renderToCanvas(ctx, w, h);
+  }, [template, logoSize, renderToCanvas]); // eslint-disable-line
 
   React.useEffect(() => { drawPreview(); }, [drawPreview]);
 
@@ -676,19 +716,7 @@ const InstagramGenerator: React.FC = () => {
       offscreen.width = w * SCALE; offscreen.height = h * SCALE;
       const ctx = offscreen.getContext('2d')!;
       ctx.scale(SCALE, SCALE);
-
-      switch (template) {
-        case 'story-highlight': renderStoryHighlight(ctx, w, h, quote, author, isAnonymous, selectedTags); break;
-        case 'call-for-submissions': renderCallForSubmissions(ctx, w, h, headline, subheadline, selectedTags, bgVariant); break;
-        case 'call-for-reviewers': renderCallForReviewers(ctx, w, h, reviewerHeadline, reviewerDescription, reviewerBenefits, bgVariant); break;
-        case 'stat-card': renderStatCard(ctx, w, h, statNumber, statLabel, statDescription, bgVariant); break;
-        case 'event-promo': renderEventPromo(ctx, w, h, eventTitle, eventDate, eventDescription, bgVariant); break;
-        case 'community-spotlight': renderCommunitySpotlight(ctx, w, h, memberName, memberStory, selectedTags, bgVariant); break;
-        case 'quote-carousel': renderQuoteCarousel(ctx, w, h, carouselQuote, slideNumber, totalSlides, bgVariant); break;
-        case 'tip-of-day': renderTipOfDay(ctx, w, h, tipTitle, tipContent, tipNumber, bgVariant); break;
-        case 'logo': renderLogo(ctx, w, h, logoVariant); break;
-      }
-
+      renderToCanvas(ctx, w, h);
       const link = document.createElement('a');
       link.download = `vital-signs-${template}-${Date.now()}.png`;
       link.href = offscreen.toDataURL('image/png');
@@ -727,197 +755,135 @@ const InstagramGenerator: React.FC = () => {
   return (
     <div className="ig-generator">
       <div className="ig-header">
-        <div className="container">
-          <h1>Instagram Post Generator</h1>
-          <p>Create on-brand posts for Vital Signs — exports at 3x resolution</p>
-        </div>
+        <h1>Instagram Post Generator</h1>
+        <p>Create on-brand posts for Vital Signs — exports at 3x resolution</p>
       </div>
-      <div className="ig-content">
-        <div className="container">
-          <div className="ig-layout">
-            <div className="ig-controls">
-              <div className="control-section">
-                <label className="control-label">Template</label>
-                <div className="template-grid">
-                  {templates.map(t => (
-                    <button key={t.id} className={`template-btn ${template === t.id ? 'active' : ''}`} onClick={() => setTemplate(t.id)}>
-                      {t.icon}<span>{t.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {template === 'story-highlight' && (<>
-                <div className="control-section">
-                  <label className="control-label">Quote</label>
-                  <textarea className="control-textarea" value={quote} onChange={e => setQuote(e.target.value)} maxLength={180} rows={3} />
-                  <span className="char-count">{quote.length}/180</span>
-                </div>
-                <div className="control-section">
-                  <label className="control-label">Author</label>
-                  <div className="author-row">
-                    <input type="text" className="control-input" value={author} onChange={e => setAuthor(e.target.value)} disabled={isAnonymous} />
-                    <label className="checkbox-label"><input type="checkbox" checked={isAnonymous} onChange={e => setIsAnonymous(e.target.checked)} /> Anonymous</label>
-                  </div>
-                </div>
-                <div className="control-section">
-                  <label className="control-label">Tags (max 3)</label>
-                  <div className="tag-selector">
-                    {HEALTH_TAGS.slice(0, 9).map(tag => (
-                      <button key={tag.id} className={`tag-btn ${selectedTags.includes(tag.name) ? 'active' : ''}`}
-                        onClick={() => toggleTag(tag.name)} disabled={selectedTags.length >= 3 && !selectedTags.includes(tag.name)}>
-                        {selectedTags.includes(tag.name) && <Check size={12} />}{tag.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>)}
-
-              {template === 'call-for-submissions' && (<>
-                <div className="control-section"><label className="control-label">Headline</label><input type="text" className="control-input" value={headline} onChange={e => setHeadline(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Subheadline</label><input type="text" className="control-input" value={subheadline} onChange={e => setSubheadline(e.target.value)} /></div>
-                <div className="control-section">
-                  <label className="control-label">Topics</label>
-                  <div className="tag-selector">
-                    {HEALTH_TAGS.slice(0, 9).map(tag => (
-                      <button key={tag.id} className={`tag-btn ${selectedTags.includes(tag.name) ? 'active' : ''}`} onClick={() => toggleTag(tag.name)}>
-                        {selectedTags.includes(tag.name) && <Check size={12} />}{tag.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <BgSelector />
-              </>)}
-
-              {template === 'call-for-reviewers' && (<>
-                <div className="control-section"><label className="control-label">Headline</label><input type="text" className="control-input" value={reviewerHeadline} onChange={e => setReviewerHeadline(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Description</label><textarea className="control-textarea" value={reviewerDescription} onChange={e => setReviewerDescription(e.target.value)} rows={2} /></div>
-                <div className="control-section">
-                  <label className="control-label">Benefits (4)</label>
-                  {reviewerBenefits.map((b, i) => <input key={i} type="text" className="control-input benefit-input" value={b} onChange={e => updateBenefit(i, e.target.value)} />)}
-                </div>
-                <BgSelector />
-              </>)}
-
-              {template === 'stat-card' && (<>
-                <div className="control-section"><label className="control-label">Number</label><input type="text" className="control-input" value={statNumber} onChange={e => setStatNumber(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Label</label><input type="text" className="control-input" value={statLabel} onChange={e => setStatLabel(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Description</label><textarea className="control-textarea" value={statDescription} onChange={e => setStatDescription(e.target.value)} rows={2} /></div>
-                <BgSelector />
-              </>)}
-
-              {template === 'event-promo' && (<>
-                <div className="control-section"><label className="control-label">Event Title</label><input type="text" className="control-input" value={eventTitle} onChange={e => setEventTitle(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Date & Time</label><input type="text" className="control-input" value={eventDate} onChange={e => setEventDate(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Description</label><textarea className="control-textarea" value={eventDescription} onChange={e => setEventDescription(e.target.value)} rows={2} /></div>
-                <BgSelector />
-              </>)}
-
-              {template === 'community-spotlight' && (<>
-                <div className="control-section"><label className="control-label">Member Name</label><input type="text" className="control-input" value={memberName} onChange={e => setMemberName(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Story Excerpt</label><textarea className="control-textarea" value={memberStory} onChange={e => setMemberStory(e.target.value)} rows={3} maxLength={150} /><span className="char-count">{memberStory.length}/150</span></div>
-                <div className="control-section">
-                  <label className="control-label">Topics</label>
-                  <div className="tag-selector">
-                    {HEALTH_TAGS.slice(0, 9).map(tag => (
-                      <button key={tag.id} className={`tag-btn ${selectedTags.includes(tag.name) ? 'active' : ''}`}
-                        onClick={() => toggleTag(tag.name)} disabled={selectedTags.length >= 3 && !selectedTags.includes(tag.name)}>
-                        {selectedTags.includes(tag.name) && <Check size={12} />}{tag.name}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <BgSelector />
-              </>)}
-
-              {template === 'quote-carousel' && (<>
-                <div className="control-section"><label className="control-label">Quote</label><textarea className="control-textarea" value={carouselQuote} onChange={e => setCarouselQuote(e.target.value)} rows={3} maxLength={150} /><span className="char-count">{carouselQuote.length}/150</span></div>
-                <div className="control-section"><label className="control-label">Slide Position</label><div className="slide-row"><input type="number" className="control-input small" value={slideNumber} onChange={e => setSlideNumber(e.target.value)} min="1" /><span>of</span><input type="number" className="control-input small" value={totalSlides} onChange={e => setTotalSlides(e.target.value)} min="2" max="10" /></div></div>
-                <BgSelector />
-              </>)}
-
-              {template === 'tip-of-day' && (<>
-                <div className="control-section"><label className="control-label">Tip Number</label><input type="text" className="control-input small" value={tipNumber} onChange={e => setTipNumber(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Title</label><input type="text" className="control-input" value={tipTitle} onChange={e => setTipTitle(e.target.value)} /></div>
-                <div className="control-section"><label className="control-label">Content</label><textarea className="control-textarea" value={tipContent} onChange={e => setTipContent(e.target.value)} rows={3} maxLength={180} /><span className="char-count">{tipContent.length}/180</span></div>
-                <BgSelector />
-              </>)}
-
-              {template === 'logo' && (<>
-                <div className="control-section">
-                  <label className="control-label">Size</label>
-                  <div className="variant-buttons">
-                    {(['square', 'horizontal', 'story'] as LogoSize[]).map(s => (
-                      <button key={s} className={`variant-btn ${logoSize === s ? 'active' : ''}`} onClick={() => setLogoSize(s)}>{s.charAt(0).toUpperCase() + s.slice(1)}</button>
-                    ))}
-                  </div>
-                </div>
-                <div className="control-section">
-                  <label className="control-label">Variant</label>
-                  <div className="variant-buttons">
-                    {(['white', 'black', 'coral'] as BackgroundVariant[]).map(v => (
-                      <button key={v} className={`variant-btn variant-${v} ${logoVariant === v ? 'active' : ''}`} onClick={() => setLogoVariant(v)}>{v === 'white' ? 'Light' : v === 'black' ? 'Dark' : 'Coral'}</button>
-                    ))}
-                  </div>
-                </div>
-              </>)}
-
-              <motion.button className="download-btn" onClick={handleDownload} disabled={downloading} whileTap={{ scale: 0.98 }}>
-                <Download size={20} />{downloading ? 'Generating...' : 'Download PNG (3x)'}
-              </motion.button>
-            </div>
-
-            <div className="ig-preview">
-              <div className="preview-label">Live Preview</div>
-              <div className="preview-container"><canvas ref={previewRef} style={{ width: '100%', height: 'auto', borderRadius: '12px' }} /></div>
+      <div className="ig-layout">
+        <div className="ig-controls">
+          <div className="control-section">
+            <label className="control-label">Template</label>
+            <div className="template-grid">
+              {templates.map(t => (
+                <button key={t.id} className={`template-btn ${template === t.id ? 'active' : ''}`} onClick={() => setTemplate(t.id)}>
+                  {t.icon}<span>{t.label}</span>
+                </button>
+              ))}
             </div>
           </div>
+
+          {template === 'story-highlight' && (<>
+            <div className="control-section"><label className="control-label">Quote</label><textarea className="control-textarea" value={quote} onChange={e => setQuote(e.target.value)} maxLength={180} rows={3} /><span className="char-count">{quote.length}/180</span></div>
+            <div className="control-section"><label className="control-label">Author</label><div className="author-row"><input type="text" className="control-input" value={author} onChange={e => setAuthor(e.target.value)} disabled={isAnonymous} /><label className="checkbox-label"><input type="checkbox" checked={isAnonymous} onChange={e => setIsAnonymous(e.target.checked)} /> Anonymous</label></div></div>
+            <div className="control-section"><label className="control-label">Tags (max 3)</label><div className="tag-selector">{HEALTH_TAGS.slice(0, 9).map(tag => (<button key={tag.id} className={`tag-btn ${selectedTags.includes(tag.name) ? 'active' : ''}`} onClick={() => toggleTag(tag.name)} disabled={selectedTags.length >= 3 && !selectedTags.includes(tag.name)}>{selectedTags.includes(tag.name) && <Check size={12} />}{tag.name}</button>))}</div></div>
+          </>)}
+
+          {template === 'call-for-submissions' && (<>
+            <div className="control-section"><label className="control-label">Headline</label><input type="text" className="control-input" value={headline} onChange={e => setHeadline(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Subheadline</label><input type="text" className="control-input" value={subheadline} onChange={e => setSubheadline(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Topics</label><div className="tag-selector">{HEALTH_TAGS.slice(0, 9).map(tag => (<button key={tag.id} className={`tag-btn ${selectedTags.includes(tag.name) ? 'active' : ''}`} onClick={() => toggleTag(tag.name)}>{selectedTags.includes(tag.name) && <Check size={12} />}{tag.name}</button>))}</div></div>
+            <BgSelector />
+          </>)}
+
+          {template === 'call-for-reviewers' && (<>
+            <div className="control-section"><label className="control-label">Headline</label><input type="text" className="control-input" value={reviewerHeadline} onChange={e => setReviewerHeadline(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Description</label><textarea className="control-textarea" value={reviewerDescription} onChange={e => setReviewerDescription(e.target.value)} rows={2} /></div>
+            <div className="control-section"><label className="control-label">Benefits (4)</label>{reviewerBenefits.map((b, i) => <input key={i} type="text" className="control-input benefit-input" value={b} onChange={e => updateBenefit(i, e.target.value)} />)}</div>
+            <BgSelector />
+          </>)}
+
+          {template === 'stat-card' && (<>
+            <div className="control-section"><label className="control-label">Number</label><input type="text" className="control-input" value={statNumber} onChange={e => setStatNumber(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Label</label><input type="text" className="control-input" value={statLabel} onChange={e => setStatLabel(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Description</label><textarea className="control-textarea" value={statDescription} onChange={e => setStatDescription(e.target.value)} rows={2} /></div>
+            <BgSelector />
+          </>)}
+
+          {template === 'event-promo' && (<>
+            <div className="control-section"><label className="control-label">Event Title</label><input type="text" className="control-input" value={eventTitle} onChange={e => setEventTitle(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Date & Time</label><input type="text" className="control-input" value={eventDate} onChange={e => setEventDate(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Description</label><textarea className="control-textarea" value={eventDescription} onChange={e => setEventDescription(e.target.value)} rows={2} /></div>
+            <BgSelector />
+          </>)}
+
+          {template === 'community-spotlight' && (<>
+            <div className="control-section"><label className="control-label">Member Name</label><input type="text" className="control-input" value={memberName} onChange={e => setMemberName(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Story Excerpt</label><textarea className="control-textarea" value={memberStory} onChange={e => setMemberStory(e.target.value)} rows={3} maxLength={150} /><span className="char-count">{memberStory.length}/150</span></div>
+            <div className="control-section"><label className="control-label">Topics</label><div className="tag-selector">{HEALTH_TAGS.slice(0, 9).map(tag => (<button key={tag.id} className={`tag-btn ${selectedTags.includes(tag.name) ? 'active' : ''}`} onClick={() => toggleTag(tag.name)} disabled={selectedTags.length >= 3 && !selectedTags.includes(tag.name)}>{selectedTags.includes(tag.name) && <Check size={12} />}{tag.name}</button>))}</div></div>
+            <BgSelector />
+          </>)}
+
+          {template === 'quote-carousel' && (<>
+            <div className="control-section"><label className="control-label">Quote</label><textarea className="control-textarea" value={carouselQuote} onChange={e => setCarouselQuote(e.target.value)} rows={3} maxLength={150} /><span className="char-count">{carouselQuote.length}/150</span></div>
+            <div className="control-section"><label className="control-label">Slide Position</label><div className="slide-row"><input type="number" className="control-input small" value={slideNumber} onChange={e => setSlideNumber(e.target.value)} min="1" /><span>of</span><input type="number" className="control-input small" value={totalSlides} onChange={e => setTotalSlides(e.target.value)} min="2" max="10" /></div></div>
+            <BgSelector />
+          </>)}
+
+          {template === 'tip-of-day' && (<>
+            <div className="control-section"><label className="control-label">Tip Number</label><input type="text" className="control-input small" value={tipNumber} onChange={e => setTipNumber(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Title</label><input type="text" className="control-input" value={tipTitle} onChange={e => setTipTitle(e.target.value)} /></div>
+            <div className="control-section"><label className="control-label">Content</label><textarea className="control-textarea" value={tipContent} onChange={e => setTipContent(e.target.value)} rows={3} maxLength={180} /><span className="char-count">{tipContent.length}/180</span></div>
+            <BgSelector />
+          </>)}
+
+          {template === 'logo' && (<>
+            <div className="control-section"><label className="control-label">Size</label><div className="variant-buttons">{(['square', 'horizontal', 'story'] as LogoSize[]).map(s => (<button key={s} className={`variant-btn ${logoSize === s ? 'active' : ''}`} onClick={() => setLogoSize(s)}>{s.charAt(0).toUpperCase() + s.slice(1)}</button>))}</div></div>
+            <div className="control-section"><label className="control-label">Variant</label><div className="variant-buttons">{(['white', 'black', 'coral'] as BackgroundVariant[]).map(v => (<button key={v} className={`variant-btn variant-${v} ${logoVariant === v ? 'active' : ''}`} onClick={() => setLogoVariant(v)}>{v === 'white' ? 'Light' : v === 'black' ? 'Dark' : 'Coral'}</button>))}</div></div>
+          </>)}
+
+          <motion.button className="download-btn" onClick={handleDownload} disabled={downloading} whileTap={{ scale: 0.98 }}>
+            <Download size={20} />{downloading ? 'Generating...' : 'Download PNG (3x)'}
+          </motion.button>
+        </div>
+
+        <div className="ig-preview">
+          <div className="preview-label">Live Preview</div>
+          <div className="preview-container"><canvas ref={previewRef} /></div>
         </div>
       </div>
 
       <style>{`
-        .ig-generator { min-height: 100vh; background: var(--vs-bg-subtle, #f8f9fa); }
-        .ig-header { background: var(--vs-white, #fff); padding: 1.5rem 0; border-bottom: 1px solid var(--vs-border, #e5e7eb); }
-        .ig-header h1 { font-size: 1.375rem; margin-bottom: 0.25rem; }
-        .ig-header p { color: var(--vs-text-secondary, #6b7280); font-size: 0.875rem; }
-        .ig-content { padding: 1.5rem 0; }
-        .ig-layout { display: grid; grid-template-columns: 340px 1fr; gap: 1.5rem; align-items: start; }
-        .ig-controls { background: var(--vs-white, #fff); border: 1px solid var(--vs-border, #e5e7eb); border-radius: 14px; padding: 1.25rem; max-height: 78vh; overflow-y: auto; }
+        .ig-generator { background: #f8f9fa; }
+        .ig-header { padding: 1.25rem 0; border-bottom: 1px solid #e5e7eb; }
+        .ig-header h1 { font-size: 1.25rem; margin: 0 0 0.25rem; }
+        .ig-header p { color: #6b7280; font-size: 0.875rem; margin: 0; }
+        .ig-layout { display: grid; grid-template-columns: 320px 1fr; gap: 1.5rem; padding: 1.5rem 0; align-items: start; }
+        .ig-controls { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; max-height: 72vh; overflow-y: auto; }
         .control-section { margin-bottom: 1.25rem; }
-        .control-label { display: block; font-size: 0.6875rem; font-weight: 700; color: var(--vs-text-tertiary, #9ca3af); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.6rem; }
-        .template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
-        .template-btn { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; padding: 0.6rem 0.4rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; font-size: 0.625rem; font-weight: 600; color: #6b7280; cursor: pointer; transition: all 0.15s; }
-        .template-btn:hover { border-color: #d1d5db; background: #fafafa; }
+        .control-label { display: block; font-size: 0.6875rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+        .template-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.375rem; }
+        .template-btn { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.5rem 0.375rem; background: #fff; border: 1px solid #e5e7eb; border-radius: 6px; font-size: 0.625rem; font-weight: 600; color: #6b7280; cursor: pointer; transition: all 0.15s; }
+        .template-btn:hover { border-color: #d1d5db; }
         .template-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-        .control-input, .control-textarea { width: 100%; padding: 0.65rem; font-family: inherit; font-size: 0.875rem; border: 1px solid #e5e7eb; border-radius: 8px; resize: vertical; box-sizing: border-box; }
+        .control-input, .control-textarea { width: 100%; padding: 0.6rem; font-family: inherit; font-size: 0.875rem; border: 1px solid #e5e7eb; border-radius: 6px; resize: vertical; box-sizing: border-box; }
         .control-input:focus, .control-textarea:focus { outline: none; border-color: #9ca3af; }
-        .control-input.small { width: 65px; text-align: center; }
-        .benefit-input { margin-bottom: 0.4rem; }
-        .char-count { display: block; font-size: 0.625rem; color: #9ca3af; text-align: right; margin-top: 0.2rem; }
-        .author-row, .slide-row { display: flex; gap: 0.6rem; align-items: center; }
+        .control-input.small { width: 60px; text-align: center; }
+        .benefit-input { margin-bottom: 0.375rem; }
+        .char-count { display: block; font-size: 0.625rem; color: #9ca3af; text-align: right; margin-top: 0.125rem; }
+        .author-row, .slide-row { display: flex; gap: 0.5rem; align-items: center; }
         .author-row .control-input { flex: 1; }
         .slide-row span { color: #9ca3af; font-size: 0.8rem; }
-        .checkbox-label { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: #6b7280; cursor: pointer; white-space: nowrap; }
-        .checkbox-label input { accent-color: #ff6b6b; }
-        .tag-selector { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-        .tag-btn { display: inline-flex; align-items: center; gap: 3px; padding: 0.3rem 0.6rem; font-size: 0.6875rem; font-weight: 600; color: #6b7280; background: #fff; border: 1px solid #e5e7eb; border-radius: 9999px; cursor: pointer; transition: all 0.15s; }
+        .checkbox-label { display: flex; align-items: center; gap: 0.375rem; font-size: 0.8rem; color: #6b7280; cursor: pointer; white-space: nowrap; }
+        .checkbox-label input { accent-color: #ff5a5f; }
+        .tag-selector { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+        .tag-btn { display: inline-flex; align-items: center; gap: 3px; padding: 0.25rem 0.5rem; font-size: 0.6875rem; font-weight: 600; color: #6b7280; background: #fff; border: 1px solid #e5e7eb; border-radius: 9999px; cursor: pointer; transition: all 0.15s; }
         .tag-btn:hover:not(:disabled) { border-color: #d1d5db; }
         .tag-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .tag-btn.active { background: #ff6b6b; color: #fff; border-color: #ff6b6b; }
-        .variant-buttons { display: flex; gap: 0.4rem; flex-wrap: wrap; }
-        .variant-btn { flex: 1; min-width: 55px; padding: 0.45rem 0.6rem; font-size: 0.6875rem; font-weight: 600; border: 1.5px solid #e5e7eb; border-radius: 8px; cursor: pointer; transition: all 0.15s; background: #fff; color: #1a1a1a; }
-        .variant-btn.variant-coral { background: #ff6b6b; color: #fff; border-color: #ff6b6b; }
+        .tag-btn.active { background: #ff5a5f; color: #fff; border-color: #ff5a5f; }
+        .variant-buttons { display: flex; gap: 0.375rem; flex-wrap: wrap; }
+        .variant-btn { flex: 1; min-width: 50px; padding: 0.4rem 0.5rem; font-size: 0.6875rem; font-weight: 600; border: 1.5px solid #e5e7eb; border-radius: 6px; cursor: pointer; transition: all 0.15s; background: #fff; color: #1a1a1a; }
+        .variant-btn.variant-coral { background: #ff5a5f; color: #fff; border-color: #ff5a5f; }
         .variant-btn.variant-black { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-        .variant-btn.variant-gradient { background: linear-gradient(135deg, #ff6b6b, #ffa07a); color: #fff; border-color: #ff6b6b; }
-        .variant-btn.variant-teal { background: linear-gradient(135deg, #20b2aa, #008b8b); color: #fff; border-color: #20b2aa; }
-        .variant-btn.active { box-shadow: 0 0 0 2px #ff6b6b; }
-        .download-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.9rem; background: #ff6b6b; color: #fff; border: none; border-radius: 10px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
+        .variant-btn.variant-gradient { background: linear-gradient(135deg, #ff5a5f, #ffa5a8); color: #fff; border-color: #ff5a5f; }
+        .variant-btn.variant-teal { background: linear-gradient(135deg, #0d9488, #115e59); color: #fff; border-color: #0d9488; }
+        .variant-btn.active { box-shadow: 0 0 0 2px #ff5a5f; }
+        .download-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem; background: #ff5a5f; color: #fff; border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
         .download-btn:hover:not(:disabled) { filter: brightness(1.05); }
         .download-btn:disabled { opacity: 0.7; cursor: wait; }
-        .ig-preview { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 1.25rem; position: sticky; top: 1rem; }
-        .preview-label { font-size: 0.6875rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 0.75rem; }
-        .preview-container { border-radius: 10px; border: 1px solid #e5e7eb; overflow: hidden; background: #f8f9fa; }
-        @media (max-width: 1024px) { .ig-layout { grid-template-columns: 1fr; } .ig-preview { position: static; } }
+        .ig-preview { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1.25rem; position: sticky; top: 1rem; }
+        .preview-label { font-size: 0.6875rem; font-weight: 700; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+        .preview-container { border-radius: 8px; border: 1px solid #e5e7eb; overflow: hidden; background: #f3f4f6; }
+        .preview-container canvas { width: 100%; height: auto; display: block; }
+        @media (max-width: 900px) { .ig-layout { grid-template-columns: 1fr; } .ig-preview { position: static; } }
       `}</style>
     </div>
   );
