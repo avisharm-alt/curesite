@@ -26,8 +26,12 @@ const HomePage: React.FC = () => {
               Real people.
             </h1>
             <div className="uoft-badge">
-              <span className="uoft-crest">🎓</span>
-              <span>UofT Affiliated</span>
+              <svg className="uoft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+              <span className="uoft-text">University of Toronto Affiliated</span>
             </div>
             <p className="hero-subtitle">
               A platform for authentic health storytelling. Share your experience, 
@@ -150,20 +154,25 @@ const HomePage: React.FC = () => {
         .uoft-badge {
           display: inline-flex;
           align-items: center;
-          gap: 0.5rem;
-          background: linear-gradient(135deg, #002A5C 0%, #1E3A5F 100%);
-          color: #FFFFFF;
-          padding: 0.5rem 1.25rem;
-          border-radius: 2rem;
-          font-size: 0.9375rem;
-          font-weight: 600;
-          margin-bottom: 1.25rem;
-          box-shadow: 0 2px 12px rgba(0, 42, 92, 0.3);
+          gap: 0.625rem;
+          color: #002A5C;
+          padding: 0;
+          font-size: 0.875rem;
+          font-weight: 500;
+          margin-bottom: 1.5rem;
           letter-spacing: 0.01em;
         }
 
-        .uoft-crest {
-          font-size: 1.1rem;
+        .uoft-icon {
+          width: 18px;
+          height: 18px;
+          color: #002A5C;
+          opacity: 0.7;
+        }
+
+        .uoft-text {
+          color: #002A5C;
+          opacity: 0.75;
         }
 
         .hero-subtitle {
