@@ -98,7 +98,7 @@ allowed_origins = [
     "https://www.cureproject.ca",  # Custom domain with www
     "http://www.cureproject.ca",  # Custom domain with www HTTP
     "https://curesite-production.up.railway.app",  # Production Railway backend
-    "https://signin-integration-1.preview.emergentagent.com",  # Preview environment
+    "https://ig-creator-admin.preview.emergentagent.com",  # Preview environment
 ]
 
 # Add any additional frontend URL from environment
