@@ -9,8 +9,16 @@ type LogoSize = 'square' | 'horizontal' | 'story';
 
 const SCALE = 3;
 const FONT = 'Inter, system-ui, -apple-system, sans-serif';
+const SERIF = 'Georgia, "Times New Roman", serif';
 const CORAL = '#FF5A5F';
-const CORAL_LIGHT = '#FF8A8D';
+const TEAL = '#0D9488';
+const CHARCOAL = '#1a1a1a';
+const WARM_WHITE = '#FEFCFA';
+const SOFT_GRAY = '#F5F3F0';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════════════════
 
 function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   ctx.beginPath();
@@ -43,567 +51,443 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, variant: BackgroundVariant) {
+function drawMinimalBackground(ctx: CanvasRenderingContext2D, w: number, h: number, variant: BackgroundVariant) {
   if (variant === 'gradient') {
+    // Soft warm gradient
     const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, '#FF5A5F');
-    grad.addColorStop(0.5, '#FF7A7E');
-    grad.addColorStop(1, '#FFA5A8');
+    grad.addColorStop(0, '#FFF8F6');
+    grad.addColorStop(1, '#FFF0ED');
     ctx.fillStyle = grad;
   } else if (variant === 'teal') {
-    const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, '#0D9488');
-    grad.addColorStop(1, '#115E59');
-    ctx.fillStyle = grad;
+    ctx.fillStyle = TEAL;
   } else if (variant === 'coral') {
     ctx.fillStyle = CORAL;
   } else if (variant === 'black') {
-    ctx.fillStyle = '#111111';
+    ctx.fillStyle = CHARCOAL;
   } else {
-    ctx.fillStyle = '#FFFFFF';
+    ctx.fillStyle = WARM_WHITE;
   }
   ctx.fillRect(0, 0, w, h);
 }
 
-function drawBranding(ctx: CanvasRenderingContext2D, cx: number, y: number, light: boolean, size: number = 28) {
+function drawMinimalBranding(ctx: CanvasRenderingContext2D, cx: number, y: number, isDark: boolean, size: number = 20) {
   ctx.save();
   ctx.textAlign = 'center';
-  ctx.font = `700 ${size}px ${FONT}`;
-  ctx.fillStyle = light ? '#1a1a1a' : '#FFFFFF';
-  const text = 'Vital Signs';
-  const tw = ctx.measureText(text).width;
-  ctx.fillText(text, cx, y);
-  ctx.fillStyle = light ? CORAL : '#FFFFFF';
-  ctx.fillText('.', cx + tw/2 + 2, y);
+  ctx.font = `500 ${size}px ${FONT}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.25)';
+  ctx.fillText('vitalsigns.health', cx, y);
   ctx.restore();
 }
 
-function drawPillCentered(ctx: CanvasRenderingContext2D, text: string, cx: number, y: number, opts: {
-  bg: string; color: string; fontSize: number; paddingX: number; paddingY: number; border?: string;
-}) {
-  ctx.font = `600 ${opts.fontSize}px ${FONT}`;
-  const tw = ctx.measureText(text).width;
-  const pw = tw + opts.paddingX * 2;
-  const ph = opts.fontSize + opts.paddingY * 2;
-  const x = cx - pw / 2;
-  
-  roundRect(ctx, x, y, pw, ph, ph / 2);
-  ctx.fillStyle = opts.bg;
-  ctx.fill();
-  if (opts.border) {
-    ctx.strokeStyle = opts.border;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  }
-  ctx.fillStyle = opts.color;
-  ctx.textAlign = 'center';
-  ctx.fillText(text, cx, y + opts.paddingY + opts.fontSize * 0.78);
-  return ph;
-}
-
-function drawTagsRow(ctx: CanvasRenderingContext2D, tags: string[], cx: number, y: number, opts: {
-  bg: string; color: string; fontSize: number; paddingX: number; paddingY: number; gap: number;
-}) {
-  if (tags.length === 0) return 0;
-  ctx.font = `600 ${opts.fontSize}px ${FONT}`;
-  const widths = tags.map(t => ctx.measureText(t).width + opts.paddingX * 2);
-  const totalW = widths.reduce((a, b) => a + b, 0) + (tags.length - 1) * opts.gap;
-  let x = cx - totalW / 2;
-  const ph = opts.fontSize + opts.paddingY * 2;
-  
-  tags.forEach((tag, i) => {
-    const pw = widths[i];
-    roundRect(ctx, x, y, pw, ph, ph / 2);
-    ctx.fillStyle = opts.bg;
-    ctx.fill();
-    ctx.fillStyle = opts.color;
-    ctx.textAlign = 'center';
-    ctx.fillText(tag, x + pw / 2, y + opts.paddingY + opts.fontSize * 0.78);
-    x += pw + opts.gap;
-  });
-  return ph;
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
-// TEMPLATE RENDERERS
+// MINIMALIST TEMPLATE RENDERERS
 // ═══════════════════════════════════════════════════════════════════════════
 
 function renderStoryHighlight(ctx: CanvasRenderingContext2D, w: number, h: number, quote: string, author: string, isAnonymous: boolean, tags: string[]) {
-  // Warm background
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, '#FEF7F0');
-  grad.addColorStop(1, '#FFF5EE');
-  ctx.fillStyle = grad;
+  // Clean warm background
+  ctx.fillStyle = WARM_WHITE;
   ctx.fillRect(0, 0, w, h);
   
   const cx = w / 2;
-  const margin = 80;
+  const margin = 100;
   
-  // Decorative coral bar at top
-  roundRect(ctx, cx - 50, 50, 100, 6, 3);
+  // Single elegant accent line at top
   ctx.fillStyle = CORAL;
-  ctx.fill();
+  ctx.fillRect(margin, 80, 60, 4);
   
-  // Main card
-  const cardY = 100;
-  const cardH = h - 200;
-  
-  // Card shadow
-  ctx.shadowColor = 'rgba(0,0,0,0.08)';
-  ctx.shadowBlur = 40;
-  ctx.shadowOffsetY = 8;
-  roundRect(ctx, margin, cardY, w - margin * 2, cardH, 24);
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fill();
-  ctx.shadowColor = 'transparent';
-  
-  // Tags inside card
-  let contentY = cardY + 50;
+  // Small tag label
   if (tags.length > 0) {
-    drawTagsRow(ctx, tags.slice(0, 3), cx, contentY, {
-      bg: '#FFF0F0', color: CORAL, fontSize: 18, paddingX: 20, paddingY: 10, gap: 12
-    });
-    contentY += 55;
+    ctx.font = `500 14px ${FONT}`;
+    ctx.fillStyle = CORAL;
+    ctx.textAlign = 'left';
+    ctx.fillText(tags[0].toUpperCase(), margin, 130);
   }
   
-  // Large quote mark - MUCH more visible
-  ctx.font = `700 220px Georgia, serif`;
-  ctx.fillStyle = 'rgba(255, 90, 95, 0.25)';
-  ctx.textAlign = 'center';
-  ctx.fillText('"', cx, contentY + 130);
+  // Large opening quote mark - very subtle
+  ctx.font = `300 280px ${SERIF}`;
+  ctx.fillStyle = 'rgba(255, 90, 95, 0.08)';
+  ctx.textAlign = 'left';
+  ctx.fillText('"', margin - 20, 340);
   
-  // Quote text
-  const maxQuoteW = w - margin * 2 - 100;
+  // Main quote - elegant serif
   const qLen = quote.length;
-  const fontSize = qLen > 120 ? 32 : qLen > 80 ? 38 : 44;
-  ctx.font = `500 ${fontSize}px ${FONT}`;
-  ctx.fillStyle = '#1a1a1a';
-  const lines = wrapText(ctx, quote, maxQuoteW);
-  const lineH = fontSize * 1.55;
-  const blockH = lines.length * lineH;
+  const fontSize = qLen > 120 ? 36 : qLen > 80 ? 44 : 52;
+  ctx.font = `400 ${fontSize}px ${SERIF}`;
+  ctx.fillStyle = CHARCOAL;
+  ctx.textAlign = 'left';
+  const lines = wrapText(ctx, quote, w - margin * 2);
+  const lineH = fontSize * 1.6;
   
-  // Center quote vertically in remaining space
-  const quoteStartY = cardY + (cardH - blockH) / 2 + (tags.length > 0 ? 25 : 0);
-  
+  let y = 280;
   lines.forEach((line, i) => {
-    ctx.fillText(line, cx, quoteStartY + i * lineH);
+    ctx.fillText(line, margin, y + i * lineH);
   });
   
-  // Author attribution
-  const authorY = quoteStartY + blockH + 40;
-  
-  // Coral line above author
-  roundRect(ctx, cx - 30, authorY - 15, 60, 3, 1.5);
-  ctx.fillStyle = CORAL;
-  ctx.fill();
-  
-  ctx.font = `500 22px ${FONT}`;
-  ctx.fillStyle = '#666666';
-  ctx.fillText(isAnonymous ? 'Anonymous' : author, cx, authorY + 15);
+  // Author - minimal styling
+  const authorY = y + lines.length * lineH + 60;
+  ctx.font = `500 18px ${FONT}`;
+  ctx.fillStyle = '#666';
+  ctx.fillText(`— ${isAnonymous ? 'Anonymous' : author}`, margin, authorY);
   
   // Bottom branding
-  drawBranding(ctx, cx, h - 60, true, 26);
-  
+  drawMinimalBranding(ctx, cx, h - 50, false, 16);
   ctx.textAlign = 'start';
 }
 
 function renderCallForSubmissions(ctx: CanvasRenderingContext2D, w: number, h: number, headline: string, subheadline: string, tags: string[], bg: BackgroundVariant) {
-  const isLight = bg === 'white';
-  drawBackground(ctx, w, h, bg);
+  const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
+  drawMinimalBackground(ctx, w, h, bg);
   
   const cx = w / 2;
-  const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.9)';
-  const accent = isLight ? CORAL : '#FFFFFF';
+  const margin = 80;
+  const textColor = isDark ? '#FFFFFF' : CHARCOAL;
+  const subtleColor = isDark ? 'rgba(255,255,255,0.7)' : '#666';
   
-  // Top badge
-  drawPillCentered(ctx, '✦ NOW ACCEPTING STORIES', cx, 80, {
-    bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.15)',
-    color: accent, fontSize: 16, paddingX: 24, paddingY: 14
+  // Vertical accent line
+  const lineX = margin;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.3)' : CORAL;
+  ctx.fillRect(lineX, 200, 4, 280);
+  
+  // Small label
+  ctx.font = `600 12px ${FONT}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.6)' : CORAL;
+  ctx.textAlign = 'left';
+  ctx.letterSpacing = '0.15em';
+  ctx.fillText('CALL FOR STORIES', lineX + 30, 220);
+  
+  // Large headline - dramatic size
+  ctx.font = `700 72px ${FONT}`;
+  ctx.fillStyle = textColor;
+  const hlLines = wrapText(ctx, headline, w - margin * 2 - 40);
+  let y = 320;
+  hlLines.forEach(line => {
+    ctx.fillText(line, lineX + 30, y);
+    y += 80;
   });
   
-  // Main headline
-  const hlSize = headline.length > 18 ? 58 : 68;
-  ctx.font = `800 ${hlSize}px ${FONT}`;
-  ctx.fillStyle = textColor;
-  ctx.textAlign = 'center';
-  const hlLines = wrapText(ctx, headline.toUpperCase(), w - 120);
-  let y = 220;
-  hlLines.forEach(line => { ctx.fillText(line, cx, y); y += hlSize * 1.12; });
-  
   // Subheadline
-  ctx.font = `400 26px ${FONT}`;
-  ctx.fillStyle = subColor;
-  ctx.fillText(subheadline, cx, y + 25);
+  ctx.font = `400 24px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  ctx.fillText(subheadline, lineX + 30, y + 20);
   
-  // Tags
+  // Minimal tags at bottom
   if (tags.length > 0) {
-    drawTagsRow(ctx, tags.slice(0, 4), cx, y + 80, {
-      bg: 'transparent', color: textColor, fontSize: 16, paddingX: 20, paddingY: 12, gap: 12
-    });
-    // Draw borders for tags
-    ctx.font = `600 16px ${FONT}`;
-    const widths = tags.slice(0, 4).map(t => ctx.measureText(t).width + 40);
-    const totalW = widths.reduce((a, b) => a + b, 0) + (Math.min(tags.length, 4) - 1) * 12;
-    let tx = cx - totalW / 2;
-    tags.slice(0, 4).forEach((_, i) => {
-      roundRect(ctx, tx, y + 80, widths[i], 40, 20);
-      ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.15)' : 'rgba(255,255,255,0.3)';
-      ctx.lineWidth = 2;
-      ctx.stroke();
-      tx += widths[i] + 12;
-    });
+    ctx.font = `400 14px ${FONT}`;
+    ctx.fillStyle = subtleColor;
+    const tagText = tags.slice(0, 3).join('  ·  ');
+    ctx.fillText(tagText, lineX + 30, h - 120);
   }
   
-  // CTA Button
-  const btnY = h - 170;
-  const btnW = 280, btnH = 56;
-  roundRect(ctx, cx - btnW/2, btnY, btnW, btnH, btnH/2);
-  ctx.fillStyle = isLight ? '#1a1a1a' : '#FFFFFF';
-  ctx.fill();
-  ctx.font = `700 18px ${FONT}`;
-  ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-  ctx.fillText('Submit Your Story →', cx, btnY + 36);
+  // Arrow indicator
+  ctx.font = `300 32px ${FONT}`;
+  ctx.fillStyle = textColor;
+  ctx.fillText('→', w - margin - 40, h - 115);
   
   // Branding
-  drawBranding(ctx, cx, h - 55, isLight, 24);
+  drawMinimalBranding(ctx, cx, h - 50, isDark, 16);
   ctx.textAlign = 'start';
 }
 
 function renderCallForReviewers(ctx: CanvasRenderingContext2D, w: number, h: number, headline: string, description: string, benefits: string[], bg: BackgroundVariant) {
-  const isLight = bg === 'white';
-  drawBackground(ctx, w, h, bg);
+  const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
+  drawMinimalBackground(ctx, w, h, bg);
   
   const cx = w / 2;
-  const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? CORAL : '#FFFFFF';
+  const margin = 80;
+  const textColor = isDark ? '#FFFFFF' : CHARCOAL;
+  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const accentColor = isDark ? '#FFFFFF' : CORAL;
   
-  // Top badge
-  drawPillCentered(ctx, '📋 JOIN OUR REVIEW BOARD', cx, 70, {
-    bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.15)',
-    color: accent, fontSize: 16, paddingX: 24, paddingY: 14
-  });
+  // Top label with line
+  ctx.fillStyle = accentColor;
+  ctx.fillRect(margin, 100, 40, 3);
+  
+  ctx.font = `600 12px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  ctx.textAlign = 'left';
+  ctx.fillText('JOIN US', margin + 55, 106);
   
   // Headline
-  const hlSize = headline.length > 22 ? 50 : 58;
-  ctx.font = `800 ${hlSize}px ${FONT}`;
+  ctx.font = `700 56px ${FONT}`;
   ctx.fillStyle = textColor;
-  ctx.textAlign = 'center';
-  const hlLines = wrapText(ctx, headline.toUpperCase(), w - 100);
-  let y = 190;
-  hlLines.forEach(line => { ctx.fillText(line, cx, y); y += hlSize * 1.1; });
-  
-  // Description
-  ctx.font = `400 24px ${FONT}`;
-  ctx.fillStyle = subColor;
-  const descLines = wrapText(ctx, description, w - 140);
-  descLines.forEach(line => { ctx.fillText(line, cx, y + 20); y += 32; });
-  
-  // Benefits with checkmarks - properly centered
-  y += 45;
-  benefits.slice(0, 4).forEach((benefit, i) => {
-    const itemY = y + i * 52;
-    
-    ctx.font = `500 20px ${FONT}`;
-    const textW = ctx.measureText(benefit).width;
-    const totalW = 36 + textW;
-    const startX = cx - totalW / 2;
-    
-    // Checkmark circle
-    ctx.beginPath();
-    ctx.arc(startX + 14, itemY, 16, 0, Math.PI * 2);
-    ctx.fillStyle = accent;
-    ctx.fill();
-    
-    // Checkmark
-    ctx.font = `700 14px ${FONT}`;
-    ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-    ctx.fillText('✓', startX + 14, itemY + 5);
-    
-    // Text
-    ctx.font = `500 20px ${FONT}`;
-    ctx.fillStyle = textColor;
-    ctx.textAlign = 'left';
-    ctx.fillText(benefit, startX + 42, itemY + 7);
-    ctx.textAlign = 'center';
+  const hlLines = wrapText(ctx, headline, w - margin * 2);
+  let y = 220;
+  hlLines.forEach(line => {
+    ctx.fillText(line, margin, y);
+    y += 66;
   });
   
-  // CTA Button
-  const btnY = h - 155;
-  const btnW = 240, btnH = 54;
-  roundRect(ctx, cx - btnW/2, btnY, btnW, btnH, btnH/2);
-  ctx.fillStyle = accent;
-  ctx.fill();
-  ctx.font = `700 18px ${FONT}`;
-  ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-  ctx.fillText('Apply Now →', cx, btnY + 35);
+  // Description
+  ctx.font = `400 22px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  const descLines = wrapText(ctx, description, w - margin * 2);
+  y += 20;
+  descLines.forEach(line => {
+    ctx.fillText(line, margin, y);
+    y += 32;
+  });
+  
+  // Benefits - minimal bullet style
+  y += 50;
+  ctx.font = `500 18px ${FONT}`;
+  benefits.slice(0, 4).forEach((benefit) => {
+    ctx.fillStyle = accentColor;
+    ctx.fillText('·', margin, y);
+    ctx.fillStyle = textColor;
+    ctx.fillText(benefit, margin + 20, y);
+    y += 40;
+  });
   
   // Branding
-  drawBranding(ctx, cx, h - 50, isLight, 24);
+  drawMinimalBranding(ctx, cx, h - 50, isDark, 16);
   ctx.textAlign = 'start';
 }
 
 function renderStatCard(ctx: CanvasRenderingContext2D, w: number, h: number, statNumber: string, statLabel: string, description: string, bg: BackgroundVariant) {
-  const isLight = bg === 'white';
-  drawBackground(ctx, w, h, bg);
+  const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
+  drawMinimalBackground(ctx, w, h, bg);
   
   const cx = w / 2;
-  const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? '#666666' : 'rgba(255,255,255,0.8)';
-  const accent = isLight ? CORAL : '#FFFFFF';
-  
-  // Decorative circles for dark backgrounds
-  if (!isLight) {
-    ctx.globalAlpha = 0.08;
-    ctx.beginPath(); ctx.arc(w * 0.15, h * 0.3, 200, 0, Math.PI * 2);
-    ctx.fillStyle = '#FFFFFF'; ctx.fill();
-    ctx.beginPath(); ctx.arc(w * 0.85, h * 0.75, 150, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalAlpha = 1;
-  }
+  const textColor = isDark ? '#FFFFFF' : CHARCOAL;
+  const subtleColor = isDark ? 'rgba(255,255,255,0.5)' : '#999';
+  const accentColor = isDark ? '#FFFFFF' : CORAL;
   
   ctx.textAlign = 'center';
   
-  // Big number
-  ctx.font = `900 200px ${FONT}`;
+  // Massive number - the hero
+  ctx.font = `200 260px ${FONT}`;
   ctx.fillStyle = textColor;
-  ctx.fillText(statNumber, cx, h/2 - 20);
+  ctx.fillText(statNumber, cx, h/2 + 40);
+  
+  // Thin line
+  ctx.fillStyle = accentColor;
+  ctx.fillRect(cx - 30, h/2 + 70, 60, 2);
   
   // Label
-  ctx.font = `700 32px ${FONT}`;
-  ctx.fillText(statLabel.toUpperCase(), cx, h/2 + 55);
-  
-  // Accent line
-  roundRect(ctx, cx - 40, h/2 + 80, 80, 4, 2);
-  ctx.fillStyle = accent;
-  ctx.fill();
+  ctx.font = `600 16px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  ctx.fillText(statLabel.toUpperCase(), cx, h/2 + 120);
   
   // Description
-  ctx.font = `400 22px ${FONT}`;
-  ctx.fillStyle = subColor;
-  const lines = wrapText(ctx, description, w - 180);
+  ctx.font = `400 20px ${FONT}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.7)' : '#666';
+  const lines = wrapText(ctx, description, w - 200);
   lines.slice(0, 2).forEach((line, i) => {
-    ctx.fillText(line, cx, h/2 + 130 + i * 32);
+    ctx.fillText(line, cx, h/2 + 170 + i * 30);
   });
   
-  drawBranding(ctx, cx, h - 55, isLight, 26);
+  // Branding
+  drawMinimalBranding(ctx, cx, h - 50, isDark, 16);
   ctx.textAlign = 'start';
 }
 
 function renderEventPromo(ctx: CanvasRenderingContext2D, w: number, h: number, eventTitle: string, eventDate: string, eventDescription: string, bg: BackgroundVariant) {
-  const isLight = bg === 'white';
-  drawBackground(ctx, w, h, bg);
+  const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
+  drawMinimalBackground(ctx, w, h, bg);
   
+  const margin = 80;
   const cx = w / 2;
-  const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? CORAL : '#FFFFFF';
+  const textColor = isDark ? '#FFFFFF' : CHARCOAL;
+  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const accentColor = isDark ? '#FFFFFF' : CORAL;
   
+  // Top corner date badge
+  ctx.fillStyle = accentColor;
+  roundRect(ctx, w - margin - 140, 80, 140, 50, 25);
+  ctx.fill();
+  ctx.font = `600 16px ${FONT}`;
+  ctx.fillStyle = isDark ? CHARCOAL : '#FFFFFF';
   ctx.textAlign = 'center';
+  ctx.fillText(eventDate.split('•')[0]?.trim() || eventDate, w - margin - 70, 112);
   
-  // Calendar icon in circle
-  ctx.beginPath();
-  ctx.arc(cx, 125, 55, 0, Math.PI * 2);
-  ctx.fillStyle = isLight ? '#FFF0F0' : 'rgba(255,255,255,0.12)';
-  ctx.fill();
-  ctx.font = `400 48px ${FONT}`;
-  ctx.fillText('📅', cx, 140);
+  // Event label
+  ctx.font = `600 12px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  ctx.textAlign = 'left';
+  ctx.fillText('EVENT', margin, 100);
   
-  // Label
-  ctx.font = `700 14px ${FONT}`;
-  ctx.fillStyle = accent;
-  ctx.fillText('UPCOMING EVENT', cx, 210);
-  
-  // Title
-  const titleSize = eventTitle.length > 18 ? 52 : 60;
-  ctx.font = `800 ${titleSize}px ${FONT}`;
+  // Large title - stacked dramatically
+  ctx.font = `700 64px ${FONT}`;
   ctx.fillStyle = textColor;
-  const titleLines = wrapText(ctx, eventTitle, w - 120);
-  let y = 295;
-  titleLines.forEach(line => { ctx.fillText(line, cx, y); y += titleSize * 1.15; });
+  const titleLines = wrapText(ctx, eventTitle, w - margin * 2);
+  let y = 280;
+  titleLines.forEach(line => {
+    ctx.fillText(line, margin, y);
+    y += 75;
+  });
   
-  // Date pill
-  ctx.font = `700 22px ${FONT}`;
-  const dateW = ctx.measureText(eventDate).width + 60;
-  roundRect(ctx, cx - dateW/2, y + 15, dateW, 52, 26);
-  ctx.fillStyle = accent;
-  ctx.fill();
-  ctx.fillStyle = isLight ? '#FFFFFF' : '#1a1a1a';
-  ctx.fillText(eventDate, cx, y + 48);
+  // Time
+  ctx.font = `400 20px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  const timePart = eventDate.split('•')[1]?.trim() || '';
+  if (timePart) {
+    ctx.fillText(timePart, margin, y + 30);
+  }
   
   // Description
   ctx.font = `400 22px ${FONT}`;
-  ctx.fillStyle = subColor;
-  const descLines = wrapText(ctx, eventDescription, w - 140);
-  descLines.slice(0, 2).forEach((line, i) => {
-    ctx.fillText(line, cx, y + 110 + i * 32);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.8)' : '#555';
+  const descLines = wrapText(ctx, eventDescription, w - margin * 2);
+  y += 90;
+  descLines.slice(0, 2).forEach(line => {
+    ctx.fillText(line, margin, y);
+    y += 32;
   });
   
-  drawBranding(ctx, cx, h - 55, isLight, 26);
+  // Branding
+  drawMinimalBranding(ctx, cx, h - 50, isDark, 16);
   ctx.textAlign = 'start';
 }
 
 function renderCommunitySpotlight(ctx: CanvasRenderingContext2D, w: number, h: number, memberName: string, memberStory: string, memberTags: string[], bg: BackgroundVariant) {
-  const isLight = bg === 'white';
-  drawBackground(ctx, w, h, bg);
+  const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
+  drawMinimalBackground(ctx, w, h, bg);
   
   const cx = w / 2;
-  const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? CORAL : '#FFFFFF';
+  const margin = 80;
+  const textColor = isDark ? '#FFFFFF' : CHARCOAL;
+  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const accentColor = isDark ? '#FFFFFF' : CORAL;
   
   ctx.textAlign = 'center';
   
-  // Header
-  ctx.font = `700 15px ${FONT}`;
-  ctx.fillStyle = accent;
-  ctx.fillText('★  COMMUNITY SPOTLIGHT  ★', cx, 85);
+  // Minimal label
+  ctx.font = `600 12px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  ctx.fillText('COMMUNITY SPOTLIGHT', cx, 100);
   
-  // Avatar
-  const avatarY = 185;
-  ctx.beginPath();
-  ctx.arc(cx, avatarY, 72, 0, Math.PI * 2);
-  ctx.fillStyle = accent;
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(cx, avatarY, 66, 0, Math.PI * 2);
-  ctx.fillStyle = isLight ? '#FEF7F0' : 'rgba(255,255,255,0.1)';
-  ctx.fill();
+  // Large initial letter as avatar
+  const initial = memberName.charAt(0).toUpperCase();
+  ctx.font = `300 180px ${SERIF}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,90,95,0.1)';
+  ctx.fillText(initial, cx, 320);
   
-  const initials = memberName.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
-  ctx.font = `700 46px ${FONT}`;
-  ctx.fillStyle = accent;
-  ctx.fillText(initials, cx, avatarY + 17);
-  
-  // Name
-  ctx.font = `700 42px ${FONT}`;
+  // Name overlaid
+  ctx.font = `600 36px ${FONT}`;
   ctx.fillStyle = textColor;
-  ctx.fillText(memberName, cx, avatarY + 105);
+  ctx.fillText(memberName, cx, 280);
   
   // Tags
   if (memberTags.length > 0) {
-    drawTagsRow(ctx, memberTags.slice(0, 3), cx, avatarY + 135, {
-      bg: isLight ? '#FFF0F0' : 'rgba(255,255,255,0.12)',
-      color: accent, fontSize: 15, paddingX: 16, paddingY: 9, gap: 10
-    });
+    ctx.font = `400 14px ${FONT}`;
+    ctx.fillStyle = accentColor;
+    ctx.fillText(memberTags.slice(0, 2).join('  ·  '), cx, 320);
   }
   
-  // Quote mark
-  ctx.font = `700 120px Georgia, serif`;
-  ctx.fillStyle = isLight ? 'rgba(255,90,95,0.2)' : 'rgba(255,255,255,0.12)';
-  ctx.fillText('"', cx - 260, avatarY + 280);
-  
-  // Story
-  ctx.font = `500 26px ${FONT}`;
-  ctx.fillStyle = subColor;
-  const storyLines = wrapText(ctx, memberStory, w - 140);
-  storyLines.slice(0, 3).forEach((line, i) => {
-    ctx.fillText(line, cx, avatarY + 250 + i * 38);
+  // Quote
+  ctx.font = `400 italic 28px ${SERIF}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.9)' : '#444';
+  ctx.textAlign = 'left';
+  const lines = wrapText(ctx, `"${memberStory}"`, w - margin * 2);
+  let y = 450;
+  lines.slice(0, 4).forEach(line => {
+    ctx.textAlign = 'center';
+    ctx.fillText(line, cx, y);
+    y += 42;
   });
   
-  drawBranding(ctx, cx, h - 55, isLight, 26);
+  // Branding
+  drawMinimalBranding(ctx, cx, h - 50, isDark, 16);
   ctx.textAlign = 'start';
 }
 
 function renderQuoteCarousel(ctx: CanvasRenderingContext2D, w: number, h: number, quote: string, slideNumber: string, totalSlides: string, bg: BackgroundVariant) {
-  const isLight = bg === 'white';
-  drawBackground(ctx, w, h, bg);
+  const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
+  drawMinimalBackground(ctx, w, h, bg);
   
   const cx = w / 2;
-  const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? 'rgba(0,0,0,0.4)' : 'rgba(255,255,255,0.5)';
-  const accent = isLight ? CORAL : '#FFFFFF';
+  const margin = 80;
+  const textColor = isDark ? '#FFFFFF' : CHARCOAL;
+  const subtleColor = isDark ? 'rgba(255,255,255,0.4)' : '#bbb';
+  const accentColor = isDark ? '#FFFFFF' : CORAL;
   
   ctx.textAlign = 'center';
   
-  // Slide indicator
-  ctx.font = `500 17px ${FONT}`;
-  ctx.fillStyle = subColor;
-  ctx.fillText(`${slideNumber} of ${totalSlides}`, cx, 75);
+  // Slide indicator - minimal dots at top
+  const total = parseInt(totalSlides) || 5;
+  const current = parseInt(slideNumber) || 1;
+  const dotSpacing = 16;
+  let dotX = cx - ((total - 1) * dotSpacing) / 2;
+  for (let i = 1; i <= total; i++) {
+    ctx.beginPath();
+    ctx.arc(dotX, 80, i === current ? 4 : 3, 0, Math.PI * 2);
+    ctx.fillStyle = i === current ? accentColor : subtleColor;
+    ctx.fill();
+    dotX += dotSpacing;
+  }
   
-  // Large quote marks
-  ctx.font = `700 320px Georgia, serif`;
-  ctx.fillStyle = isLight ? 'rgba(255,90,95,0.12)' : 'rgba(255,255,255,0.1)';
-  ctx.fillText('"', cx, 380);
+  // Giant subtle quote mark
+  ctx.font = `300 400px ${SERIF}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
+  ctx.fillText('"', cx, 480);
   
-  // Quote
+  // Quote text - centered and elegant
   const qLen = quote.length;
   const fontSize = qLen > 100 ? 36 : qLen > 60 ? 44 : 52;
-  ctx.font = `600 ${fontSize}px ${FONT}`;
+  ctx.font = `400 ${fontSize}px ${SERIF}`;
   ctx.fillStyle = textColor;
-  const lines = wrapText(ctx, quote, w - 130);
-  const lineH = fontSize * 1.5;
+  const lines = wrapText(ctx, quote, w - margin * 2);
+  const lineH = fontSize * 1.55;
   const blockH = lines.length * lineH;
-  const startY = (h - blockH) / 2 + 30;
+  const startY = (h - blockH) / 2 + 40;
+  
   lines.forEach((line, i) => {
     ctx.fillText(line, cx, startY + i * lineH);
   });
   
-  // Dots
-  const dotsY = h - 130;
-  const total = parseInt(totalSlides) || 5;
-  const current = parseInt(slideNumber) || 1;
-  const spacing = 30;
-  let dotX = cx - ((total - 1) * spacing) / 2;
-  for (let i = 1; i <= total; i++) {
-    ctx.beginPath();
-    ctx.arc(dotX, dotsY, i === current ? 8 : 5, 0, Math.PI * 2);
-    ctx.fillStyle = i === current ? accent : subColor;
-    ctx.fill();
-    dotX += spacing;
-  }
-  
-  drawBranding(ctx, cx, h - 55, isLight, 24);
+  // Branding
+  drawMinimalBranding(ctx, cx, h - 50, isDark, 16);
   ctx.textAlign = 'start';
 }
 
 function renderTipOfDay(ctx: CanvasRenderingContext2D, w: number, h: number, tipTitle: string, tipContent: string, tipNumber: string, bg: BackgroundVariant) {
-  const isLight = bg === 'white';
-  drawBackground(ctx, w, h, bg);
+  const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
+  drawMinimalBackground(ctx, w, h, bg);
   
   const cx = w / 2;
-  const textColor = isLight ? '#1a1a1a' : '#FFFFFF';
-  const subColor = isLight ? '#555555' : 'rgba(255,255,255,0.85)';
-  const accent = isLight ? CORAL : '#FFFFFF';
+  const margin = 80;
+  const textColor = isDark ? '#FFFFFF' : CHARCOAL;
+  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const accentColor = isDark ? '#FFFFFF' : CORAL;
   
-  ctx.textAlign = 'center';
+  // Large tip number in background
+  ctx.font = `200 320px ${FONT}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
+  ctx.textAlign = 'right';
+  ctx.fillText(tipNumber, w - 40, 340);
   
-  // Icon
-  ctx.beginPath();
-  ctx.arc(cx, 115, 50, 0, Math.PI * 2);
-  ctx.fillStyle = isLight ? '#FFF0F0' : 'rgba(255,255,255,0.12)';
-  ctx.fill();
-  ctx.font = `400 44px ${FONT}`;
-  ctx.fillText('💡', cx, 132);
-  
-  // Badge
-  ctx.font = `700 15px ${FONT}`;
-  ctx.fillStyle = accent;
-  ctx.fillText(`TIP #${tipNumber}`, cx, 200);
+  // Label
+  ctx.font = `600 12px ${FONT}`;
+  ctx.fillStyle = accentColor;
+  ctx.textAlign = 'left';
+  ctx.fillText(`TIP #${tipNumber}`, margin, 140);
   
   // Title
-  const titleSize = tipTitle.length > 18 ? 48 : 56;
-  ctx.font = `800 ${titleSize}px ${FONT}`;
+  ctx.font = `700 52px ${FONT}`;
   ctx.fillStyle = textColor;
-  const titleLines = wrapText(ctx, tipTitle, w - 120);
-  let y = 290;
-  titleLines.forEach(line => { ctx.fillText(line, cx, y); y += titleSize * 1.15; });
+  const titleLines = wrapText(ctx, tipTitle, w - margin * 2);
+  let y = 260;
+  titleLines.forEach(line => {
+    ctx.fillText(line, margin, y);
+    y += 62;
+  });
   
   // Accent line
-  roundRect(ctx, cx - 40, y + 15, 80, 4, 2);
-  ctx.fillStyle = accent;
-  ctx.fill();
+  ctx.fillStyle = accentColor;
+  ctx.fillRect(margin, y + 10, 50, 3);
   
   // Content
   ctx.font = `400 24px ${FONT}`;
-  ctx.fillStyle = subColor;
-  const contentLines = wrapText(ctx, tipContent, w - 150);
-  contentLines.slice(0, 4).forEach((line, i) => {
-    ctx.fillText(line, cx, y + 70 + i * 36);
+  ctx.fillStyle = subtleColor;
+  const contentLines = wrapText(ctx, tipContent, w - margin * 2);
+  y += 60;
+  contentLines.slice(0, 4).forEach(line => {
+    ctx.fillText(line, margin, y);
+    y += 36;
   });
   
-  drawBranding(ctx, cx, h - 55, isLight, 26);
+  // Branding
+  drawMinimalBranding(ctx, cx, h - 50, isDark, 16);
   ctx.textAlign = 'start';
 }
 
@@ -611,26 +495,32 @@ function renderLogo(ctx: CanvasRenderingContext2D, w: number, h: number, variant
   const isWhite = variant === 'white';
   const isCoral = variant === 'coral';
   
-  ctx.fillStyle = isWhite ? '#FFFFFF' : isCoral ? CORAL : '#111111';
+  ctx.fillStyle = isWhite ? WARM_WHITE : isCoral ? CORAL : CHARCOAL;
   ctx.fillRect(0, 0, w, h);
   
   const cx = w / 2, cy = h / 2;
-  const textColor = isWhite ? '#1a1a1a' : '#FFFFFF';
+  const textColor = isWhite ? CHARCOAL : '#FFFFFF';
   const dotColor = isCoral ? '#FFFFFF' : CORAL;
   
-  const mainSize = Math.min(w, h) > 1200 ? 92 : Math.min(w, h) > 600 ? 72 : 64;
-  ctx.font = `700 ${mainSize}px ${FONT}`;
+  // Clean wordmark
+  const mainSize = Math.min(w, h) > 1200 ? 80 : Math.min(w, h) > 600 ? 64 : 56;
+  ctx.font = `600 ${mainSize}px ${FONT}`;
   ctx.textAlign = 'center';
   ctx.fillStyle = textColor;
   const text = 'Vital Signs';
   const tw = ctx.measureText(text).width;
   ctx.fillText(text, cx, cy);
-  ctx.fillStyle = dotColor;
-  ctx.fillText('.', cx + tw/2 + 3, cy);
   
-  ctx.font = `400 ${mainSize * 0.26}px ${FONT}`;
-  ctx.fillStyle = isWhite ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.65)';
-  ctx.fillText('Real stories. Real health. Real people.', cx, cy + mainSize * 0.55);
+  // Accent dot
+  ctx.beginPath();
+  ctx.arc(cx + tw/2 + 12, cy - mainSize * 0.3, 8, 0, Math.PI * 2);
+  ctx.fillStyle = dotColor;
+  ctx.fill();
+  
+  // Tagline
+  ctx.font = `400 ${mainSize * 0.22}px ${FONT}`;
+  ctx.fillStyle = isWhite ? '#888' : 'rgba(255,255,255,0.6)';
+  ctx.fillText('Real stories. Real health.', cx, cy + mainSize * 0.6);
   ctx.textAlign = 'start';
 }
 
@@ -756,7 +646,7 @@ const InstagramGenerator: React.FC = () => {
     <div className="ig-generator">
       <div className="ig-header">
         <h1>Instagram Post Generator</h1>
-        <p>Create on-brand posts for Vital Signs — exports at 3x resolution</p>
+        <p>Create minimalist, on-brand posts — exports at 3x resolution</p>
       </div>
       <div className="ig-layout">
         <div className="ig-controls">
@@ -873,8 +763,8 @@ const InstagramGenerator: React.FC = () => {
         .variant-btn { flex: 1; min-width: 50px; padding: 0.4rem 0.5rem; font-size: 0.6875rem; font-weight: 600; border: 1.5px solid #e5e7eb; border-radius: 6px; cursor: pointer; transition: all 0.15s; background: #fff; color: #1a1a1a; }
         .variant-btn.variant-coral { background: #ff5a5f; color: #fff; border-color: #ff5a5f; }
         .variant-btn.variant-black { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-        .variant-btn.variant-gradient { background: linear-gradient(135deg, #ff5a5f, #ffa5a8); color: #fff; border-color: #ff5a5f; }
-        .variant-btn.variant-teal { background: linear-gradient(135deg, #0d9488, #115e59); color: #fff; border-color: #0d9488; }
+        .variant-btn.variant-gradient { background: linear-gradient(135deg, #fff8f6, #fff0ed); border-color: #ffd4d1; }
+        .variant-btn.variant-teal { background: #0d9488; color: #fff; border-color: #0d9488; }
         .variant-btn.active { box-shadow: 0 0 0 2px #ff5a5f; }
         .download-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem; background: #ff5a5f; color: #fff; border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
         .download-btn:hover:not(:disabled) { filter: brightness(1.05); }
