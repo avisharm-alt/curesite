@@ -14,7 +14,6 @@ const CORAL = '#FF5A5F';
 const TEAL = '#0D9488';
 const CHARCOAL = '#1a1a1a';
 const WARM_WHITE = '#FEFCFA';
-const SOFT_GRAY = '#F5F3F0';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // HELPER FUNCTIONS
@@ -51,446 +50,547 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, maxWidth: number)
   return lines;
 }
 
-function drawMinimalBackground(ctx: CanvasRenderingContext2D, w: number, h: number, variant: BackgroundVariant) {
+function drawBackground(ctx: CanvasRenderingContext2D, w: number, h: number, variant: BackgroundVariant) {
   if (variant === 'gradient') {
-    // Soft warm gradient
     const grad = ctx.createLinearGradient(0, 0, w, h);
-    grad.addColorStop(0, '#FFF8F6');
-    grad.addColorStop(1, '#FFF0ED');
+    grad.addColorStop(0, '#FFF5F3');
+    grad.addColorStop(1, '#FFE8E5');
     ctx.fillStyle = grad;
   } else if (variant === 'teal') {
-    ctx.fillStyle = TEAL;
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#0D9488');
+    grad.addColorStop(1, '#0F766E');
+    ctx.fillStyle = grad;
   } else if (variant === 'coral') {
-    ctx.fillStyle = CORAL;
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#FF5A5F');
+    grad.addColorStop(1, '#E54B50');
+    ctx.fillStyle = grad;
   } else if (variant === 'black') {
-    ctx.fillStyle = CHARCOAL;
+    ctx.fillStyle = '#111111';
   } else {
     ctx.fillStyle = WARM_WHITE;
   }
   ctx.fillRect(0, 0, w, h);
 }
 
-function drawMinimalBranding(ctx: CanvasRenderingContext2D, cx: number, y: number, isDark: boolean, size: number = 20) {
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.font = `500 ${size}px ${FONT}`;
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.25)';
-  ctx.fillText('vitalsigns.health', cx, y);
-  ctx.restore();
-}
-
 // ═══════════════════════════════════════════════════════════════════════════
-// MINIMALIST TEMPLATE RENDERERS
+// REDESIGNED TEMPLATE RENDERERS - More Visual Impact
 // ═══════════════════════════════════════════════════════════════════════════
 
 function renderStoryHighlight(ctx: CanvasRenderingContext2D, w: number, h: number, quote: string, author: string, isAnonymous: boolean, tags: string[]) {
-  // Clean warm background
-  ctx.fillStyle = WARM_WHITE;
+  // Warm cream background
+  ctx.fillStyle = '#FBF9F7';
   ctx.fillRect(0, 0, w, h);
   
-  const cx = w / 2;
-  const margin = 70;
-  
-  // Single elegant accent line at top
+  // Large coral accent block in top-left
   ctx.fillStyle = CORAL;
-  ctx.fillRect(margin, 60, 50, 3);
+  ctx.fillRect(0, 0, 8, 400);
   
-  // Small tag label
+  // Tag pill at top
   if (tags.length > 0) {
-    ctx.font = `500 13px ${FONT}`;
+    const tag = tags[0].toUpperCase();
+    ctx.font = `700 13px ${FONT}`;
+    const tagW = ctx.measureText(tag).width + 32;
     ctx.fillStyle = CORAL;
+    roundRect(ctx, 50, 50, tagW, 36, 18);
+    ctx.fill();
+    ctx.fillStyle = '#fff';
     ctx.textAlign = 'left';
-    ctx.fillText(tags[0].toUpperCase(), margin, 100);
+    ctx.fillText(tag, 66, 74);
   }
   
-  // Large opening quote mark - very subtle
-  ctx.font = `300 240px ${SERIF}`;
-  ctx.fillStyle = 'rgba(255, 90, 95, 0.08)';
+  // Giant decorative quote mark
+  ctx.font = `700 420px ${SERIF}`;
+  ctx.fillStyle = 'rgba(255, 90, 95, 0.07)';
   ctx.textAlign = 'left';
-  ctx.fillText('"', margin - 15, 300);
+  ctx.fillText('"', -30, 450);
   
-  // Main quote - elegant serif
+  // Main quote - large and bold
   const qLen = quote.length;
-  const fontSize = qLen > 120 ? 38 : qLen > 80 ? 46 : 54;
-  ctx.font = `400 ${fontSize}px ${SERIF}`;
+  const fontSize = qLen > 100 ? 44 : qLen > 60 ? 52 : 62;
+  ctx.font = `500 ${fontSize}px ${SERIF}`;
   ctx.fillStyle = CHARCOAL;
-  ctx.textAlign = 'left';
-  const lines = wrapText(ctx, quote, w - margin * 2);
-  const lineH = fontSize * 1.45;
-  
-  // Center quote block vertically
-  const blockH = lines.length * lineH;
-  let y = Math.max(220, (h - blockH) / 2 - 20);
+  const lines = wrapText(ctx, quote, w - 100);
+  const lineH = fontSize * 1.35;
+  const totalH = lines.length * lineH;
+  const startY = (h - totalH) / 2 + 40;
   
   lines.forEach((line, i) => {
-    ctx.fillText(line, margin, y + i * lineH);
+    ctx.fillText(line, 50, startY + i * lineH);
   });
   
-  // Author - minimal styling
-  const authorY = y + lines.length * lineH + 40;
-  ctx.font = `500 18px ${FONT}`;
+  // Author with em dash
+  const authorY = startY + lines.length * lineH + 50;
+  ctx.font = `600 20px ${FONT}`;
+  ctx.fillStyle = CORAL;
+  ctx.fillText('—', 50, authorY);
   ctx.fillStyle = '#666';
-  ctx.fillText(`— ${isAnonymous ? 'Anonymous' : author}`, margin, authorY);
+  ctx.font = `500 20px ${FONT}`;
+  ctx.fillText(isAnonymous ? 'Anonymous' : author, 80, authorY);
   
-  // Bottom branding
-  drawMinimalBranding(ctx, cx, h - 45, false, 15);
+  // Bottom branding bar
+  ctx.fillStyle = '#F0EDEA';
+  ctx.fillRect(0, h - 70, w, 70);
+  ctx.font = `600 14px ${FONT}`;
+  ctx.fillStyle = '#999';
+  ctx.textAlign = 'center';
+  ctx.fillText('VITAL SIGNS', w / 2, h - 35);
+  
   ctx.textAlign = 'start';
 }
 
 function renderCallForSubmissions(ctx: CanvasRenderingContext2D, w: number, h: number, headline: string, subheadline: string, tags: string[], bg: BackgroundVariant) {
   const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
-  drawMinimalBackground(ctx, w, h, bg);
+  drawBackground(ctx, w, h, bg);
   
-  const cx = w / 2;
-  const margin = 60;
   const textColor = isDark ? '#FFFFFF' : CHARCOAL;
-  const subtleColor = isDark ? 'rgba(255,255,255,0.7)' : '#666';
+  const subtleColor = isDark ? 'rgba(255,255,255,0.75)' : '#555';
   
-  // Vertical accent line
-  const lineX = margin;
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.3)' : CORAL;
-  ctx.fillRect(lineX, 160, 3, 320);
+  // Corner accent shape
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,90,95,0.1)';
+  ctx.beginPath();
+  ctx.moveTo(w, 0);
+  ctx.lineTo(w, 350);
+  ctx.lineTo(w - 350, 0);
+  ctx.closePath();
+  ctx.fill();
   
   // Small label
-  ctx.font = `600 11px ${FONT}`;
+  ctx.font = `700 12px ${FONT}`;
   ctx.fillStyle = isDark ? 'rgba(255,255,255,0.6)' : CORAL;
   ctx.textAlign = 'left';
-  ctx.letterSpacing = '0.15em';
-  ctx.fillText('CALL FOR STORIES', lineX + 24, 180);
+  ctx.fillText('✦  CALL FOR STORIES', 50, 80);
   
-  // Large headline - dramatic size
-  ctx.font = `700 68px ${FONT}`;
+  // Large headline - dramatic
+  ctx.font = `800 82px ${FONT}`;
   ctx.fillStyle = textColor;
-  const hlLines = wrapText(ctx, headline, w - margin * 2 - 30);
-  let y = 280;
+  const hlLines = wrapText(ctx, headline.toUpperCase(), w - 100);
+  let y = 200;
   hlLines.forEach(line => {
-    ctx.fillText(line, lineX + 24, y);
-    y += 75;
+    ctx.fillText(line, 50, y);
+    y += 90;
   });
   
-  // Subheadline
-  ctx.font = `400 22px ${FONT}`;
-  ctx.fillStyle = subtleColor;
-  ctx.fillText(subheadline, lineX + 24, y + 15);
+  // Accent line
+  ctx.fillStyle = isDark ? '#fff' : CORAL;
+  ctx.fillRect(50, y + 10, 80, 5);
   
-  // Minimal tags at bottom
+  // Subheadline
+  ctx.font = `400 26px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  const subLines = wrapText(ctx, subheadline, w - 100);
+  y += 60;
+  subLines.forEach(line => {
+    ctx.fillText(line, 50, y);
+    y += 36;
+  });
+  
+  // Tags row at bottom
   if (tags.length > 0) {
-    ctx.font = `400 13px ${FONT}`;
-    ctx.fillStyle = subtleColor;
-    const tagText = tags.slice(0, 3).join('  ·  ');
-    ctx.fillText(tagText, lineX + 24, h - 100);
+    ctx.font = `500 14px ${FONT}`;
+    let tx = 50;
+    const ty = h - 130;
+    tags.slice(0, 3).forEach((tag) => {
+      const tw = ctx.measureText(tag).width + 28;
+      ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 1.5;
+      roundRect(ctx, tx, ty, tw, 38, 19);
+      ctx.stroke();
+      ctx.fillStyle = subtleColor;
+      ctx.fillText(tag, tx + 14, ty + 25);
+      tx += tw + 12;
+    });
   }
   
-  // Arrow indicator
-  ctx.font = `300 28px ${FONT}`;
+  // CTA arrow
+  ctx.font = `400 36px ${FONT}`;
   ctx.fillStyle = textColor;
-  ctx.fillText('→', w - margin - 30, h - 96);
+  ctx.textAlign = 'right';
+  ctx.fillText('→', w - 50, h - 50);
   
-  // Branding
-  drawMinimalBranding(ctx, cx, h - 45, isDark, 15);
   ctx.textAlign = 'start';
 }
 
 function renderCallForReviewers(ctx: CanvasRenderingContext2D, w: number, h: number, headline: string, description: string, benefits: string[], bg: BackgroundVariant) {
   const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
-  drawMinimalBackground(ctx, w, h, bg);
+  drawBackground(ctx, w, h, bg);
   
-  const cx = w / 2;
-  const margin = 60;
   const textColor = isDark ? '#FFFFFF' : CHARCOAL;
-  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const subtleColor = isDark ? 'rgba(255,255,255,0.7)' : '#666';
   const accentColor = isDark ? '#FFFFFF' : CORAL;
   
-  // Top label with line
+  // Side accent bar
   ctx.fillStyle = accentColor;
-  ctx.fillRect(margin, 80, 35, 3);
+  ctx.fillRect(0, 150, 6, 500);
   
-  ctx.font = `600 11px ${FONT}`;
+  // Icon circle
+  ctx.beginPath();
+  ctx.arc(100, 100, 40, 0, Math.PI * 2);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,90,95,0.12)';
+  ctx.fill();
+  ctx.font = `400 32px ${FONT}`;
+  ctx.fillStyle = accentColor;
+  ctx.textAlign = 'center';
+  ctx.fillText('✋', 100, 112);
+  
+  // Label
+  ctx.font = `700 12px ${FONT}`;
   ctx.fillStyle = subtleColor;
   ctx.textAlign = 'left';
-  ctx.fillText('JOIN US', margin + 48, 86);
+  ctx.fillText('JOIN THE TEAM', 160, 108);
   
   // Headline
-  ctx.font = `700 52px ${FONT}`;
+  ctx.font = `700 64px ${FONT}`;
   ctx.fillStyle = textColor;
-  const hlLines = wrapText(ctx, headline, w - margin * 2);
-  let y = 180;
+  const hlLines = wrapText(ctx, headline, w - 80);
+  let y = 240;
   hlLines.forEach(line => {
-    ctx.fillText(line, margin, y);
-    y += 58;
+    ctx.fillText(line, 40, y);
+    y += 72;
   });
   
   // Description
-  ctx.font = `400 20px ${FONT}`;
+  ctx.font = `400 22px ${FONT}`;
   ctx.fillStyle = subtleColor;
-  const descLines = wrapText(ctx, description, w - margin * 2);
-  y += 10;
+  const descLines = wrapText(ctx, description, w - 80);
+  y += 15;
   descLines.forEach(line => {
-    ctx.fillText(line, margin, y);
-    y += 28;
+    ctx.fillText(line, 40, y);
+    y += 30;
   });
   
-  // Benefits - minimal bullet style
-  y += 35;
-  ctx.font = `500 17px ${FONT}`;
+  // Benefits with checkmarks
+  y += 40;
+  ctx.font = `500 20px ${FONT}`;
   benefits.slice(0, 4).forEach((benefit) => {
+    // Checkmark circle
+    ctx.beginPath();
+    ctx.arc(60, y - 6, 14, 0, Math.PI * 2);
     ctx.fillStyle = accentColor;
-    ctx.fillText('·', margin, y);
+    ctx.fill();
+    ctx.font = `700 12px ${FONT}`;
+    ctx.fillStyle = isDark ? CHARCOAL : '#fff';
+    ctx.textAlign = 'center';
+    ctx.fillText('✓', 60, y - 2);
+    
+    ctx.font = `500 20px ${FONT}`;
     ctx.fillStyle = textColor;
-    ctx.fillText(benefit, margin + 18, y);
-    y += 36;
+    ctx.textAlign = 'left';
+    ctx.fillText(benefit, 90, y);
+    y += 46;
   });
   
-  // Branding
-  drawMinimalBranding(ctx, cx, h - 45, isDark, 15);
   ctx.textAlign = 'start';
 }
 
 function renderStatCard(ctx: CanvasRenderingContext2D, w: number, h: number, statNumber: string, statLabel: string, description: string, bg: BackgroundVariant) {
   const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
-  drawMinimalBackground(ctx, w, h, bg);
+  drawBackground(ctx, w, h, bg);
   
-  const cx = w / 2;
   const textColor = isDark ? '#FFFFFF' : CHARCOAL;
-  const subtleColor = isDark ? 'rgba(255,255,255,0.5)' : '#999';
+  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
   const accentColor = isDark ? '#FFFFFF' : CORAL;
+  
+  // Decorative circles
+  ctx.beginPath();
+  ctx.arc(w - 100, 150, 180, 0, Math.PI * 2);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,90,95,0.05)';
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(150, h - 150, 120, 0, Math.PI * 2);
+  ctx.fill();
   
   ctx.textAlign = 'center';
   
-  // Massive number - the hero
-  ctx.font = `200 220px ${FONT}`;
-  ctx.fillStyle = textColor;
-  ctx.fillText(statNumber, cx, h/2 + 20);
-  
-  // Thin line
+  // Small label above number
+  ctx.font = `700 14px ${FONT}`;
   ctx.fillStyle = accentColor;
-  ctx.fillRect(cx - 25, h/2 + 50, 50, 2);
+  ctx.fillText('COMMUNITY IMPACT', w / 2, 180);
   
-  // Label
-  ctx.font = `600 14px ${FONT}`;
-  ctx.fillStyle = subtleColor;
-  ctx.fillText(statLabel.toUpperCase(), cx, h/2 + 90);
+  // Massive number
+  ctx.font = `200 280px ${FONT}`;
+  ctx.fillStyle = textColor;
+  ctx.fillText(statNumber, w / 2, h / 2 + 80);
+  
+  // Label below
+  ctx.font = `700 24px ${FONT}`;
+  ctx.fillStyle = textColor;
+  ctx.fillText(statLabel.toUpperCase(), w / 2, h / 2 + 140);
+  
+  // Divider
+  ctx.fillStyle = accentColor;
+  ctx.fillRect(w / 2 - 40, h / 2 + 170, 80, 3);
   
   // Description
-  ctx.font = `400 18px ${FONT}`;
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.7)' : '#666';
+  ctx.font = `400 20px ${FONT}`;
+  ctx.fillStyle = subtleColor;
   const lines = wrapText(ctx, description, w - 160);
   lines.slice(0, 2).forEach((line, i) => {
-    ctx.fillText(line, cx, h/2 + 135 + i * 26);
+    ctx.fillText(line, w / 2, h / 2 + 220 + i * 28);
   });
   
-  // Branding
-  drawMinimalBranding(ctx, cx, h - 45, isDark, 15);
   ctx.textAlign = 'start';
 }
 
 function renderEventPromo(ctx: CanvasRenderingContext2D, w: number, h: number, eventTitle: string, eventDate: string, eventDescription: string, bg: BackgroundVariant) {
   const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
-  drawMinimalBackground(ctx, w, h, bg);
+  drawBackground(ctx, w, h, bg);
   
-  const margin = 60;
-  const cx = w / 2;
   const textColor = isDark ? '#FFFFFF' : CHARCOAL;
-  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const subtleColor = isDark ? 'rgba(255,255,255,0.7)' : '#666';
   const accentColor = isDark ? '#FFFFFF' : CORAL;
   
-  // Top corner date badge
+  // Calendar icon block
   ctx.fillStyle = accentColor;
-  roundRect(ctx, w - margin - 130, 60, 130, 44, 22);
+  roundRect(ctx, 50, 50, 100, 100, 16);
   ctx.fill();
-  ctx.font = `600 14px ${FONT}`;
-  ctx.fillStyle = isDark ? CHARCOAL : '#FFFFFF';
+  ctx.font = `400 48px ${FONT}`;
+  ctx.fillStyle = isDark ? CHARCOAL : '#fff';
   ctx.textAlign = 'center';
-  ctx.fillText(eventDate.split('•')[0]?.trim() || eventDate, w - margin - 65, 88);
+  ctx.fillText('📅', 100, 115);
   
-  // Event label
-  ctx.font = `600 11px ${FONT}`;
+  // Date badge
+  ctx.fillStyle = isDark ? 'rgba(0,0,0,0.3)' : '#F5F3F0';
+  roundRect(ctx, 170, 65, 200, 70, 12);
+  ctx.fill();
+  ctx.font = `700 16px ${FONT}`;
   ctx.fillStyle = subtleColor;
-  ctx.textAlign = 'left';
-  ctx.fillText('EVENT', margin, 80);
-  
-  // Large title - stacked dramatically
-  ctx.font = `700 58px ${FONT}`;
+  ctx.fillText('SAVE THE DATE', 270, 95);
+  ctx.font = `600 18px ${FONT}`;
   ctx.fillStyle = textColor;
-  const titleLines = wrapText(ctx, eventTitle, w - margin * 2);
-  let y = 220;
+  ctx.fillText(eventDate.split('•')[0]?.trim() || eventDate, 270, 120);
+  
+  // Large title
+  ctx.font = `700 72px ${FONT}`;
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'left';
+  const titleLines = wrapText(ctx, eventTitle, w - 100);
+  let y = 280;
   titleLines.forEach(line => {
-    ctx.fillText(line, margin, y);
-    y += 66;
+    ctx.fillText(line, 50, y);
+    y += 80;
   });
   
   // Time
-  ctx.font = `400 18px ${FONT}`;
-  ctx.fillStyle = subtleColor;
-  const timePart = eventDate.split('•')[1]?.trim() || '';
+  const timePart = eventDate.split('•')[1]?.trim();
   if (timePart) {
-    ctx.fillText(timePart, margin, y + 20);
+    ctx.font = `500 24px ${FONT}`;
+    ctx.fillStyle = accentColor;
+    ctx.fillText(timePart, 50, y + 20);
+    y += 50;
   }
   
   // Description
-  ctx.font = `400 20px ${FONT}`;
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.8)' : '#555';
-  const descLines = wrapText(ctx, eventDescription, w - margin * 2);
-  y += 70;
+  ctx.font = `400 24px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  const descLines = wrapText(ctx, eventDescription, w - 100);
+  y += 30;
   descLines.slice(0, 2).forEach(line => {
-    ctx.fillText(line, margin, y);
-    y += 28;
+    ctx.fillText(line, 50, y);
+    y += 34;
   });
   
-  // Branding
-  drawMinimalBranding(ctx, cx, h - 45, isDark, 15);
+  // Bottom bar with CTA
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.1)' : '#F5F3F0';
+  ctx.fillRect(0, h - 90, w, 90);
+  ctx.font = `700 16px ${FONT}`;
+  ctx.fillStyle = textColor;
+  ctx.textAlign = 'center';
+  ctx.fillText('TAP TO LEARN MORE  →', w / 2, h - 45);
+  
   ctx.textAlign = 'start';
 }
 
 function renderCommunitySpotlight(ctx: CanvasRenderingContext2D, w: number, h: number, memberName: string, memberStory: string, memberTags: string[], bg: BackgroundVariant) {
   const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
-  drawMinimalBackground(ctx, w, h, bg);
+  drawBackground(ctx, w, h, bg);
   
-  const cx = w / 2;
-  const margin = 60;
   const textColor = isDark ? '#FFFFFF' : CHARCOAL;
-  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const subtleColor = isDark ? 'rgba(255,255,255,0.7)' : '#666';
   const accentColor = isDark ? '#FFFFFF' : CORAL;
   
+  // Top banner
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.1)' : CORAL;
+  ctx.fillRect(0, 0, w, 80);
+  ctx.font = `700 14px ${FONT}`;
+  ctx.fillStyle = isDark ? '#fff' : '#fff';
   ctx.textAlign = 'center';
+  ctx.fillText('★  COMMUNITY SPOTLIGHT  ★', w / 2, 50);
   
-  // Minimal label
-  ctx.font = `600 11px ${FONT}`;
-  ctx.fillStyle = subtleColor;
-  ctx.fillText('COMMUNITY SPOTLIGHT', cx, 80);
+  // Large avatar circle with initial
+  const avatarY = 230;
+  ctx.beginPath();
+  ctx.arc(w / 2, avatarY, 100, 0, Math.PI * 2);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.15)' : '#F5F3F0';
+  ctx.fill();
+  ctx.strokeStyle = accentColor;
+  ctx.lineWidth = 4;
+  ctx.stroke();
   
-  // Large initial letter as avatar
   const initial = memberName.charAt(0).toUpperCase();
-  ctx.font = `300 160px ${SERIF}`;
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,90,95,0.1)';
-  ctx.fillText(initial, cx, 280);
+  ctx.font = `600 72px ${FONT}`;
+  ctx.fillStyle = accentColor;
+  ctx.fillText(initial, w / 2, avatarY + 26);
   
-  // Name overlaid
-  ctx.font = `600 34px ${FONT}`;
+  // Name
+  ctx.font = `700 36px ${FONT}`;
   ctx.fillStyle = textColor;
-  ctx.fillText(memberName, cx, 250);
+  ctx.fillText(memberName, w / 2, avatarY + 150);
   
   // Tags
   if (memberTags.length > 0) {
-    ctx.font = `400 13px ${FONT}`;
-    ctx.fillStyle = accentColor;
-    ctx.fillText(memberTags.slice(0, 2).join('  ·  '), cx, 285);
+    ctx.font = `500 14px ${FONT}`;
+    ctx.fillStyle = subtleColor;
+    ctx.fillText(memberTags.slice(0, 2).join('  ·  '), w / 2, avatarY + 185);
   }
   
-  // Quote
+  // Quote box
+  const boxY = avatarY + 230;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.08)' : '#F8F6F4';
+  roundRect(ctx, 50, boxY, w - 100, 260, 20);
+  ctx.fill();
+  
+  // Quote mark
+  ctx.font = `700 80px ${SERIF}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,90,95,0.15)';
+  ctx.textAlign = 'left';
+  ctx.fillText('"', 70, boxY + 70);
+  
+  // Story quote
   ctx.font = `400 italic 26px ${SERIF}`;
   ctx.fillStyle = isDark ? 'rgba(255,255,255,0.9)' : '#444';
-  ctx.textAlign = 'left';
-  const lines = wrapText(ctx, `"${memberStory}"`, w - margin * 2);
-  let y = 400;
-  lines.slice(0, 4).forEach(line => {
-    ctx.textAlign = 'center';
-    ctx.fillText(line, cx, y);
-    y += 38;
+  ctx.textAlign = 'center';
+  const lines = wrapText(ctx, memberStory, w - 160);
+  lines.slice(0, 4).forEach((line, i) => {
+    ctx.fillText(line, w / 2, boxY + 100 + i * 38);
   });
   
-  // Branding
-  drawMinimalBranding(ctx, cx, h - 45, isDark, 15);
   ctx.textAlign = 'start';
 }
 
 function renderQuoteCarousel(ctx: CanvasRenderingContext2D, w: number, h: number, quote: string, slideNumber: string, totalSlides: string, bg: BackgroundVariant) {
   const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
-  drawMinimalBackground(ctx, w, h, bg);
+  drawBackground(ctx, w, h, bg);
   
-  const cx = w / 2;
-  const margin = 60;
   const textColor = isDark ? '#FFFFFF' : CHARCOAL;
-  const subtleColor = isDark ? 'rgba(255,255,255,0.4)' : '#bbb';
+  const subtleColor = isDark ? 'rgba(255,255,255,0.4)' : '#ccc';
   const accentColor = isDark ? '#FFFFFF' : CORAL;
+  
+  // Frame border
+  ctx.strokeStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
+  ctx.lineWidth = 2;
+  roundRect(ctx, 40, 40, w - 80, h - 80, 24);
+  ctx.stroke();
   
   ctx.textAlign = 'center';
   
-  // Slide indicator - minimal dots at top
+  // Slide indicator dots
   const total = parseInt(totalSlides) || 5;
   const current = parseInt(slideNumber) || 1;
-  const dotSpacing = 14;
-  let dotX = cx - ((total - 1) * dotSpacing) / 2;
+  const dotSpacing = 20;
+  let dotX = w / 2 - ((total - 1) * dotSpacing) / 2;
   for (let i = 1; i <= total; i++) {
     ctx.beginPath();
-    ctx.arc(dotX, 60, i === current ? 4 : 2.5, 0, Math.PI * 2);
+    ctx.arc(dotX, 90, i === current ? 6 : 4, 0, Math.PI * 2);
     ctx.fillStyle = i === current ? accentColor : subtleColor;
     ctx.fill();
     dotX += dotSpacing;
   }
   
-  // Giant subtle quote mark
-  ctx.font = `300 340px ${SERIF}`;
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
-  ctx.fillText('"', cx, 440);
+  // Giant quote marks
+  ctx.font = `700 200px ${SERIF}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(255,90,95,0.08)';
+  ctx.fillText('"', w / 2 - 300, 350);
+  ctx.fillText('"', w / 2 + 200, 750);
   
-  // Quote text - centered and elegant
+  // Quote text
   const qLen = quote.length;
-  const fontSize = qLen > 100 ? 38 : qLen > 60 ? 46 : 54;
-  ctx.font = `400 ${fontSize}px ${SERIF}`;
+  const fontSize = qLen > 100 ? 42 : qLen > 60 ? 50 : 60;
+  ctx.font = `500 ${fontSize}px ${SERIF}`;
   ctx.fillStyle = textColor;
-  const lines = wrapText(ctx, quote, w - margin * 2);
-  const lineH = fontSize * 1.45;
+  const lines = wrapText(ctx, quote, w - 160);
+  const lineH = fontSize * 1.4;
   const blockH = lines.length * lineH;
-  const startY = (h - blockH) / 2 + 30;
+  const startY = (h - blockH) / 2 + 20;
   
   lines.forEach((line, i) => {
-    ctx.fillText(line, cx, startY + i * lineH);
+    ctx.fillText(line, w / 2, startY + i * lineH);
   });
   
-  // Branding
-  drawMinimalBranding(ctx, cx, h - 45, isDark, 15);
+  // Branding at bottom
+  ctx.font = `600 14px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  ctx.fillText('VITAL SIGNS', w / 2, h - 70);
+  
   ctx.textAlign = 'start';
 }
 
 function renderTipOfDay(ctx: CanvasRenderingContext2D, w: number, h: number, tipTitle: string, tipContent: string, tipNumber: string, bg: BackgroundVariant) {
   const isDark = bg === 'coral' || bg === 'black' || bg === 'teal';
-  drawMinimalBackground(ctx, w, h, bg);
+  drawBackground(ctx, w, h, bg);
   
-  const cx = w / 2;
-  const margin = 60;
   const textColor = isDark ? '#FFFFFF' : CHARCOAL;
-  const subtleColor = isDark ? 'rgba(255,255,255,0.6)' : '#888';
+  const subtleColor = isDark ? 'rgba(255,255,255,0.7)' : '#666';
   const accentColor = isDark ? '#FFFFFF' : CORAL;
   
-  // Large tip number in background
-  ctx.font = `200 280px ${FONT}`;
-  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)';
+  // Large number in background
+  ctx.font = `900 500px ${FONT}`;
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.04)' : 'rgba(0,0,0,0.03)';
   ctx.textAlign = 'right';
-  ctx.fillText(tipNumber, w - 30, 300);
+  ctx.fillText(tipNumber, w + 50, 500);
   
-  // Label
-  ctx.font = `600 11px ${FONT}`;
+  // Lightbulb icon
+  ctx.beginPath();
+  ctx.arc(100, 120, 50, 0, Math.PI * 2);
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(255,90,95,0.12)';
+  ctx.fill();
+  ctx.font = `400 40px ${FONT}`;
+  ctx.textAlign = 'center';
+  ctx.fillText('💡', 100, 135);
+  
+  // Tip badge
   ctx.fillStyle = accentColor;
-  ctx.textAlign = 'left';
-  ctx.fillText(`TIP #${tipNumber}`, margin, 110);
+  roundRect(ctx, 170, 95, 100, 50, 25);
+  ctx.fill();
+  ctx.font = `700 18px ${FONT}`;
+  ctx.fillStyle = isDark ? CHARCOAL : '#fff';
+  ctx.fillText(`#${tipNumber}`, 220, 128);
   
   // Title
-  ctx.font = `700 48px ${FONT}`;
+  ctx.font = `700 60px ${FONT}`;
   ctx.fillStyle = textColor;
-  const titleLines = wrapText(ctx, tipTitle, w - margin * 2);
-  let y = 210;
+  ctx.textAlign = 'left';
+  const titleLines = wrapText(ctx, tipTitle, w - 100);
+  let y = 290;
   titleLines.forEach(line => {
-    ctx.fillText(line, margin, y);
-    y += 55;
+    ctx.fillText(line, 50, y);
+    y += 70;
   });
   
-  // Accent line
+  // Divider
   ctx.fillStyle = accentColor;
-  ctx.fillRect(margin, y + 5, 45, 3);
+  ctx.fillRect(50, y + 10, 60, 4);
   
   // Content
-  ctx.font = `400 22px ${FONT}`;
+  ctx.font = `400 26px ${FONT}`;
   ctx.fillStyle = subtleColor;
-  const contentLines = wrapText(ctx, tipContent, w - margin * 2);
-  y += 45;
+  const contentLines = wrapText(ctx, tipContent, w - 100);
+  y += 60;
   contentLines.slice(0, 4).forEach(line => {
-    ctx.fillText(line, margin, y);
-    y += 32;
+    ctx.fillText(line, 50, y);
+    y += 38;
   });
   
-  // Branding
-  drawMinimalBranding(ctx, cx, h - 45, isDark, 15);
+  // Bottom branding
+  ctx.fillStyle = isDark ? 'rgba(255,255,255,0.1)' : '#F5F3F0';
+  ctx.fillRect(0, h - 80, w, 80);
+  ctx.font = `600 14px ${FONT}`;
+  ctx.fillStyle = subtleColor;
+  ctx.textAlign = 'center';
+  ctx.fillText('VITAL SIGNS  ·  WELLNESS TIPS', w / 2, h - 40);
+  
   ctx.textAlign = 'start';
 }
 
@@ -498,32 +598,52 @@ function renderLogo(ctx: CanvasRenderingContext2D, w: number, h: number, variant
   const isWhite = variant === 'white';
   const isCoral = variant === 'coral';
   
-  ctx.fillStyle = isWhite ? WARM_WHITE : isCoral ? CORAL : CHARCOAL;
+  if (isCoral) {
+    const grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#FF5A5F');
+    grad.addColorStop(1, '#E54B50');
+    ctx.fillStyle = grad;
+  } else if (isWhite) {
+    ctx.fillStyle = WARM_WHITE;
+  } else {
+    ctx.fillStyle = '#111111';
+  }
   ctx.fillRect(0, 0, w, h);
   
   const cx = w / 2, cy = h / 2;
   const textColor = isWhite ? CHARCOAL : '#FFFFFF';
   const dotColor = isCoral ? '#FFFFFF' : CORAL;
   
+  // Decorative circles
+  ctx.beginPath();
+  ctx.arc(cx - 200, cy - 100, 300, 0, Math.PI * 2);
+  ctx.fillStyle = isWhite ? 'rgba(255,90,95,0.05)' : 'rgba(255,255,255,0.03)';
+  ctx.fill();
+  
+  ctx.beginPath();
+  ctx.arc(cx + 200, cy + 100, 200, 0, Math.PI * 2);
+  ctx.fill();
+  
   // Clean wordmark
-  const mainSize = Math.min(w, h) > 1200 ? 80 : Math.min(w, h) > 600 ? 64 : 56;
-  ctx.font = `600 ${mainSize}px ${FONT}`;
+  const mainSize = Math.min(w, h) > 1200 ? 88 : Math.min(w, h) > 600 ? 72 : 64;
+  ctx.font = `700 ${mainSize}px ${FONT}`;
   ctx.textAlign = 'center';
   ctx.fillStyle = textColor;
   const text = 'Vital Signs';
-  const tw = ctx.measureText(text).width;
-  ctx.fillText(text, cx, cy);
+  ctx.fillText(text, cx, cy + 10);
   
   // Accent dot
+  const tw = ctx.measureText(text).width;
   ctx.beginPath();
-  ctx.arc(cx + tw/2 + 12, cy - mainSize * 0.3, 8, 0, Math.PI * 2);
+  ctx.arc(cx + tw / 2 + 16, cy - mainSize * 0.25, 10, 0, Math.PI * 2);
   ctx.fillStyle = dotColor;
   ctx.fill();
   
   // Tagline
-  ctx.font = `400 ${mainSize * 0.22}px ${FONT}`;
+  ctx.font = `400 ${mainSize * 0.24}px ${FONT}`;
   ctx.fillStyle = isWhite ? '#888' : 'rgba(255,255,255,0.6)';
-  ctx.fillText('Real stories. Real health.', cx, cy + mainSize * 0.6);
+  ctx.fillText('Real stories. Real health. Real people.', cx, cy + mainSize * 0.65);
+  
   ctx.textAlign = 'start';
 }
 
@@ -649,7 +769,7 @@ const InstagramGenerator: React.FC = () => {
     <div className="ig-generator">
       <div className="ig-header">
         <h1>Instagram Post Generator</h1>
-        <p>Create minimalist, on-brand posts — exports at 3x resolution</p>
+        <p>Create on-brand posts for Vital Signs — exports at 3x resolution</p>
       </div>
       <div className="ig-layout">
         <div className="ig-controls">
@@ -766,7 +886,7 @@ const InstagramGenerator: React.FC = () => {
         .variant-btn { flex: 1; min-width: 50px; padding: 0.4rem 0.5rem; font-size: 0.6875rem; font-weight: 600; border: 1.5px solid #e5e7eb; border-radius: 6px; cursor: pointer; transition: all 0.15s; background: #fff; color: #1a1a1a; }
         .variant-btn.variant-coral { background: #ff5a5f; color: #fff; border-color: #ff5a5f; }
         .variant-btn.variant-black { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-        .variant-btn.variant-gradient { background: linear-gradient(135deg, #fff8f6, #fff0ed); border-color: #ffd4d1; }
+        .variant-btn.variant-gradient { background: linear-gradient(135deg, #fff5f3, #ffe8e5); border-color: #ffd4d1; }
         .variant-btn.variant-teal { background: #0d9488; color: #fff; border-color: #0d9488; }
         .variant-btn.active { box-shadow: 0 0 0 2px #ff5a5f; }
         .download-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.875rem; background: #ff5a5f; color: #fff; border: none; border-radius: 8px; font-size: 0.9375rem; font-weight: 700; cursor: pointer; transition: all 0.15s; }
