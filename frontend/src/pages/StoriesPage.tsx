@@ -157,9 +157,9 @@ const StoriesPage: React.FC = () => {
           font-family: var(--vs-font-serif);
           font-feature-settings: "liga", "dlig", "kern";
           font-weight: 600;
-          font-size: clamp(64px, 9vw, 132px);
-          line-height: 0.96;
-          letter-spacing: -0.035em;
+          font-size: clamp(48px, 6.5vw, 96px);
+          line-height: 0.98;
+          letter-spacing: -0.03em;
           color: var(--vs-ink);
           margin: 24px 0 32px;
         }

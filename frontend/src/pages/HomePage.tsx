@@ -211,9 +211,9 @@ const HomePage: React.FC = () => {
           font-family: var(--vs-font-serif);
           font-feature-settings: "liga", "dlig", "kern";
           font-weight: 600;
-          font-size: clamp(64px, 11vw, 160px);
-          line-height: 0.94;
-          letter-spacing: -0.04em;
+          font-size: clamp(48px, 7.5vw, 112px);
+          line-height: 0.96;
+          letter-spacing: -0.035em;
           color: var(--vs-ink);
           margin: 0 0 48px;
         }
@@ -245,9 +245,9 @@ const HomePage: React.FC = () => {
           font-family: var(--vs-font-serif);
           font-feature-settings: "liga", "dlig", "kern";
           font-weight: 600;
-          font-size: clamp(44px, 5.5vw, 84px);
-          line-height: 1;
-          letter-spacing: -0.025em;
+          font-size: clamp(36px, 4.2vw, 64px);
+          line-height: 1.04;
+          letter-spacing: -0.022em;
           color: var(--vs-ink);
           margin: 0;
         }

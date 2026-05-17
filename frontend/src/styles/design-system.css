@@ -85,19 +85,9 @@ body {
   position: relative;
 }
 
-/* Subtle newsprint grain over the entire viewport */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  mix-blend-mode: multiply;
-  opacity: 0.5;
-}
+/* (Grain texture removed — keeps colors true and crisp) */
 
-#root, .app { position: relative; z-index: 2; min-height: 100vh; display: flex; flex-direction: column; }
+#root, .app { min-height: 100vh; display: flex; flex-direction: column; background: var(--vs-ivory); }
 main { flex: 1; }
 
 a { color: inherit; text-decoration: none; }
@@ -111,10 +101,10 @@ h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.02em;
   color: var(--vs-ink);
 }
-h1 { font-weight: 600; font-size: clamp(56px, 7vw, 112px); line-height: 0.98; letter-spacing: -0.03em; }
-h2 { font-size: clamp(40px, 4.5vw, 72px); letter-spacing: -0.02em; }
-h3 { font-size: clamp(28px, 2.4vw, 44px); letter-spacing: -0.015em; line-height: 1.1; }
-h4 { font-size: 24px; letter-spacing: -0.01em; line-height: 1.2; }
+h1 { font-weight: 600; font-size: clamp(44px, 5.5vw, 88px); line-height: 1.0; letter-spacing: -0.03em; }
+h2 { font-size: clamp(32px, 3.6vw, 56px); letter-spacing: -0.02em; }
+h3 { font-size: clamp(24px, 2vw, 36px); letter-spacing: -0.015em; line-height: 1.15; }
+h4 { font-size: 20px; letter-spacing: -0.01em; line-height: 1.25; }
 
 p { color: var(--vs-ink); line-height: 1.6; font-family: var(--vs-font-sans); }
 
@@ -374,12 +364,12 @@ select {
   font-family: var(--vs-font-serif);
   font-feature-settings: "liga", "dlig", "kern";
   font-weight: 500;
-  font-size: clamp(28px, 2.8vw, 44px);
-  line-height: 1.1;
-  letter-spacing: -0.015em;
+  font-size: clamp(24px, 2.2vw, 36px);
+  line-height: 1.12;
+  letter-spacing: -0.012em;
   color: var(--vs-ink);
   margin: 0 0 20px;
-  max-width: 22ch;
+  max-width: 24ch;
   transition: color 200ms ease;
 }
 
@@ -440,9 +430,9 @@ select {
   font-family: var(--vs-font-serif);
   font-feature-settings: "liga", "dlig", "kern";
   font-weight: 500;
-  font-size: clamp(32px, 3.6vw, 56px);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  font-size: clamp(28px, 2.8vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.018em;
   color: var(--vs-ink);
 }
 
@@ -460,9 +450,9 @@ select {
   font-feature-settings: "liga", "dlig", "kern";
   font-weight: 500;
   font-style: italic;
-  font-size: clamp(36px, 4.4vw, 64px);
-  line-height: 1.15;
-  letter-spacing: -0.015em;
+  font-size: clamp(28px, 3.4vw, 48px);
+  line-height: 1.18;
+  letter-spacing: -0.012em;
   color: var(--vs-paper);
   max-width: 28ch;
 }

@@ -249,9 +249,9 @@ const joinStyles = `
     font-family: var(--vs-font-serif);
     font-feature-settings: "liga", "dlig", "kern";
     font-weight: 600;
-    font-size: clamp(56px, 7vw, 112px);
-    line-height: 0.98;
-    letter-spacing: -0.035em;
+    font-size: clamp(44px, 5.5vw, 80px);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
     color: var(--vs-ink);
     margin: 24px 0 32px;
   }
@@ -260,7 +260,7 @@ const joinStyles = `
   .jn-section { padding: 32px 0 128px; }
 
   .jn-what {
-    max-width: 720px;
+    max-width: 100%;
     padding: 48px 0;
     border-top: 1px solid var(--vs-rule);
     border-bottom: 1px solid var(--vs-rule);
@@ -290,7 +290,7 @@ const joinStyles = `
     flex-shrink: 0;
   }
 
-  .jn-form { max-width: 720px; }
+  .jn-form { max-width: 100%; }
 
   .jn-row {
     display: grid;

@@ -138,75 +138,81 @@ const SubmitStoryPage: React.FC = () => {
               </div>
             </div>
 
-            {/* 04 Author */}
-            <div className="sub-field">
-              <label className="sub-label">04 — How should we credit you?</label>
-              <div className="sub-toggle">
-                <button
-                  type="button"
-                  className={`sub-toggle-btn ${formData.isAnonymous ? 'is-active' : ''}`}
-                  onClick={() => setFormData({ ...formData, isAnonymous: true })}
-                >
-                  Anonymous
-                </button>
-                <button
-                  type="button"
-                  className={`sub-toggle-btn ${!formData.isAnonymous ? 'is-active' : ''}`}
-                  onClick={() => setFormData({ ...formData, isAnonymous: false })}
-                >
-                  My name
-                </button>
+            {/* 04 + 05 in a 2-column row */}
+            <div className="sub-form-row">
+              {/* 04 Author */}
+              <div className="sub-field">
+                <label className="sub-label">04 — How should we credit you?</label>
+                <div className="sub-toggle">
+                  <button
+                    type="button"
+                    className={`sub-toggle-btn ${formData.isAnonymous ? 'is-active' : ''}`}
+                    onClick={() => setFormData({ ...formData, isAnonymous: true })}
+                  >
+                    Anonymous
+                  </button>
+                  <button
+                    type="button"
+                    className={`sub-toggle-btn ${!formData.isAnonymous ? 'is-active' : ''}`}
+                    onClick={() => setFormData({ ...formData, isAnonymous: false })}
+                  >
+                    My name
+                  </button>
+                </div>
+                <p className="sub-help" style={{ marginTop: 12 }}>
+                  Editors always know who wrote each story — readers only see what you choose.
+                </p>
               </div>
-              <p className="sub-help" style={{ marginTop: 12 }}>
-                Editors always know who wrote each story — readers only see what you choose.
-              </p>
+
+              {/* 05 University */}
+              <div className="sub-field">
+                <label className="sub-label" htmlFor="university">
+                  05 — Affiliation <span className="opt">(optional)</span>
+                </label>
+                <select
+                  id="university"
+                  value={formData.university}
+                  onChange={(e) => setFormData({ ...formData, university: e.target.value })}
+                >
+                  <option value="">None / Prefer not to say</option>
+                  {UNIVERSITIES.map((uni: string) => (
+                    <option key={uni} value={uni}>{uni}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
-            {/* 05 University */}
-            <div className="sub-field">
-              <label className="sub-label" htmlFor="university">
-                05 — Affiliation <span className="opt">(optional)</span>
-              </label>
-              <select
-                id="university"
-                value={formData.university}
-                onChange={(e) => setFormData({ ...formData, university: e.target.value })}
-              >
-                <option value="">None / Prefer not to say</option>
-                {UNIVERSITIES.map((uni: string) => (
-                  <option key={uni} value={uni}>{uni}</option>
-                ))}
-              </select>
-            </div>
+            {/* 06 + 07 in a 2-column row */}
+            <div className="sub-form-row">
+              {/* 06 Content warning */}
+              <div className="sub-field">
+                <label className="sub-label">06 — Sensitive content</label>
+                <label className="sub-check">
+                  <input
+                    type="checkbox"
+                    checked={formData.hasContentWarning}
+                    onChange={(e) => setFormData({ ...formData, hasContentWarning: e.target.checked })}
+                  />
+                  <span>
+                    This story includes trauma, loss, or graphic detail. Add a content warning.
+                  </span>
+                </label>
+              </div>
 
-            {/* 06 Content warning */}
-            <div className="sub-field">
-              <label className="sub-label">06 — Sensitive content</label>
-              <label className="sub-check">
-                <input
-                  type="checkbox"
-                  checked={formData.hasContentWarning}
-                  onChange={(e) => setFormData({ ...formData, hasContentWarning: e.target.checked })}
-                />
-                <span>
-                  This story includes trauma, loss, or graphic detail. Add a content warning.
-                </span>
-              </label>
-            </div>
-
-            {/* 07 Consent */}
-            <div className="sub-field">
-              <label className="sub-label">07 — Consent <span className="req">*</span></label>
-              <label className="sub-check">
-                <input
-                  type="checkbox"
-                  checked={formData.consentGiven}
-                  onChange={(e) => setFormData({ ...formData, consentGiven: e.target.checked })}
-                />
-                <span>
-                  I consent to this story being reviewed and published on Vital Signs.
-                </span>
-              </label>
+              {/* 07 Consent */}
+              <div className="sub-field">
+                <label className="sub-label">07 — Consent <span className="req">*</span></label>
+                <label className="sub-check">
+                  <input
+                    type="checkbox"
+                    checked={formData.consentGiven}
+                    onChange={(e) => setFormData({ ...formData, consentGiven: e.target.checked })}
+                  />
+                  <span>
+                    I consent to this story being reviewed and published on Vital Signs.
+                  </span>
+                </label>
+              </div>
             </div>
 
             <div className="sub-cta">
@@ -237,16 +243,25 @@ const submitStyles = `
     font-family: var(--vs-font-serif);
     font-feature-settings: "liga", "dlig", "kern";
     font-weight: 600;
-    font-size: clamp(56px, 8vw, 120px);
-    line-height: 0.98;
-    letter-spacing: -0.035em;
+    font-size: clamp(44px, 5.5vw, 80px);
+    line-height: 1;
+    letter-spacing: -0.03em;
     color: var(--vs-ink);
     margin: 24px 0 32px;
   }
   .sub-title em { font-style: italic; font-weight: 500; }
 
   .sub-form-section { padding: 0 0 128px; }
-  .sub-form { max-width: 560px; }
+  .sub-form { max-width: 100%; }
+  .sub-form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .sub-form-row > .sub-field { margin-bottom: 0; }
+  @media (max-width: 700px) {
+    .sub-form-row { grid-template-columns: 1fr; gap: 0; }
+  }
 
   .sub-field {
     display: flex;

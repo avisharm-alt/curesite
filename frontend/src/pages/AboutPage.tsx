@@ -121,9 +121,9 @@ const AboutPage: React.FC = () => {
           font-family: var(--vs-font-serif);
           font-feature-settings: "liga", "dlig", "kern";
           font-weight: 600;
-          font-size: clamp(56px, 7vw, 120px);
-          line-height: 0.98;
-          letter-spacing: -0.035em;
+          font-size: clamp(44px, 5.5vw, 80px);
+          line-height: 1.02;
+          letter-spacing: -0.03em;
           color: var(--vs-ink);
           margin: 24px 0 32px;
         }
@@ -141,9 +141,9 @@ const AboutPage: React.FC = () => {
           font-family: var(--vs-font-serif);
           font-feature-settings: "liga", "dlig", "kern";
           font-weight: 500;
-          font-size: clamp(32px, 3.4vw, 52px);
-          line-height: 1.05;
-          letter-spacing: -0.02em;
+          font-size: clamp(28px, 2.8vw, 40px);
+          line-height: 1.08;
+          letter-spacing: -0.018em;
           color: var(--vs-ink);
           margin: 0;
         }
@@ -169,9 +169,9 @@ const AboutPage: React.FC = () => {
           font-feature-settings: "liga", "dlig", "kern";
           font-style: italic;
           font-weight: 500;
-          font-size: clamp(36px, 4.4vw, 64px);
-          line-height: 1.15;
-          letter-spacing: -0.015em;
+          font-size: clamp(28px, 3.4vw, 48px);
+          line-height: 1.18;
+          letter-spacing: -0.012em;
           color: var(--vs-ink);
           max-width: 28ch;
           margin: 0;
@@ -196,9 +196,9 @@ const AboutPage: React.FC = () => {
           font-family: var(--vs-font-serif);
           font-feature-settings: "liga", "dlig", "kern";
           font-weight: 600;
-          font-size: clamp(44px, 5.5vw, 84px);
-          line-height: 1;
-          letter-spacing: -0.025em;
+          font-size: clamp(36px, 4.2vw, 64px);
+          line-height: 1.04;
+          letter-spacing: -0.022em;
           color: var(--vs-ink);
           margin: 0;
         }
