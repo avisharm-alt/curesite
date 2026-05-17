@@ -1,299 +1,271 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
-import StoryCard from '../components/StoryCard.tsx';
-import TagPill from '../components/TagPill.tsx';
-import CTASection from '../components/CTASection.tsx';
-import SectionHeader from '../components/SectionHeader.tsx';
 import { FEATURED_STORIES, HEALTH_TAGS } from '../data/mockData.ts';
 
+const stripHtml = (s: string) => (s || '').replace(/<[^>]*>/g, '');
+const truncate = (s: string, n = 200) => {
+  const t = stripHtml(s);
+  return t.length <= n ? t : t.slice(0, n).trim() + '…';
+};
+const formatDate = (d: string) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase() : '';
+const readTime = (text: string) => {
+  const w = stripHtml(text).split(/\s+/).length;
+  return `${Math.max(1, Math.round(w / 200))} MIN READ`;
+};
+
 const HomePage: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="home-page">
-      {/* Hero Section */}
-      <section className="hero">
+      {/* ---------- 01 HERO ---------- */}
+      <section className="hp-hero">
         <div className="container">
-          <motion.div
-            className="hero-content"
-            initial={{ opacity: 0, y: 30 }}
+          <div className="hp-hero-top">
+            <motion.div
+              className="vs-eyebrow"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              — ON THE PLATFORM
+            </motion.div>
+            <motion.div
+              className="hp-affiliation"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.08 }}
+            >
+              University of Toronto<br />Affiliated
+            </motion.div>
+          </div>
+
+          <motion.h1
+            className="hp-hero-title"
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: 'easeOut' }}
+            transition={{ duration: 0.7, delay: 0.12 }}
           >
-            <h1 className="hero-title">
-              Real stories.<br />
-              Real health.<br />
-              Real people.
-            </h1>
-            <div className="uoft-badge">
-              <svg className="uoft-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                <path d="M2 17l10 5 10-5"/>
-                <path d="M2 12l10 5 10-5"/>
-              </svg>
-              <span className="uoft-text">University of Toronto Affiliated</span>
-            </div>
-            <p className="hero-subtitle">
-              A platform for authentic health storytelling. Share your experience, 
-              read others' stories, and connect with a community that understands.
-            </p>
-            <div className="hero-actions">
-              <Link to="/submit" className="btn btn-primary btn-lg">
-                Share Your Story
-                <ArrowRight size={18} />
-              </Link>
-              <Link to="/stories" className="btn btn-secondary btn-lg">
-                Read Stories
-              </Link>
-            </div>
+            Real stories.<br />
+            Real health.<br />
+            Real <em>people</em><span className="vs-period">.</span>
+          </motion.h1>
+
+          <motion.p
+            className="hp-hero-lead"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.2 }}
+          >
+            A literary space where people share the health experiences that
+            shaped them — so others reading don’t have to carry them alone.
+          </motion.p>
+
+          <motion.div
+            className="hp-cta-row"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.28 }}
+          >
+            <Link to="/submit" className="btn btn-primary btn-lg">Share your story</Link>
+            <Link to="/stories" className="btn btn-secondary btn-lg">Read the archive →</Link>
           </motion.div>
         </div>
       </section>
 
-      {/* Featured Stories Section */}
-      <section className="section featured-section">
+      {/* ---------- 02 FEATURED ---------- */}
+      <section className="section hp-featured">
         <div className="container">
-          <div className="featured-header">
-            <SectionHeader
-              title="Featured Stories"
-              subtitle="Selected stories from our community"
-            />
-            <Link to="/stories" className="btn btn-ghost">
-              View all
-              <ArrowRight size={16} />
-            </Link>
+          <div className="vs-section-number"><span className="num">02</span>— FEATURED</div>
+          <div className="hp-feat-header">
+            <h2 className="hp-section-title">
+              The stories<br />we’re reading<span className="vs-period">.</span>
+            </h2>
+            <Link to="/stories" className="btn btn-ghost">See all →</Link>
           </div>
-          <div className="stories-grid">
-            {FEATURED_STORIES.map((story, index) => (
-              <StoryCard key={story.id} story={story} index={index} />
+
+          <div className="vs-story-list">
+            {FEATURED_STORIES.slice(0, 4).map((s: any, idx: number) => (
+              <motion.article
+                key={s.id}
+                className={`vs-story-card ${idx === 0 ? 'vs-story-card--featured' : ''}`}
+                onClick={() => navigate(`/stories/${s.id}`)}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.55, delay: idx * 0.08 }}
+              >
+                <div className="vs-story-card-meta-top">
+                  {s.hasContentWarning && (
+                    <span className="vs-chip vs-chip--warning">Content Warning</span>
+                  )}
+                  {(s.tags || []).slice(0, 2).map((t: string) => (
+                    <span key={t} className="vs-chip">{t}</span>
+                  ))}
+                </div>
+                <h3 className="vs-story-card-title">{s.title}</h3>
+                <p className="vs-story-card-excerpt">{truncate(s.preview || s.body, 200)}</p>
+                <div className="vs-story-card-footer">
+                  <span>— {s.isAnonymous ? 'ANONYMOUS' : (s.authorName || 'ANONYMOUS').toUpperCase()} · {readTime(s.body || s.preview || '')}</span>
+                  <span className="right">
+                    {formatDate(s.publishedAt)}
+                    <span className="vs-story-card-arrow">→</span>
+                  </span>
+                </div>
+              </motion.article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Topics Section */}
-      <section className="section topics-section">
+      {/* ---------- 03 THEMES ---------- */}
+      <section className="section hp-themes">
         <div className="container">
-          <SectionHeader
-            title="Explore by Topic"
-            subtitle="Find stories that resonate with your experience"
-            align="center"
-          />
-          <motion.div
-            className="topics-grid"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-          >
-            {HEALTH_TAGS.map((tag) => (
-              <Link key={tag.id} to={`/stories?tag=${encodeURIComponent(tag.name)}`}>
-                <TagPill tag={tag.name} count={tag.count} size="lg" />
+          <div className="vs-section-number"><span className="num">03</span>— THEMES</div>
+          <div className="vs-grid-asym hp-themes-header">
+            <h2 className="hp-section-title">
+              Read by what<br /><em className="vs-italic vs-coral">matters</em> to you<span className="vs-period">.</span>
+            </h2>
+            <p className="vs-lead">
+              Every story finds its readers. Browse by the experience that brought you here
+              — chronic illness, mental health, caregiving, recovery.
+            </p>
+          </div>
+
+          <div className="vs-themes">
+            {HEALTH_TAGS.map((tag: any) => (
+              <Link
+                key={tag.id}
+                to={`/stories?tag=${encodeURIComponent(tag.name)}`}
+                className="vs-theme-row"
+              >
+                <span className="vs-theme-marker" />
+                <span className="vs-theme-name">{tag.name}</span>
+                <span className="vs-theme-count">
+                  {tag.count || 0} {tag.count === 1 ? 'STORY' : 'STORIES'}
+                </span>
               </Link>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
-      {/* About Preview Section */}
-      <section className="section about-preview-section">
+      {/* ---------- 04 STATEMENT ---------- */}
+      <section className="section vs-section--charcoal hp-statement">
         <div className="container">
-          <motion.div
-            className="about-preview"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="about-preview-title">Why Vital Signs?</h2>
-            <p className="about-preview-text">
-              Vital Signs is a place for people to share health experiences with honesty, 
-              empathy, and care. We believe that storytelling has the power to reduce stigma, 
-              build understanding, and help others feel less alone.
-            </p>
-            <Link to="/about" className="btn btn-ghost">
-              Learn more about us
-              <ArrowRight size={16} />
-            </Link>
-          </motion.div>
+          <div className="vs-section-number" style={{ color: 'rgba(245,242,234,0.6)' }}>
+            <span className="num">04</span>— EDITORIAL NOTE
+          </div>
+          <p className="vs-statement-quote">
+            We don’t publish health <em>content</em>.
+            We publish the people who lived it.
+          </p>
+          <div className="vs-statement-attr">— The editors</div>
         </div>
       </section>
 
-      {/* Final CTA */}
-      <CTASection
-        title="Everyone has a health story."
-        subtitle="What's yours?"
-        buttonText="Share Your Story"
-        buttonLink="/submit"
-      />
+      {/* ---------- 05 CTA ---------- */}
+      <section className="section hp-cta">
+        <div className="container">
+          <div className="vs-section-number"><span className="num">05</span>— YOUR TURN</div>
+          <div className="vs-grid-asym hp-cta-row">
+            <h2 className="hp-section-title">
+              Share your <em className="vs-italic vs-coral">story</em><span className="vs-period">.</span>
+            </h2>
+            <div>
+              <p className="vs-lead">
+                Anonymously or with your name. Reviewed by editors. Read by people
+                who needed to hear it.
+              </p>
+              <div style={{ marginTop: 32 }}>
+                <Link to="/submit" className="btn btn-primary btn-lg">Begin writing</Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <style>{`
-        .home-page {
-          min-height: 100vh;
-        }
+        .home-page { min-height: 100vh; background: var(--vs-ivory); }
 
-        /* Hero */
-        .hero {
-          padding: var(--vs-space-24) 0 var(--vs-space-20);
-          background: var(--vs-white);
-        }
-
-        .hero-content {
-          max-width: 720px;
-        }
-
-        .hero-title {
-          font-size: 4rem;
-          font-weight: 700;
-          line-height: 1.05;
-          letter-spacing: -0.03em;
-          color: var(--vs-text-primary);
-          margin-bottom: var(--vs-space-6);
-        }
-
-        .uoft-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.625rem;
-          color: #002A5C;
-          padding: 0;
-          font-size: 0.875rem;
-          font-weight: 500;
-          margin-bottom: 1.5rem;
-          letter-spacing: 0.01em;
-        }
-
-        .uoft-icon {
-          width: 18px;
-          height: 18px;
-          color: #002A5C;
-          opacity: 0.7;
-        }
-
-        .uoft-text {
-          color: #002A5C;
-          opacity: 0.75;
-        }
-
-        .hero-subtitle {
-          font-size: 1.25rem;
-          line-height: 1.7;
-          color: var(--vs-text-secondary);
-          margin-bottom: var(--vs-space-8);
-          max-width: 560px;
-        }
-
-        .hero-actions {
-          display: flex;
-          gap: var(--vs-space-4);
-          flex-wrap: wrap;
-        }
-
-        .hero-actions .btn {
-          display: inline-flex;
-          align-items: center;
-          gap: var(--vs-space-2);
-        }
-
-        /* Featured */
-        .featured-section {
-          background: var(--vs-bg-subtle);
-          border-top: 1px solid var(--vs-border);
-          border-bottom: 1px solid var(--vs-border);
-        }
-
-        .featured-header {
+        .hp-hero { padding: 120px 0 96px; }
+        .hp-hero-top {
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
+          margin-bottom: 96px;
+          gap: 32px;
         }
-
-        .featured-header .btn-ghost {
-          display: flex;
-          align-items: center;
-          gap: var(--vs-space-1);
+        .hp-affiliation {
+          font-family: var(--vs-font-mono);
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--vs-ink-muted);
+          text-align: right;
+          line-height: 1.5;
         }
-
-        .stories-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: var(--vs-space-6);
-        }
-
-        /* Topics */
-        .topics-section {
-          background: var(--vs-white);
-        }
-
-        .topics-grid {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: var(--vs-space-3);
-        }
-
-        .topics-grid a {
-          text-decoration: none;
-        }
-
-        /* About Preview */
-        .about-preview-section {
-          background: var(--vs-bg-subtle);
-          border-top: 1px solid var(--vs-border);
-        }
-
-        .about-preview {
-          max-width: 640px;
-          margin: 0 auto;
-          text-align: center;
-        }
-
-        .about-preview-title {
-          font-size: 2rem;
+        .hp-hero-title {
+          font-family: var(--vs-font-serif);
+          font-feature-settings: "liga", "dlig", "kern";
           font-weight: 600;
-          margin-bottom: var(--vs-space-4);
+          font-size: clamp(64px, 11vw, 160px);
+          line-height: 0.94;
+          letter-spacing: -0.04em;
+          color: var(--vs-ink);
+          margin: 0 0 48px;
         }
-
-        .about-preview-text {
-          font-size: 1.125rem;
-          line-height: 1.8;
-          color: var(--vs-text-secondary);
-          margin-bottom: var(--vs-space-6);
+        .hp-hero-title em {
+          font-style: italic;
+          font-weight: 500;
+          color: var(--vs-coral);
         }
-
-        .about-preview .btn-ghost {
-          display: inline-flex;
-          align-items: center;
-          gap: var(--vs-space-1);
+        .hp-hero-lead {
+          font-family: var(--vs-font-sans);
+          font-size: clamp(18px, 1.6vw, 22px);
+          line-height: 1.5;
+          color: var(--vs-ink-muted);
+          max-width: 56ch;
+          margin: 0 0 56px;
         }
+        .hp-cta-row { display: flex; gap: 16px; flex-wrap: wrap; }
 
-        @media (max-width: 1024px) {
-          .stories-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
+        .hp-featured { background: var(--vs-sand); }
+        .hp-feat-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+          gap: 24px;
+          flex-wrap: wrap;
+          margin: 24px 0 48px;
         }
+        .hp-section-title {
+          font-family: var(--vs-font-serif);
+          font-feature-settings: "liga", "dlig", "kern";
+          font-weight: 600;
+          font-size: clamp(44px, 5.5vw, 84px);
+          line-height: 1;
+          letter-spacing: -0.025em;
+          color: var(--vs-ink);
+          margin: 0;
+        }
+        .hp-section-title em { font-style: italic; font-weight: 500; }
 
-        @media (max-width: 768px) {
-          .hero {
-            padding: var(--vs-space-16) 0 var(--vs-space-12);
-          }
+        .hp-themes-header { margin: 24px 0 64px; }
 
-          .hero-title {
-            font-size: 2.75rem;
-          }
+        .hp-statement { padding: 200px 0; }
+        .hp-statement .vs-statement-quote { margin-top: 64px; }
 
-          .hero-subtitle {
-            font-size: 1.125rem;
-          }
+        .hp-cta-row { margin-top: 32px; }
 
-          .stories-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .featured-header {
-            flex-direction: column;
-            gap: var(--vs-space-4);
-          }
+        @media (max-width: 900px) {
+          .hp-hero { padding: 72px 0 64px; }
+          .hp-hero-top { margin-bottom: 48px; }
+          .hp-affiliation { display: none; }
+          .hp-hero-lead { font-size: 18px; margin-bottom: 40px; }
+          .hp-statement { padding: 120px 0; }
         }
       `}</style>
     </div>

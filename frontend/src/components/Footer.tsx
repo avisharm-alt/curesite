@@ -2,134 +2,131 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
+  const year = new Date().getFullYear();
   return (
-    <footer className="footer">
-      <div className="footer-container">
-        <div className="footer-top">
-          <div className="footer-brand">
-            <Link to="/" className="footer-logo">
-              Vital Signs<span className="footer-logo-dot">.</span>
+    <footer className="vs-footer">
+      <div className="vs-footer-container">
+        <div className="vs-footer-grid">
+          <div className="vs-footer-brand">
+            <Link to="/" className="vs-footer-wordmark">
+              Vital Signs<span className="vs-period">.</span>
             </Link>
-            <p className="footer-tagline">
-              Real stories. Real health. Real people.
+            <p className="vs-footer-tagline">
+              A community where people share their health experiences to build empathy,
+              reduce stigma, and feel a little less alone.
             </p>
           </div>
-          
-          <div className="footer-links">
-            <div className="footer-column">
-              <h4 className="footer-column-title">Platform</h4>
-              <Link to="/stories">Read Stories</Link>
-              <Link to="/submit">Share Your Story</Link>
-              <Link to="/about">About Us</Link>
-            </div>
-            <div className="footer-column">
-              <h4 className="footer-column-title">Legal</h4>
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Content Guidelines</a>
-            </div>
+
+          <div className="vs-footer-col">
+            <h4>— Read</h4>
+            <Link to="/stories">All Stories</Link>
+            <Link to="/stories?tag=Mental%20Health">Mental Health</Link>
+            <Link to="/stories?tag=Chronic%20Illness">Chronic Illness</Link>
+            <Link to="/stories?tag=Caregiving">Caregiving</Link>
+          </div>
+
+          <div className="vs-footer-col">
+            <h4>— Contribute</h4>
+            <Link to="/submit">Share a Story</Link>
+            <Link to="/join">Join the Board</Link>
+            <Link to="/about">About Vital Signs</Link>
+          </div>
+
+          <div className="vs-footer-col">
+            <h4>— Connect</h4>
+            <a href="mailto:hello@vitalsigns.org">hello@vitalsigns.org</a>
+            <a href="https://utoronto.ca" target="_blank" rel="noreferrer">University of Toronto</a>
           </div>
         </div>
-        
-        <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Vital Signs. All rights reserved.</p>
+
+        <div className="vs-footer-bottom">
+          <span>
+            © {year} Vital Signs<span className="vs-period">.</span> &nbsp;&nbsp; All rights reserved.
+          </span>
+          <span>vitalsigns.org</span>
         </div>
       </div>
 
       <style>{`
-        .footer {
-          background: var(--vs-black);
-          color: var(--vs-white);
-          padding: var(--vs-space-16) 0 var(--vs-space-8);
+        .vs-footer {
+          background: var(--vs-charcoal);
+          color: var(--vs-paper);
+          padding: 96px 0 48px;
+          position: relative;
+          z-index: 3;
         }
-
-        .footer-container {
-          max-width: 1200px;
+        .vs-footer-container {
+          max-width: 1280px;
           margin: 0 auto;
-          padding: 0 var(--vs-space-6);
+          padding: 0 96px;
         }
+        .vs-footer-grid {
+          display: grid;
+          grid-template-columns: 1.6fr 1fr 1fr 1fr;
+          gap: 64px;
+          margin-bottom: 80px;
+        }
+        .vs-footer-brand { max-width: 36ch; }
+        .vs-footer-wordmark {
+          font-family: var(--vs-font-serif);
+          font-weight: 600;
+          font-size: 38px;
+          letter-spacing: -0.02em;
+          color: var(--vs-paper);
+          line-height: 1;
+          display: inline-block;
+          margin-bottom: 20px;
+        }
+        .vs-footer-tagline {
+          font-family: var(--vs-font-sans);
+          font-size: 14px;
+          color: rgba(245, 242, 234, 0.6);
+          line-height: 1.6;
+          margin: 0;
+        }
+        .vs-footer-col h4 {
+          font-family: var(--vs-font-mono);
+          font-size: 11px;
+          font-weight: 400;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--vs-coral);
+          margin: 0 0 24px;
+          line-height: 1;
+        }
+        .vs-footer-col a {
+          display: block;
+          font-family: var(--vs-font-sans);
+          font-size: 14px;
+          color: rgba(245, 242, 234, 0.78);
+          margin-bottom: 12px;
+          transition: color 200ms ease;
+        }
+        .vs-footer-col a:hover { color: var(--vs-coral); }
 
-        .footer-top {
+        .vs-footer-bottom {
           display: flex;
           justify-content: space-between;
-          padding-bottom: var(--vs-space-12);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .footer-brand {
-          max-width: 280px;
-        }
-
-        .footer-logo {
-          font-size: 1.25rem;
-          font-weight: 600;
-          color: var(--vs-white);
-          text-decoration: none;
-        }
-
-        .footer-logo-dot {
-          color: var(--vs-coral);
-        }
-
-        .footer-tagline {
-          margin-top: var(--vs-space-3);
-          font-size: 0.9375rem;
-          color: rgba(255, 255, 255, 0.5);
-        }
-
-        .footer-links {
-          display: flex;
-          gap: var(--vs-space-16);
-        }
-
-        .footer-column {
-          display: flex;
-          flex-direction: column;
-          gap: var(--vs-space-3);
-        }
-
-        .footer-column-title {
-          font-size: 0.8125rem;
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.4);
+          align-items: center;
+          padding-top: 32px;
+          border-top: 1px solid var(--vs-rule-dark);
+          font-family: var(--vs-font-mono);
+          font-size: 10.5px;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
-          letter-spacing: 0.05em;
-          margin-bottom: var(--vs-space-2);
+          color: rgba(245, 242, 234, 0.5);
         }
+        .vs-footer-bottom .vs-period { color: var(--vs-coral); }
 
-        .footer-column a {
-          font-size: 0.9375rem;
-          color: rgba(255, 255, 255, 0.7);
-          text-decoration: none;
-          transition: color var(--vs-transition-fast);
+        @media (max-width: 1024px) {
+          .vs-footer-grid { grid-template-columns: 1fr 1fr; gap: 48px; }
         }
-
-        .footer-column a:hover {
-          color: var(--vs-white);
+        @media (max-width: 900px) {
+          .vs-footer-container { padding: 0 24px; }
         }
-
-        .footer-bottom {
-          padding-top: var(--vs-space-8);
-        }
-
-        .footer-bottom p {
-          font-size: 0.875rem;
-          color: rgba(255, 255, 255, 0.4);
-        }
-
-        @media (max-width: 768px) {
-          .footer-top {
-            flex-direction: column;
-            gap: var(--vs-space-10);
-          }
-
-          .footer-links {
-            gap: var(--vs-space-10);
-          }
-
-          .footer-container {
-            padding: 0 var(--vs-space-4);
-          }
+        @media (max-width: 600px) {
+          .vs-footer-grid { grid-template-columns: 1fr; gap: 40px; }
+          .vs-footer-bottom { flex-direction: column; gap: 12px; align-items: flex-start; }
         }
       `}</style>
     </footer>

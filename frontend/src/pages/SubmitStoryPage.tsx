@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Check, AlertTriangle, Eye, EyeOff } from 'lucide-react';
-import SectionHeader from '../components/SectionHeader.tsx';
-import TagPill from '../components/TagPill.tsx';
+import { Link } from 'react-router-dom';
+import { Check } from 'lucide-react';
 import { HEALTH_TAGS, UNIVERSITIES } from '../data/mockData.ts';
 
 const SubmitStoryPage: React.FC = () => {
@@ -28,362 +27,365 @@ const SubmitStoryPage: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock submission
     setSubmitted(true);
   };
 
-  const isValid = formData.title && formData.body && formData.tags.length > 0 && formData.consentGiven;
+  const isValid = formData.title && formData.body.trim().length >= 100 && formData.tags.length > 0 && formData.consentGiven;
 
   if (submitted) {
     return (
       <div className="submit-success">
         <div className="container container-sm">
           <motion.div
-            className="success-content"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
+            className="ss-content"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <div className="success-icon">
-              <Check size={32} />
-            </div>
-            <h1>Story Submitted</h1>
+            <div className="vs-eyebrow">— RECEIVED</div>
+            <h1>Thank you<span className="vs-period">.</span></h1>
             <p>
-              Thank you for sharing your story. Our team will review it and
-              you'll be notified once it's published.
+              Your story is with our editors now. We read every submission carefully
+              and respond within a few days. If we suggest small edits for clarity,
+              we’ll explain why — and your voice always wins.
             </p>
+            <div className="ss-actions">
+              <Link to="/stories" className="btn btn-primary">Read the archive</Link>
+              <Link to="/" className="btn btn-secondary">Back to home</Link>
+            </div>
           </motion.div>
         </div>
+        <style>{submitStyles}</style>
       </div>
     );
   }
 
   return (
     <div className="submit-page">
-      <section className="submit-header">
-        <div className="container container-sm">
-          <SectionHeader
-            title="Share Your Story"
-            subtitle="Your experience matters. Share it with a community that cares."
-          />
+      <section className="sub-hero">
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55 }}
+          >
+            <div className="vs-eyebrow">— SHARE YOUR STORY</div>
+            <h1 className="sub-title">
+              Tell us what <em className="vs-italic vs-coral">mattered</em><span className="vs-period">.</span>
+            </h1>
+            <p className="vs-lead">
+              Write at your own pace. Anonymously or with your name. We review every
+              story for safety and respect before it’s published — usually within a few days.
+            </p>
+          </motion.div>
         </div>
       </section>
 
-      <section className="submit-form-section">
-        <div className="container container-sm">
-          <form className="submit-form" onSubmit={handleSubmit}>
-            {/* Title */}
-            <div className="form-group">
-              <label className="form-label">Title</label>
+      <section className="sub-form-section">
+        <div className="container">
+          <form className="sub-form" onSubmit={handleSubmit}>
+            {/* 01 Title */}
+            <div className="sub-field">
+              <label className="sub-label" htmlFor="title">
+                01 — Title <span className="req">*</span>
+              </label>
               <input
+                id="title"
                 type="text"
-                className="input"
-                placeholder="Give your story a title"
+                placeholder="A line that catches what this is about"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 maxLength={120}
               />
-              <span className="form-hint">{formData.title.length}/120</span>
+              <div className="sub-foot">
+                <span>{formData.title.length}/120</span>
+              </div>
             </div>
 
-            {/* Body */}
-            <div className="form-group">
-              <label className="form-label">Your Story</label>
+            {/* 02 Body */}
+            <div className="sub-field">
+              <label className="sub-label" htmlFor="body">
+                02 — Your story <span className="req">*</span>
+              </label>
               <textarea
-                className="input textarea story-textarea"
-                placeholder="Share your experience. Take your time—there's no wrong way to tell your story."
+                id="body"
+                placeholder="Start anywhere. The diagnosis. The waiting room. The first morning after."
                 value={formData.body}
                 onChange={(e) => setFormData({ ...formData, body: e.target.value })}
-                rows={12}
               />
+              <div className="sub-foot">
+                <span className="sub-help">Most stories run 400–1,500 words. Take your time.</span>
+                <span>{formData.body.trim().split(/\s+/).filter(Boolean).length} words</span>
+              </div>
             </div>
 
-            {/* Tags */}
-            <div className="form-group">
-              <label className="form-label">Topics</label>
-              <p className="form-description">Select all that apply</p>
-              <div className="tags-grid">
-                {HEALTH_TAGS.map((tag) => (
-                  <TagPill
-                    key={tag.id}
-                    tag={tag.name}
-                    active={formData.tags.includes(tag.name)}
-                    onClick={() => handleTagToggle(tag.name)}
-                  />
+            {/* 03 Tags */}
+            <div className="sub-field">
+              <label className="sub-label">03 — Topics <span className="req">*</span></label>
+              <p className="sub-help" style={{ marginBottom: 12 }}>Select all that apply.</p>
+              <div className="sub-tags">
+                {HEALTH_TAGS.map((t: any) => (
+                  <button
+                    type="button"
+                    key={t.id}
+                    className={`vs-chip ${formData.tags.includes(t.name) ? 'vs-chip--active' : ''}`}
+                    onClick={() => handleTagToggle(t.name)}
+                  >
+                    {formData.tags.includes(t.name) && <Check size={11} strokeWidth={2.5} />}
+                    {t.name}
+                  </button>
                 ))}
               </div>
             </div>
 
-            {/* Author Display */}
-            <div className="form-group">
-              <label className="form-label">Author Display</label>
-              <div className="toggle-group">
+            {/* 04 Author */}
+            <div className="sub-field">
+              <label className="sub-label">04 — How should we credit you?</label>
+              <div className="sub-toggle">
                 <button
                   type="button"
-                  className={`toggle-btn ${formData.isAnonymous ? 'active' : ''}`}
+                  className={`sub-toggle-btn ${formData.isAnonymous ? 'is-active' : ''}`}
                   onClick={() => setFormData({ ...formData, isAnonymous: true })}
                 >
-                  <EyeOff size={18} />
-                  <span>Post Anonymously</span>
+                  Anonymous
                 </button>
                 <button
                   type="button"
-                  className={`toggle-btn ${!formData.isAnonymous ? 'active' : ''}`}
+                  className={`sub-toggle-btn ${!formData.isAnonymous ? 'is-active' : ''}`}
                   onClick={() => setFormData({ ...formData, isAnonymous: false })}
                 >
-                  <Eye size={18} />
-                  <span>Use My Name</span>
+                  My name
                 </button>
               </div>
-              <p className="form-hint">
-                Your identity is always private to moderators, regardless of display choice.
+              <p className="sub-help" style={{ marginTop: 12 }}>
+                Editors always know who wrote each story — readers only see what you choose.
               </p>
             </div>
 
-            {/* University */}
-            <div className="form-group">
-              <label className="form-label">University Affiliation <span className="optional">(optional)</span></label>
+            {/* 05 University */}
+            <div className="sub-field">
+              <label className="sub-label" htmlFor="university">
+                05 — Affiliation <span className="opt">(optional)</span>
+              </label>
               <select
-                className="input"
+                id="university"
                 value={formData.university}
                 onChange={(e) => setFormData({ ...formData, university: e.target.value })}
               >
-                <option value="">Select university (optional)</option>
-                {UNIVERSITIES.map((uni) => (
+                <option value="">None / Prefer not to say</option>
+                {UNIVERSITIES.map((uni: string) => (
                   <option key={uni} value={uni}>{uni}</option>
                 ))}
               </select>
             </div>
 
-            {/* Content Warning */}
-            <div className="form-group">
-              <label className="checkbox-label">
+            {/* 06 Content warning */}
+            <div className="sub-field">
+              <label className="sub-label">06 — Sensitive content</label>
+              <label className="sub-check">
                 <input
                   type="checkbox"
                   checked={formData.hasContentWarning}
                   onChange={(e) => setFormData({ ...formData, hasContentWarning: e.target.checked })}
                 />
-                <AlertTriangle size={18} />
-                <span>This story contains potentially distressing content</span>
+                <span>
+                  This story includes trauma, loss, or graphic detail. Add a content warning.
+                </span>
               </label>
             </div>
 
-            {/* Consent */}
-            <div className="form-group consent-group">
-              <label className="checkbox-label">
+            {/* 07 Consent */}
+            <div className="sub-field">
+              <label className="sub-label">07 — Consent <span className="req">*</span></label>
+              <label className="sub-check">
                 <input
                   type="checkbox"
                   checked={formData.consentGiven}
                   onChange={(e) => setFormData({ ...formData, consentGiven: e.target.checked })}
                 />
                 <span>
-                  I consent to this story being published on Vital Signs and understand
-                  it will be reviewed before publication.
+                  I consent to this story being reviewed and published on Vital Signs.
                 </span>
               </label>
             </div>
 
-            {/* Submit */}
-            <div className="form-actions">
-              <p className="form-notice">
-                Stories are reviewed by our team to ensure a safe, supportive environment.
-                You'll be notified when your story is published.
-              </p>
+            <div className="sub-cta">
               <button type="submit" className="btn btn-primary btn-lg" disabled={!isValid}>
-                Submit Story
+                Submit for review
               </button>
+              <Link to="/" className="btn btn-secondary">Save & exit</Link>
             </div>
+
+            <p className="sub-help" style={{ marginTop: 24, maxWidth: '60ch' }}>
+              By submitting, you understand your story will be read by our editorial team
+              before appearing on the site. We may suggest small edits for clarity — never tone.
+            </p>
           </form>
         </div>
       </section>
 
-      <style>{`
-        .submit-page {
-          min-height: 100vh;
-          background: var(--vs-white);
-        }
-
-        .submit-success {
-          min-height: 100vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
-        .success-content {
-          text-align: center;
-          max-width: 400px;
-        }
-
-        .success-icon {
-          width: 64px;
-          height: 64px;
-          background: rgba(255, 90, 95, 0.1);
-          color: var(--vs-coral);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          margin: 0 auto var(--vs-space-6);
-        }
-
-        .success-content h1 {
-          font-size: 2rem;
-          margin-bottom: var(--vs-space-4);
-        }
-
-        .submit-header {
-          padding: var(--vs-space-12) 0;
-          border-bottom: 1px solid var(--vs-border);
-        }
-
-        .submit-header .section-header {
-          margin-bottom: 0;
-        }
-
-        .submit-form-section {
-          padding: var(--vs-space-10) 0 var(--vs-space-20);
-        }
-
-        .submit-form {
-          display: flex;
-          flex-direction: column;
-          gap: var(--vs-space-8);
-        }
-
-        .form-group {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .form-label {
-          font-size: 0.9375rem;
-          font-weight: 600;
-          color: var(--vs-text-primary);
-          margin-bottom: var(--vs-space-2);
-        }
-
-        .form-label .optional {
-          font-weight: 400;
-          color: var(--vs-text-tertiary);
-        }
-
-        .form-description {
-          font-size: 0.875rem;
-          color: var(--vs-text-tertiary);
-          margin-bottom: var(--vs-space-3);
-        }
-
-        .form-hint {
-          font-size: 0.8125rem;
-          color: var(--vs-text-tertiary);
-          margin-top: var(--vs-space-2);
-        }
-
-        .story-textarea {
-          min-height: 320px;
-          line-height: 1.8;
-        }
-
-        .tags-grid {
-          display: flex;
-          flex-wrap: wrap;
-          gap: var(--vs-space-2);
-        }
-
-        .toggle-group {
-          display: flex;
-          gap: var(--vs-space-3);
-        }
-
-        .toggle-btn {
-          display: flex;
-          align-items: center;
-          gap: var(--vs-space-2);
-          padding: var(--vs-space-3) var(--vs-space-4);
-          font-family: var(--vs-font);
-          font-size: 0.9375rem;
-          font-weight: 500;
-          color: var(--vs-text-secondary);
-          background: var(--vs-white);
-          border: 1px solid var(--vs-border);
-          border-radius: var(--vs-radius-md);
-          cursor: pointer;
-          transition: all var(--vs-transition-fast);
-        }
-
-        .toggle-btn:hover {
-          border-color: var(--vs-border-hover);
-        }
-
-        .toggle-btn.active {
-          background: var(--vs-black);
-          color: var(--vs-white);
-          border-color: var(--vs-black);
-        }
-
-        .checkbox-label {
-          display: flex;
-          align-items: flex-start;
-          gap: var(--vs-space-3);
-          font-size: 0.9375rem;
-          color: var(--vs-text-primary);
-          cursor: pointer;
-        }
-
-        .checkbox-label input[type="checkbox"] {
-          width: 18px;
-          height: 18px;
-          margin-top: 2px;
-          accent-color: var(--vs-coral);
-        }
-
-        .checkbox-label svg {
-          color: var(--vs-coral);
-          flex-shrink: 0;
-          margin-top: 2px;
-        }
-
-        .consent-group {
-          padding: var(--vs-space-5);
-          background: var(--vs-bg-subtle);
-          border: 1px solid var(--vs-border);
-          border-radius: var(--vs-radius-lg);
-        }
-
-        .form-actions {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: var(--vs-space-4);
-          padding-top: var(--vs-space-6);
-          border-top: 1px solid var(--vs-border);
-        }
-
-        .form-notice {
-          font-size: 0.875rem;
-          color: var(--vs-text-tertiary);
-          text-align: right;
-          max-width: 400px;
-        }
-
-        @media (max-width: 768px) {
-          .toggle-group {
-            flex-direction: column;
-          }
-
-          .form-actions {
-            align-items: stretch;
-          }
-
-          .form-notice {
-            text-align: left;
-            max-width: none;
-          }
-        }
-      `}</style>
+      <style>{submitStyles}</style>
     </div>
   );
 };
+
+const submitStyles = `
+  .submit-page { min-height: 100vh; background: var(--vs-ivory); }
+
+  .sub-hero { padding: 96px 0 56px; }
+  .sub-title {
+    font-family: var(--vs-font-serif);
+    font-feature-settings: "liga", "dlig", "kern";
+    font-weight: 600;
+    font-size: clamp(56px, 8vw, 120px);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    color: var(--vs-ink);
+    margin: 24px 0 32px;
+  }
+  .sub-title em { font-style: italic; font-weight: 500; }
+
+  .sub-form-section { padding: 0 0 128px; }
+  .sub-form { max-width: 560px; }
+
+  .sub-field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 40px;
+  }
+  .sub-label {
+    font-family: var(--vs-font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--vs-ink-muted);
+  }
+  .sub-label .req { color: var(--vs-coral); margin-left: 4px; }
+  .sub-label .opt {
+    color: var(--vs-ink-faint);
+    text-transform: none;
+    letter-spacing: 0.04em;
+    margin-left: 4px;
+  }
+
+  .sub-foot {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--vs-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vs-ink-faint);
+  }
+  .sub-help {
+    font-family: var(--vs-font-sans);
+    font-size: 13px;
+    color: var(--vs-ink-muted);
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 0;
+  }
+
+  .sub-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  .sub-toggle {
+    display: inline-flex;
+    gap: 0;
+    border: 1px solid var(--vs-rule-strong);
+    border-radius: 999px;
+    padding: 4px;
+    width: fit-content;
+  }
+  .sub-toggle-btn {
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-family: var(--vs-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vs-ink-muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  .sub-toggle-btn.is-active {
+    background: var(--vs-ink);
+    color: var(--vs-paper);
+  }
+
+  .sub-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    cursor: pointer;
+    font-family: var(--vs-font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--vs-ink);
+  }
+  .sub-check input[type="checkbox"] {
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--vs-rule-strong);
+    border-radius: 4px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    background: var(--vs-ivory);
+    transition: all 180ms ease;
+  }
+  .sub-check input[type="checkbox"]:checked {
+    background: var(--vs-ink);
+    border-color: var(--vs-ink);
+  }
+  .sub-check input[type="checkbox"]:checked::after {
+    content: "";
+    width: 6px;
+    height: 10px;
+    border: solid var(--vs-paper);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg) translate(-1px, -2px);
+  }
+
+  .sub-cta {
+    display: flex;
+    gap: 16px;
+    margin-top: 48px;
+    flex-wrap: wrap;
+    padding-top: 32px;
+    border-top: 1px solid var(--vs-rule);
+  }
+
+  .submit-success {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    background: var(--vs-ivory);
+    padding: 96px 0;
+  }
+  .ss-content { max-width: 560px; }
+  .ss-content h1 {
+    font-family: var(--vs-font-serif);
+    font-weight: 600;
+    font-size: clamp(56px, 7vw, 96px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 24px 0 32px;
+  }
+  .ss-content p {
+    font-size: 18px;
+    color: var(--vs-ink-muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 54ch;
+  }
+  .ss-actions { display: flex; gap: 16px; flex-wrap: wrap; }
+`;
 
 export default SubmitStoryPage;

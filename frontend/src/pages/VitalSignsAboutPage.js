@@ -1,139 +1,125 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Users, Shield, MessageCircleHeart, PenLine } from 'lucide-react';
 
 const VitalSignsAboutPage = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="vs-page vs-about-page">
-      {/* Hero Section */}
-      <section className="vs-about-hero">
+    <div className="vs-page">
+      {/* Hero */}
+      <section className="vs-page-hero">
         <div className="vs-container">
-          <div className="vs-about-hero-content">
-            <h1>About Vital Signs</h1>
-            <p className="vs-about-tagline">
-              A community where health stories create connection, understanding, and hope.
-            </p>
-          </div>
+          <div className="vs-eyebrow">— ABOUT THE PLATFORM</div>
+          <div className="vs-spacer-sm" />
+          <h1 className="vs-page-title">
+            A platform for<br />
+            <em className="vs-italic vs-coral">authentic</em> health<br />
+            storytelling<span className="vs-period">.</span>
+          </h1>
+          <p className="vs-lead">
+            Vital Signs is a literary archive of first-person health experiences —
+            curated, edited, and held with care. Founded at the University of Toronto
+            in partnership with the people who lived these stories first.
+          </p>
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="vs-mission-section">
+      {/* Editorial rows */}
+      <section>
         <div className="vs-container">
-          <div className="vs-mission-content">
-            <div className="vs-mission-icon">
-              <Heart size={48} />
-            </div>
-            <h2>Our Mission</h2>
-            <p>
-              Health experiences are deeply personal, yet remarkably universal. Whether you're 
-              navigating a chronic illness, supporting a loved one through treatment, or reflecting 
-              on a health journey that changed your life—your story matters.
-            </p>
-            <p>
-              Vital Signs exists to create a safe space where people can share their authentic 
-              health experiences. We believe that storytelling has the power to reduce stigma, 
-              build empathy, and help others feel less alone in their struggles.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Values Section */}
-      <section className="vs-values-section">
-        <div className="vs-container">
-          <h2>What We Stand For</h2>
-          <div className="vs-values-grid">
-            <div className="vs-value-card">
-              <div className="vs-value-icon">
-                <MessageCircleHeart size={32} />
-              </div>
-              <h3>Authenticity</h3>
+          <div className="vs-about-row">
+            <h2>Why this exists.</h2>
+            <div>
               <p>
-                Real stories from real people. We value honest, unfiltered experiences that 
-                reflect the true complexity of health journeys.
+                Health experiences shape who we are, yet most people face them alone.
+                The doctor's visit is fifteen minutes. The recovery is months. The aftermath
+                is the rest of a life. None of it has anywhere to go.
               </p>
-            </div>
-            
-            <div className="vs-value-card">
-              <div className="vs-value-icon">
-                <Users size={32} />
-              </div>
-              <h3>Community</h3>
               <p>
-                You're not alone. Our platform connects people through shared experiences, 
-                creating a supportive community of understanding.
-              </p>
-            </div>
-            
-            <div className="vs-value-card">
-              <div className="vs-value-icon">
-                <Shield size={32} />
-              </div>
-              <h3>Safety</h3>
-              <p>
-                Your comfort matters. Share anonymously if you prefer, and know that all 
-                stories are reviewed to maintain a respectful, supportive environment.
+                Vital Signs is a place to put it down. To be read by others who needed
+                to read exactly that. To stop carrying the heavy parts in private.
               </p>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* How It Works Section */}
-      <section className="vs-how-section">
-        <div className="vs-container">
-          <h2>How It Works</h2>
-          <div className="vs-steps-grid">
-            <div className="vs-step">
-              <div className="vs-step-number">1</div>
-              <h3>Share Your Story</h3>
-              <p>Write about your health experience—whether it's a diagnosis, recovery, caregiving, or anything in between.</p>
+          <div className="vs-about-row">
+            <h2>How it works.</h2>
+            <div>
+              <p>
+                <strong>01 — Write.</strong> You share a story at whatever length and detail
+                feels right. Anonymously, or with your name attached.
+              </p>
+              <p>
+                <strong>02 — We review.</strong> A small editorial team reads every submission
+                for safety and clarity. We never change tone or voice — only suggest cuts where
+                a sentence isn't doing its job.
+              </p>
+              <p>
+                <strong>03 — It's published.</strong> Your story lives in the archive, searchable
+                by topic. Readers can mark it as resonating with their own experience — a small
+                signal that you helped someone feel less alone.
+              </p>
             </div>
-            <div className="vs-step">
-              <div className="vs-step-number">2</div>
-              <h3>We Review</h3>
-              <p>Our team reviews submissions to ensure a safe, supportive environment for everyone.</p>
-            </div>
-            <div className="vs-step">
-              <div className="vs-step-number">3</div>
-              <h3>Connect & Heal</h3>
-              <p>Your story is published and others can resonate with it, creating connections that help everyone feel less alone.</p>
+          </div>
+
+          <div className="vs-about-row">
+            <h2>What we won't do.</h2>
+            <div>
+              <p>
+                We don't run advertising. We don't sell data. We don't push notifications,
+                surface engagement metrics, or measure what makes you scroll. Readers don't
+                comment publicly on your story — the platform is built for reading, not reacting.
+              </p>
+              <p>
+                We don't moderate experience. We moderate safety. If something hurtful or unsafe
+                slips in, it comes down. Everything else — the messy, contradictory, human stuff —
+                stays exactly as you wrote it.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Privacy Section */}
-      <section className="vs-privacy-section">
+      {/* Sand callout */}
+      <section className="vs-about-quote">
         <div className="vs-container">
-          <div className="vs-privacy-content">
-            <Shield size={32} />
-            <h2>Your Privacy Matters</h2>
-            <p>
-              We take your privacy seriously. You can choose to share your story anonymously, 
-              and your personal information is never shared publicly. Only our moderation team 
-              can see your identity to ensure the authenticity and safety of our platform.
-            </p>
+          <p className="vs-about-quote-text">
+            The body keeps the score. We keep the writing.
+          </p>
+          <div style={{
+            marginTop: 32,
+            fontFamily: "'Space Mono', monospace",
+            fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase',
+            color: 'var(--vs-ink-muted)',
+          }}>
+            — From the founding editor's note
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="vs-about-cta">
+      {/* CTA */}
+      <section className="vs-section">
         <div className="vs-container">
-          <div className="vs-about-cta-content">
-            <h2>Ready to Share Your Story?</h2>
-            <p>Your experience could be exactly what someone else needs to hear today.</p>
-            <button 
-              className="vs-btn-primary vs-btn-large"
-              onClick={() => navigate('/submit')}
-            >
-              <PenLine size={24} />
-              Share Your Story
-            </button>
+          <div className="vs-section-number">
+            <span className="num">04</span>— YOUR STORY
+          </div>
+          <div className="vs-grid-asym" style={{ marginTop: 32 }}>
+            <h2 className="vs-section-title">
+              Ready when you <em className="vs-italic vs-coral">are</em><span className="vs-period">.</span>
+            </h2>
+            <div>
+              <p className="vs-lead" style={{ marginBottom: 32 }}>
+                There's no minimum length. No required vulnerability. Write what you'd
+                want to read.
+              </p>
+              <button
+                className="vs-btn vs-btn--primary vs-btn--large"
+                onClick={() => navigate('/submit')}
+              >
+                <span className="vs-btn-dot" />
+                Share your story
+              </button>
+            </div>
           </div>
         </div>
       </section>

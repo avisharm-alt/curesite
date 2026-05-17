@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route, Link, useNavigate, useLocation, Navigate } from 'react-router-dom';
-import toast, { Toaster } from 'react-hot-toast';
+import { BrowserRouter, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import './App.css';
 import './VitalSigns.css';
 
-// Import Vital Signs pages
+// Pages
 import VitalSignsHomePage from './pages/VitalSignsHomePage';
 import VitalSignsAboutPage from './pages/VitalSignsAboutPage';
 import StoriesPage from './pages/StoriesPage';
@@ -14,161 +14,168 @@ import AdminStoriesPage from './pages/AdminStoriesPage';
 import ProfilePage from './pages/ProfilePage';
 import SignInPage from './pages/SignInPage';
 
-// Import hooks
 import { AuthProvider, useAuth } from './hooks/useAuth';
-
-// Import Lucide React icons
-import { 
-  BookOpen, Heart, PenLine, User, LogOut, Menu, X, Home, Settings
-} from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Vital Signs Header Component
+// ---------- Wordmark ----------
+const Wordmark = ({ size = 26 }) => (
+  <span className="vs-wordmark" style={{ fontSize: size }}>
+    Vital Signs<span className="vs-period">.</span>
+  </span>
+);
+
+// ---------- Header ----------
 const VitalSignsHeader = () => {
   const { user, logout } = useAuth();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [open, setOpen] = useState(false);
   const location = useLocation();
 
-  const navigation = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'Stories', href: '/stories', icon: BookOpen },
-    { name: 'About', href: '/about', icon: Heart },
-    ...(user ? [{ name: 'Share Story', href: '/submit', icon: PenLine }] : []),
-    ...(user ? [{ name: 'My Profile', href: '/profile', icon: User }] : []),
-    ...(user?.user_type === 'admin' ? [{ name: 'Admin', href: '/admin', icon: Settings }] : []),
+  const nav = [
+    { name: 'Stories', href: '/stories' },
+    { name: 'About', href: '/about' },
+    ...(user ? [{ name: 'Share', href: '/submit' }] : []),
+    ...(user ? [{ name: 'Profile', href: '/profile' }] : []),
+    ...(user?.user_type === 'admin' ? [{ name: 'Admin', href: '/admin' }] : []),
   ];
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${API}/auth/google`;
+  const handleLogin = () => { window.location.href = `${API}/auth/google`; };
+
+  const isActive = (href) => {
+    if (href === '/') return location.pathname === '/';
+    return location.pathname === href || location.pathname.startsWith(href + '/');
   };
 
   return (
     <header className="vs-header">
-      <nav className="vs-nav-container">
-        <div className="vs-nav-brand">
-          <Link to="/" className="vs-logo-link">
-            <span className="vs-logo-text">Vital<span className="vs-logo-accent">Signs</span></span>
-          </Link>
-        </div>
+      <div className="vs-nav-container">
+        <Link to="/" aria-label="Vital Signs home"><Wordmark /></Link>
 
-        {/* Desktop Navigation */}
-        <div className="vs-nav-links">
-          {navigation.map((item) => (
-            <Link 
-              key={item.name} 
-              to={item.href} 
-              className={`vs-nav-link ${location.pathname === item.href ? 'active' : ''}`}
+        <nav className="vs-nav-links" aria-label="Primary">
+          {nav.map((item) => (
+            <Link
+              key={item.name}
+              to={item.href}
+              className={`vs-nav-link ${isActive(item.href) ? 'active' : ''}`}
             >
-              <item.icon size={18} />
               {item.name}
             </Link>
           ))}
-        </div>
+        </nav>
 
-        {/* User Menu */}
-        <div className="vs-nav-user">
+        <div className="vs-nav-cta">
           {user ? (
-            <div className="vs-user-menu">
-              <span className="vs-user-name">{user.name}</span>
-              <button onClick={logout} className="vs-logout-btn" title="Sign out">
-                <LogOut size={18} />
+            <>
+              <span className="vs-user-name">— {user.name?.split(' ')[0]}</span>
+              <button onClick={logout} className="vs-btn vs-btn--ghost" aria-label="Sign out">
+                Sign out
               </button>
-            </div>
+            </>
           ) : (
-            <button onClick={handleGoogleLogin} className="vs-login-btn">
-              <img 
-                src="https://developers.google.com/identity/images/g-logo.png" 
-                alt="Google" 
-                className="vs-google-icon"
-              />
+            <button onClick={handleLogin} className="vs-btn vs-btn--primary">
+              <span className="vs-btn-dot" />
               Sign in
             </button>
           )}
-        </div>
-
-        {/* Mobile Menu Button */}
-        <div className="vs-mobile-menu-btn">
-          <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          <button
+            className="vs-mobile-toggle vs-btn vs-btn--ghost"
+            onClick={() => setOpen(!open)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
           </button>
         </div>
-      </nav>
+      </div>
 
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="vs-mobile-menu">
-          {navigation.map((item) => (
-            <Link 
-              key={item.name} 
-              to={item.href} 
-              className="vs-mobile-nav-link"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <item.icon size={18} />
-              {item.name}
-            </Link>
-          ))}
-          {!user && (
-            <button onClick={handleGoogleLogin} className="vs-mobile-login-btn">
-              <img 
-                src="https://developers.google.com/identity/images/g-logo.png" 
-                alt="Google" 
-                className="vs-google-icon"
-              />
-              Sign in with Google
-            </button>
-          )}
-        </div>
-      )}
+      <div className={`vs-mobile-menu ${open ? 'open' : ''}`}>
+        <Link to="/" onClick={() => setOpen(false)} className={isActive('/') ? 'active' : ''}>Home</Link>
+        {nav.map((item) => (
+          <Link
+            key={item.name}
+            to={item.href}
+            onClick={() => setOpen(false)}
+            className={isActive(item.href) ? 'active' : ''}
+          >
+            {item.name}
+          </Link>
+        ))}
+        {!user && (
+          <button
+            onClick={handleLogin}
+            className="vs-btn vs-btn--primary"
+            style={{ alignSelf: 'flex-start', marginTop: 16 }}
+          >
+            <span className="vs-btn-dot" />
+            Sign in with Google
+          </button>
+        )}
+      </div>
     </header>
   );
 };
 
-// Vital Signs Footer Component
+// ---------- Footer ----------
 const VitalSignsFooter = () => {
+  const year = new Date().getFullYear();
   return (
     <footer className="vs-footer">
-      <div className="vs-footer-content">
-        <div className="vs-footer-brand">
-          <span className="vs-footer-logo">Vital<span className="vs-logo-accent">Signs</span></span>
-          <p className="vs-footer-tagline">Real stories. Real health. Real people.</p>
+      <div className="vs-container">
+        <div className="vs-footer-grid">
+          <div>
+            <div className="vs-footer-wordmark">
+              Vital Signs<span className="vs-period">.</span>
+            </div>
+            <p className="vs-footer-tagline">
+              A community where people share their health experiences to build empathy,
+              reduce stigma, and feel a little less alone.
+            </p>
+          </div>
+
+          <div className="vs-footer-col">
+            <h4>— Read</h4>
+            <Link to="/stories">All Stories</Link>
+            <Link to="/stories?tag=Mental%20Health">Mental Health</Link>
+            <Link to="/stories?tag=Chronic%20Illness">Chronic Illness</Link>
+            <Link to="/stories?tag=Caregiving">Caregiving</Link>
+          </div>
+
+          <div className="vs-footer-col">
+            <h4>— Contribute</h4>
+            <Link to="/submit">Share a Story</Link>
+            <Link to="/about">About Vital Signs</Link>
+            <Link to="/about">Editorial Standards</Link>
+          </div>
+
+          <div className="vs-footer-col">
+            <h4>— Connect</h4>
+            <a href="mailto:hello@vitalsigns.org">hello@vitalsigns.org</a>
+            <a href="https://utoronto.ca" target="_blank" rel="noreferrer">University of Toronto</a>
+          </div>
         </div>
-        
-        <div className="vs-footer-links">
-          <Link to="/stories">Read Stories</Link>
-          <Link to="/submit">Share Your Story</Link>
-          <Link to="/about">About Us</Link>
-        </div>
-        
+
         <div className="vs-footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Vital Signs. All rights reserved.</p>
+          <span>© {year} Vital Signs<span className="vs-period">.</span> &nbsp;&nbsp; All rights reserved.</span>
+          <span>vitalsigns.org</span>
         </div>
       </div>
     </footer>
   );
 };
 
-// Legacy Route Redirects
-const LegacyRedirect = () => {
-  return <Navigate to="/" replace />;
-};
+const LegacyRedirect = () => <Navigate to="/" replace />;
 
-// Main App Component
 const App = () => {
-  // Set document title for Vital Signs
   React.useEffect(() => {
-    document.title = "Vital Signs - Real stories. Real health. Real people.";
-    
-    // Update meta description
-    let metaDescription = document.querySelector('meta[name="description"]');
-    if (!metaDescription) {
-      metaDescription = document.createElement('meta');
-      metaDescription.name = 'description';
-      document.head.appendChild(metaDescription);
+    document.title = 'Vital Signs. — Real stories. Real health. Real people.';
+    let meta = document.querySelector('meta[name="description"]');
+    if (!meta) {
+      meta = document.createElement('meta');
+      meta.name = 'description';
+      document.head.appendChild(meta);
     }
-    metaDescription.content = 'A community where people share their health experiences to build empathy, reduce stigma, and connect with others who understand.';
+    meta.content = 'A literary community where people share their health experiences to build empathy, reduce stigma, and connect with others who understand.';
   }, []);
 
   return (
@@ -178,7 +185,6 @@ const App = () => {
           <VitalSignsHeader />
           <main className="vs-main">
             <Routes>
-              {/* Vital Signs Routes */}
               <Route path="/" element={<VitalSignsHomePage />} />
               <Route path="/stories" element={<StoriesPage />} />
               <Route path="/stories/:storyId" element={<StoryDetailPage />} />
@@ -187,8 +193,8 @@ const App = () => {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/admin" element={<AdminStoriesPage />} />
               <Route path="/signin" element={<SignInPage />} />
-              
-              {/* Legacy Route Redirects */}
+
+              {/* Legacy redirects */}
               <Route path="/posters" element={<LegacyRedirect />} />
               <Route path="/journal" element={<LegacyRedirect />} />
               <Route path="/journal/*" element={<LegacyRedirect />} />
@@ -197,13 +203,26 @@ const App = () => {
               <Route path="/students" element={<LegacyRedirect />} />
               <Route path="/submit-poster" element={<LegacyRedirect />} />
               <Route path="/submit-article" element={<LegacyRedirect />} />
-              
-              {/* Catch all */}
+
               <Route path="*" element={<VitalSignsHomePage />} />
             </Routes>
           </main>
           <VitalSignsFooter />
-          <Toaster position="top-right" />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              style: {
+                background: '#161616',
+                color: '#F5F2EA',
+                fontFamily: "'Space Mono', monospace",
+                fontSize: '11px',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                borderRadius: '6px',
+                padding: '14px 18px',
+              },
+            }}
+          />
         </div>
       </BrowserRouter>
     </AuthProvider>

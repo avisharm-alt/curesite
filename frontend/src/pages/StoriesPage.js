@@ -1,287 +1,162 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { BookOpen, Filter, MessageCircleHeart, AlertTriangle, ChevronDown } from 'lucide-react';
-import { useAuth } from '../hooks/useAuth';
-import toast from 'react-hot-toast';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+const stripHtml = (s) => (s || '').replace(/<[^>]*>/g, '');
+const truncate = (s, n = 200) => {
+  const t = stripHtml(s);
+  return t.length <= n ? t : t.slice(0, n).trim() + '…';
+};
+const formatDate = (d) => d ? new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }).toUpperCase() : '';
+const readTime = (text) => `${Math.max(1, Math.round(stripHtml(text).split(/\s+/).length / 200))} MIN READ`;
+
 const StoriesPage = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const { user, token } = useAuth();
-  
+  const [params, setParams] = useSearchParams();
+
   const [stories, setStories] = useState([]);
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(false);
   const [total, setTotal] = useState(0);
-  
-  // Filters
-  const [selectedTag, setSelectedTag] = useState(searchParams.get('tag') || '');
-  const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
+
+  const [selectedTag, setSelectedTag] = useState(params.get('tag') || '');
+  const [sort, setSort] = useState('newest');
 
   useEffect(() => {
-    fetchTags();
+    fetch(`${API}/tags`).then(r => r.ok ? r.json() : []).then(setTags).catch(() => {});
   }, []);
 
-  useEffect(() => {
-    fetchStories(1);
-  }, [selectedTag, sortBy]);
+  useEffect(() => { fetchStories(1); /* eslint-disable-next-line */ }, [selectedTag, sort]);
 
-  const fetchTags = async () => {
-    try {
-      const res = await fetch(`${API}/tags`);
-      if (res.ok) {
-        const data = await res.json();
-        setTags(data);
-      }
-    } catch (error) {
-      console.error('Error fetching tags:', error);
-    }
-  };
-
-  const fetchStories = async (pageNum) => {
+  const fetchStories = async (n) => {
     setLoading(true);
     try {
-      let url = `${API}/stories?page=${pageNum}&limit=12&sort=${sortBy}`;
-      if (selectedTag) {
-        url += `&tag=${encodeURIComponent(selectedTag)}`;
-      }
-      
+      let url = `${API}/stories?page=${n}&limit=10&sort=${sort}`;
+      if (selectedTag) url += `&tag=${encodeURIComponent(selectedTag)}`;
       const res = await fetch(url);
       if (res.ok) {
         const data = await res.json();
-        if (pageNum === 1) {
-          setStories(data.stories);
-        } else {
-          setStories(prev => [...prev, ...data.stories]);
-        }
-        setPage(pageNum);
+        setStories(n === 1 ? data.stories : [...stories, ...data.stories]);
+        setPage(n);
         setHasMore(data.has_more);
         setTotal(data.total);
       }
-    } catch (error) {
-      console.error('Error fetching stories:', error);
-      toast.error('Failed to load stories');
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
-  const handleTagSelect = (tag) => {
-    setSelectedTag(tag);
-    if (tag) {
-      setSearchParams({ tag });
-    } else {
-      setSearchParams({});
-    }
-  };
-
-  const handleResonate = async (storyId, e) => {
-    e.stopPropagation();
-    
-    if (!user) {
-      toast.error('Please sign in to resonate with stories');
-      return;
-    }
-
-    try {
-      const res = await fetch(`${API}/stories/${storyId}/resonate`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        // Update local state
-        setStories(prev => prev.map(story => 
-          story.id === storyId 
-            ? { ...story, resonance_count: data.resonance_count, user_resonated: data.user_resonated }
-            : story
-        ));
-        toast.success(data.user_resonated ? 'This resonated with you' : 'Resonance removed');
-      }
-    } catch (error) {
-      console.error('Error toggling resonance:', error);
-      toast.error('Failed to update');
-    }
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  };
-
-  const truncateText = (text, maxLength = 200) => {
-    if (!text) return '';
-    const plainText = text.replace(/<[^>]*>/g, '');
-    if (plainText.length <= maxLength) return plainText;
-    return plainText.substring(0, maxLength).trim() + '...';
+  const onTag = (name) => {
+    setSelectedTag(name);
+    if (name) setParams({ tag: name }); else setParams({});
   };
 
   return (
-    <div className="vs-page vs-stories-page">
-      {/* Header */}
-      <section className="vs-page-header">
+    <div className="vs-page">
+      {/* ----- Page hero ----- */}
+      <section className="vs-page-hero">
         <div className="vs-container">
-          <div className="vs-page-header-content">
-            <div className="vs-page-icon">
-              <BookOpen size={32} />
-            </div>
-            <div>
-              <h1 className="vs-page-title">Stories</h1>
-              <p className="vs-page-subtitle">
-                Real health experiences shared by our community
-              </p>
-            </div>
-          </div>
+          <div className="vs-eyebrow">— THE ARCHIVE</div>
+          <div className="vs-spacer-sm" />
+          <h1 className="vs-page-title">
+            Stories<span className="vs-period">.</span>
+          </h1>
+          <p className="vs-lead">
+            Long-form accounts of illness, recovery, caregiving and the quiet
+            in-between, written by the people who lived them.
+          </p>
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="vs-filters-section">
+      {/* ----- Filter bar ----- */}
+      <section>
         <div className="vs-container">
-          <div className="vs-filters-bar">
-            <div className="vs-tag-filters">
-              <button 
-                className={`vs-tag-btn ${!selectedTag ? 'active' : ''}`}
-                onClick={() => handleTagSelect('')}
+          <div className="vs-filter-bar">
+            <div className="left">
+              <button
+                className={`vs-chip ${!selectedTag ? 'vs-chip--active' : ''}`}
+                onClick={() => onTag('')}
               >
-                All Topics
+                All
               </button>
-              {tags.slice(0, 5).map(tag => (
+              {tags.map(t => (
                 <button
-                  key={tag.id}
-                  className={`vs-tag-btn ${selectedTag === tag.name ? 'active' : ''}`}
-                  onClick={() => handleTagSelect(tag.name)}
+                  key={t.id}
+                  className={`vs-chip ${selectedTag === t.name ? 'vs-chip--active' : ''}`}
+                  onClick={() => onTag(t.name)}
                 >
-                  {tag.name}
+                  {t.name}
                 </button>
               ))}
-              <button 
-                className="vs-tag-btn vs-more-btn"
-                onClick={() => setShowFilters(!showFilters)}
-              >
-                More <ChevronDown size={16} />
-              </button>
             </div>
-            
-            <div className="vs-sort-filter">
-              <select 
-                value={sortBy} 
-                onChange={(e) => setSortBy(e.target.value)}
-                className="vs-sort-select"
-              >
-                <option value="newest">Newest First</option>
-                <option value="oldest">Oldest First</option>
-                <option value="most_resonated">Most Resonated</option>
+            <div className="right">
+              <span>{total} {total === 1 ? 'STORY' : 'STORIES'}</span>
+              <select className="vs-select-native" value={sort} onChange={(e) => setSort(e.target.value)}>
+                <option value="newest">Newest</option>
+                <option value="oldest">Oldest</option>
+                <option value="most_resonated">Most resonated</option>
               </select>
             </div>
           </div>
-
-          {showFilters && (
-            <div className="vs-expanded-filters">
-              {tags.map(tag => (
-                <button
-                  key={tag.id}
-                  className={`vs-tag-btn ${selectedTag === tag.name ? 'active' : ''}`}
-                  onClick={() => handleTagSelect(tag.name)}
-                >
-                  {tag.name} ({tag.story_count || 0})
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="vs-results-info">
-            <span>{total} {total === 1 ? 'story' : 'stories'} found</span>
-            {selectedTag && (
-              <span className="vs-active-filter">
-                in <strong>{selectedTag}</strong>
-                <button onClick={() => handleTagSelect('')} className="vs-clear-filter">×</button>
-              </span>
-            )}
-          </div>
         </div>
       </section>
 
-      {/* Stories Grid */}
-      <section className="vs-stories-section">
+      {/* ----- Stories list ----- */}
+      <section>
         <div className="vs-container">
-          {loading && page === 1 ? (
-            <div className="vs-loading-grid">
-              {[1, 2, 3, 4, 5, 6].map(i => (
-                <div key={i} className="vs-story-card-skeleton"></div>
-              ))}
-            </div>
-          ) : stories.length > 0 ? (
-            <>
-              <div className="vs-stories-grid">
-                {stories.map(story => (
-                  <article 
-                    key={story.id}
-                    className="vs-story-card"
-                    onClick={() => navigate(`/stories/${story.id}`)}
-                  >
-                    {story.has_content_warning && (
-                      <div className="vs-content-warning-badge">
-                        <AlertTriangle size={12} /> Content Warning
-                      </div>
-                    )}
-                    <div className="vs-story-card-tags">
-                      {story.tags?.slice(0, 2).map((tag, idx) => (
-                        <span key={idx} className="vs-tag-pill">{tag}</span>
-                      ))}
-                    </div>
-                    <h3 className="vs-story-card-title">{story.title}</h3>
-                    <p className="vs-story-card-preview">{truncateText(story.body)}</p>
-                    <div className="vs-story-card-footer">
-                      <span className="vs-story-author">
-                        {story.author_name || 'Anonymous'}
-                      </span>
-                      <span className="vs-story-date">{formatDate(story.published_at)}</span>
-                    </div>
-                    <button 
-                      className={`vs-resonate-btn ${story.user_resonated ? 'resonated' : ''}`}
-                      onClick={(e) => handleResonate(story.id, e)}
-                    >
-                      <MessageCircleHeart size={18} />
-                      <span>{story.resonance_count || 0}</span>
-                    </button>
-                  </article>
-                ))}
+          <div className="vs-story-list">
+            {loading && page === 1 && [1, 2, 3].map(i => (
+              <div key={i} className="vs-loading-row">
+                <div className="vs-skeleton vs-skel-tag" />
+                <div className="vs-skeleton vs-skel-title" />
+                <div className="vs-skeleton vs-skel-excerpt" />
+                <div className="vs-skeleton vs-skel-excerpt-2" />
               </div>
+            ))}
 
-              {hasMore && (
-                <div className="vs-load-more">
-                  <button 
-                    className="vs-btn-outline"
-                    onClick={() => fetchStories(page + 1)}
-                    disabled={loading}
-                  >
-                    {loading ? 'Loading...' : 'Load More Stories'}
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="vs-empty-state">
-              <BookOpen size={64} className="vs-empty-icon" />
-              <h3>No stories yet</h3>
-              <p>Be the first to share a story about {selectedTag || 'your health experience'}!</p>
-              <button 
-                className="vs-btn-primary"
-                onClick={() => navigate('/submit')}
+            {!loading && stories.length === 0 && (
+              <div className="vs-empty">
+                <h3 className="vs-h3">No stories yet{selectedTag ? ` in ${selectedTag}.` : '.'}</h3>
+                <p>Be the first to share — your account could be the one someone else needed to read today.</p>
+                <button className="vs-btn vs-btn--primary" onClick={() => navigate('/submit')}>
+                  <span className="vs-btn-dot" /> Share yours
+                </button>
+              </div>
+            )}
+
+            {stories.map((s, idx) => (
+              <article
+                key={s.id}
+                className={`vs-story-card ${idx === 0 ? 'vs-story-card--featured' : ''}`}
+                onClick={() => navigate(`/stories/${s.id}`)}
               >
-                Share Your Story
+                <div className="vs-story-card-meta-top">
+                  {s.has_content_warning && <span className="vs-chip vs-chip--warning">Content Warning</span>}
+                  {s.tags?.slice(0, 3).map(t => <span key={t} className="vs-chip">{t}</span>)}
+                </div>
+                <h3 className="vs-story-card-title">{s.title}</h3>
+                <p className="vs-story-card-excerpt">{truncate(s.body, 220)}</p>
+                <div className="vs-story-card-footer">
+                  <span>— {s.author_name || 'Anonymous'} · {readTime(s.body)}</span>
+                  <span className="right">
+                    {formatDate(s.published_at)}
+                    <span className="vs-story-card-arrow">→</span>
+                  </span>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          {hasMore && (
+            <div className="vs-load-more">
+              <button
+                className="vs-btn vs-btn--ghost"
+                disabled={loading}
+                onClick={() => fetchStories(page + 1)}
+              >
+                {loading ? 'Loading…' : 'Load more →'}
               </button>
             </div>
           )}

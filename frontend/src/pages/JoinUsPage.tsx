@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Send, CheckCircle } from 'lucide-react';
+import { CheckCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { UNIVERSITIES } from '../data/mockData.ts';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -20,11 +21,13 @@ const JoinUsPage: React.FC = () => {
 
   const wordCount = form.why_join.trim().split(/\s+/).filter(Boolean).length;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     if (name === 'why_join') {
       const words = value.trim().split(/\s+/).filter(Boolean);
-      if (words.length > 200) return; // hard cap
+      if (words.length > 200) return;
     }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
@@ -56,21 +59,25 @@ const JoinUsPage: React.FC = () => {
 
   if (submitted) {
     return (
-      <div className="join-page">
+      <div className="join-success-page">
         <div className="container container-sm">
           <motion.div
-            className="join-success"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4 }}
+            className="js-content"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
             data-testid="application-success"
           >
-            <CheckCircle size={48} strokeWidth={1.5} />
-            <h1>Application Received</h1>
+            <div className="vs-eyebrow">— APPLICATION RECEIVED</div>
+            <h1>Thank you<span className="vs-period">.</span></h1>
             <p>
-              Thank you for your interest in joining the Vital Signs Review Board.
-              We'll review your application and get back to you soon.
+              We’ve received your application to join the Vital Signs review board.
+              We read every one carefully and will be in touch soon.
             </p>
+            <div className="js-actions">
+              <Link to="/stories" className="btn btn-primary">Read the archive</Link>
+              <Link to="/" className="btn btn-secondary">Back to home</Link>
+            </div>
           </motion.div>
         </div>
         <style>{joinStyles}</style>
@@ -80,50 +87,45 @@ const JoinUsPage: React.FC = () => {
 
   return (
     <div className="join-page">
-      <section className="join-header">
-        <div className="container container-sm">
+      <section className="jn-hero">
+        <div className="container">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.55 }}
           >
-            <h1 className="join-title">Join the Review Board</h1>
-            <p className="join-subtitle">
-              Help shape the stories that get published on Vital Signs. We're building
-              a distributed editorial board of students across Canadian universities
-              who care about authentic health storytelling.
+            <div className="vs-eyebrow">— WE’RE HIRING / VOLUNTEERS</div>
+            <h1 className="jn-title">
+              Join the <em className="vs-italic vs-coral">review</em> board<span className="vs-period">.</span>
+            </h1>
+            <p className="vs-lead">
+              Help shape the stories that get published on Vital Signs. We’re building
+              a small editorial board of students across Canadian universities who care
+              about authentic health storytelling.
             </p>
           </motion.div>
         </div>
       </section>
 
-      <section className="join-form-section">
-        <div className="container container-sm">
-          <motion.div
-            className="join-what"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <h2>What reviewers do</h2>
-            <ul>
-              <li>Read submitted stories and flag content concerns</li>
-              <li>Recommend approve, reject, or request edits</li>
-              <li>Help maintain the quality and sensitivity of published stories</li>
+      <section className="jn-section">
+        <div className="container">
+          <div className="jn-what">
+            <div className="vs-section-number"><span className="num">01</span>— WHAT REVIEWERS DO</div>
+            <ul className="jn-list">
+              <li><span className="jn-dot" />Read submitted stories and flag content concerns</li>
+              <li><span className="jn-dot" />Recommend approve, reject, or request edits</li>
+              <li><span className="jn-dot" />Help maintain the quality and sensitivity of published stories</li>
             </ul>
-          </motion.div>
+          </div>
 
-          <motion.form
-            className="join-form"
-            onSubmit={handleSubmit}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            data-testid="join-form"
-          >
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="name">Full Name</label>
+          <form className="jn-form" onSubmit={handleSubmit} data-testid="join-form">
+            <div className="vs-section-number" style={{ marginBottom: 24 }}>
+              <span className="num">02</span>— APPLY
+            </div>
+
+            <div className="jn-row">
+              <div className="sub-field">
+                <label className="sub-label" htmlFor="name">Full name <span className="req">*</span></label>
                 <input
                   id="name"
                   name="name"
@@ -135,8 +137,8 @@ const JoinUsPage: React.FC = () => {
                   data-testid="join-name"
                 />
               </div>
-              <div className="form-group">
-                <label htmlFor="email">Email</label>
+              <div className="sub-field">
+                <label className="sub-label" htmlFor="email">Email <span className="req">*</span></label>
                 <input
                   id="email"
                   name="email"
@@ -150,9 +152,9 @@ const JoinUsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="university">University</label>
+            <div className="jn-row">
+              <div className="sub-field">
+                <label className="sub-label" htmlFor="university">University <span className="req">*</span></label>
                 <select
                   id="university"
                   name="university"
@@ -162,13 +164,13 @@ const JoinUsPage: React.FC = () => {
                   data-testid="join-university"
                 >
                   <option value="">Select university</option>
-                  {UNIVERSITIES.map((u) => (
+                  {UNIVERSITIES.map((u: string) => (
                     <option key={u} value={u}>{u}</option>
                   ))}
                 </select>
               </div>
-              <div className="form-group">
-                <label htmlFor="program">Program</label>
+              <div className="sub-field">
+                <label className="sub-label" htmlFor="program">Program <span className="req">*</span></label>
                 <input
                   id="program"
                   name="program"
@@ -182,8 +184,8 @@ const JoinUsPage: React.FC = () => {
               </div>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="year">Year of Study</label>
+            <div className="sub-field">
+              <label className="sub-label" htmlFor="year">Year of study <span className="req">*</span></label>
               <select
                 id="year"
                 name="year"
@@ -202,218 +204,148 @@ const JoinUsPage: React.FC = () => {
               </select>
             </div>
 
-            <div className="form-group">
-              <label htmlFor="why_join">
-                Why do you want to join the review board?
-                <span className="word-count">{wordCount}/200 words</span>
+            <div className="sub-field">
+              <label className="sub-label" htmlFor="why_join">
+                Why join the board? <span className="req">*</span>
+                <span className="jn-words">{wordCount}/200 words</span>
               </label>
               <textarea
                 id="why_join"
                 name="why_join"
                 value={form.why_join}
                 onChange={handleChange}
-                placeholder="Tell us why you're interested in reviewing health stories and what perspective you'd bring to the board..."
+                placeholder="Tell us why you’re drawn to reviewing health stories and what perspective you’d bring to the board…"
                 rows={6}
                 required
                 data-testid="join-why"
               />
             </div>
 
-            <button
-              type="submit"
-              className="btn btn-primary btn-lg join-submit"
-              disabled={submitting || wordCount === 0}
-              data-testid="join-submit-btn"
-            >
-              {submitting ? 'Submitting...' : 'Submit Application'}
-              {!submitting && <Send size={18} />}
-            </button>
-          </motion.form>
+            <div className="jn-cta">
+              <button
+                type="submit"
+                className="btn btn-primary btn-lg"
+                disabled={submitting || wordCount === 0}
+                data-testid="join-submit-btn"
+              >
+                {submitting ? 'Submitting…' : 'Submit application'}
+              </button>
+              <Link to="/" className="btn btn-secondary">Cancel</Link>
+            </div>
+          </form>
         </div>
       </section>
+
       <style>{joinStyles}</style>
     </div>
   );
 };
 
 const joinStyles = `
-  .join-page {
-    min-height: 100vh;
-    background: var(--vs-bg-subtle);
-  }
+  .join-page { min-height: 100vh; background: var(--vs-ivory); }
 
-  .join-header {
-    background: var(--vs-white);
-    padding: var(--vs-space-16) 0 var(--vs-space-12);
-    border-bottom: 1px solid var(--vs-border);
-  }
-
-  .join-title {
-    font-size: 2.75rem;
-    font-weight: 700;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    margin-bottom: var(--vs-space-4);
-  }
-
-  .join-subtitle {
-    font-size: 1.125rem;
-    line-height: 1.7;
-    color: var(--vs-text-secondary);
-    max-width: 560px;
-  }
-
-  .join-form-section {
-    padding: var(--vs-space-10) 0 var(--vs-space-20);
-  }
-
-  .join-what {
-    background: var(--vs-white);
-    border: 1px solid var(--vs-border);
-    border-radius: var(--vs-radius-lg);
-    padding: var(--vs-space-6) var(--vs-space-8);
-    margin-bottom: var(--vs-space-8);
-  }
-
-  .join-what h2 {
-    font-size: 1.125rem;
+  .jn-hero { padding: 96px 0 56px; }
+  .jn-title {
+    font-family: var(--vs-font-serif);
+    font-feature-settings: "liga", "dlig", "kern";
     font-weight: 600;
-    margin-bottom: var(--vs-space-3);
+    font-size: clamp(56px, 7vw, 112px);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    color: var(--vs-ink);
+    margin: 24px 0 32px;
   }
+  .jn-title em { font-style: italic; font-weight: 500; }
 
-  .join-what ul {
+  .jn-section { padding: 32px 0 128px; }
+
+  .jn-what {
+    max-width: 720px;
+    padding: 48px 0;
+    border-top: 1px solid var(--vs-rule);
+    border-bottom: 1px solid var(--vs-rule);
+    margin-bottom: 80px;
+  }
+  .jn-list {
     list-style: none;
+    margin: 24px 0 0;
     padding: 0;
-    margin: 0;
   }
-
-  .join-what li {
-    position: relative;
-    padding-left: var(--vs-space-5);
-    font-size: 0.9375rem;
-    color: var(--vs-text-secondary);
-    line-height: 1.8;
+  .jn-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    font-family: var(--vs-font-sans);
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--vs-ink);
+    padding: 10px 0;
   }
-
-  .join-what li::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0.65em;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
+  .jn-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 999px;
     background: var(--vs-coral);
+    margin-top: 10px;
+    flex-shrink: 0;
   }
 
-  .join-form {
-    background: var(--vs-white);
-    border: 1px solid var(--vs-border);
-    border-radius: var(--vs-radius-lg);
-    padding: var(--vs-space-8);
-  }
+  .jn-form { max-width: 720px; }
 
-  .form-row {
+  .jn-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--vs-space-5);
+    gap: 24px;
   }
+  .jn-row > .sub-field { margin-bottom: 0; }
 
-  .form-group {
-    margin-bottom: var(--vs-space-5);
+  .jn-words {
+    margin-left: auto;
+    font-family: var(--vs-font-mono);
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--vs-ink-faint);
   }
+  .sub-label { display: flex; align-items: center; }
 
-  .form-group label {
+  .jn-cta {
     display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--vs-text-primary);
-    margin-bottom: var(--vs-space-2);
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 32px;
+    padding-top: 32px;
+    border-top: 1px solid var(--vs-rule);
   }
 
-  .word-count {
-    font-size: 0.75rem;
-    font-weight: 400;
-    color: var(--vs-text-tertiary);
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: var(--vs-space-3) var(--vs-space-4);
-    font-family: var(--vs-font);
-    font-size: 0.9375rem;
-    color: var(--vs-text-primary);
-    background: var(--vs-white);
-    border: 1px solid var(--vs-border);
-    border-radius: var(--vs-radius-md);
-    transition: border-color var(--vs-transition-fast);
-    box-sizing: border-box;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: var(--vs-black);
-  }
-
-  .form-group textarea {
-    resize: vertical;
-    line-height: 1.6;
-  }
-
-  .join-submit {
-    display: inline-flex;
+  .join-success-page {
+    min-height: 100vh;
+    display: flex;
     align-items: center;
-    gap: var(--vs-space-2);
-    margin-top: var(--vs-space-2);
+    background: var(--vs-ivory);
+    padding: 96px 0;
   }
-
-  .join-submit:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-
-  .join-success {
-    text-align: center;
-    padding: var(--vs-space-24) 0;
-  }
-
-  .join-success svg {
-    color: #16a34a;
-    margin-bottom: var(--vs-space-6);
-  }
-
-  .join-success h1 {
-    font-size: 2rem;
+  .js-content { max-width: 560px; }
+  .js-content h1 {
+    font-family: var(--vs-font-serif);
     font-weight: 600;
-    margin-bottom: var(--vs-space-4);
+    font-size: clamp(56px, 7vw, 96px);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin: 24px 0 32px;
   }
-
-  .join-success p {
-    font-size: 1.125rem;
-    color: var(--vs-text-secondary);
-    max-width: 480px;
-    margin: 0 auto;
-    line-height: 1.7;
+  .js-content p {
+    font-size: 18px;
+    color: var(--vs-ink-muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 54ch;
   }
+  .js-actions { display: flex; gap: 16px; flex-wrap: wrap; }
 
-  @media (max-width: 768px) {
-    .join-title {
-      font-size: 2rem;
-    }
-
-    .form-row {
-      grid-template-columns: 1fr;
-    }
-
-    .join-form {
-      padding: var(--vs-space-6);
-    }
+  @media (max-width: 700px) {
+    .jn-hero { padding: 56px 0 32px; }
+    .jn-row { grid-template-columns: 1fr; }
   }
 `;
 

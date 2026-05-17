@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, LogOut } from 'lucide-react';
-
-const API_URL = process.env.REACT_APP_BACKEND_URL;
+import { AnimatePresence, motion } from 'framer-motion';
+import { Menu, X } from 'lucide-react';
 
 interface AuthUser {
   email: string;
@@ -19,19 +17,12 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Read user from localStorage (set by OAuthTokenHandler in App.tsx)
     const storedUser = localStorage.getItem('user');
     const token = localStorage.getItem('token');
     if (storedUser && token) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch {
-        setUser(null);
-      }
-    } else {
-      setUser(null);
-    }
-  }, [location]); // Re-check on every route change
+      try { setUser(JSON.parse(storedUser)); } catch { setUser(null); }
+    } else { setUser(null); }
+  }, [location]);
 
   const handleSignOut = () => {
     localStorage.removeItem('token');
@@ -41,24 +32,24 @@ const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { href: '/stories', label: 'Read Stories' },
-    { href: '/submit', label: 'Share Your Story' },
+    { href: '/stories', label: 'Stories' },
+    { href: '/submit', label: 'Share' },
     { href: '/join', label: 'Join Us' },
     { href: '/about', label: 'About' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) =>
+    path === '/' ? location.pathname === '/' : location.pathname.startsWith(path);
 
   return (
     <nav className="navbar">
       <div className="navbar-container">
-        {/* Logo */}
-        <Link to="/" className="navbar-logo">
-          Vital Signs
-          <span className="navbar-logo-dot">.</span>
+        {/* Wordmark */}
+        <Link to="/" className="navbar-logo" aria-label="Vital Signs home">
+          Vital Signs<span className="navbar-logo-dot">.</span>
         </Link>
 
-        {/* Desktop Navigation */}
+        {/* Desktop nav */}
         <div className="navbar-links">
           {navLinks.map((link) => (
             <Link
@@ -71,38 +62,41 @@ const Navbar: React.FC = () => {
           ))}
         </div>
 
-        {/* Sign In / User Actions */}
+        {/* Right side */}
         <div className="navbar-actions">
+          <div className="navbar-affiliation" aria-label="University of Toronto Affiliated">
+            <span>University of Toronto</span>
+            <span>Affiliated</span>
+          </div>
+
           {user ? (
             <div className="navbar-user" data-testid="navbar-user">
-              <span className="navbar-user-name">{user.name}</span>
+              <span className="navbar-user-name">— {user.name?.split(' ')[0]}</span>
               {user.user_type === 'admin' && (
                 <Link to="/admin" className="btn btn-secondary btn-sm" data-testid="admin-link">
                   Admin
                 </Link>
               )}
-              <button className="navbar-signout" onClick={handleSignOut} data-testid="signout-btn" title="Sign out">
-                <LogOut size={18} />
+              <button className="navbar-signout" onClick={handleSignOut} data-testid="signout-btn">
+                Sign out
               </button>
             </div>
           ) : (
-            <Link to="/signin" className="btn btn-secondary btn-sm" data-testid="signin-btn">
-              Sign In
+            <Link to="/signin" className="btn btn-primary btn-sm" data-testid="signin-btn">
+              Sign in
             </Link>
           )}
-        </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          className="navbar-mobile-btn"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+          <button
+            className="navbar-mobile-btn"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
@@ -116,7 +110,7 @@ const Navbar: React.FC = () => {
               <Link
                 key={link.href}
                 to={link.href}
-                className="navbar-mobile-link"
+                className={`navbar-mobile-link ${isActive(link.href) ? 'active' : ''}`}
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 {link.label}
@@ -129,16 +123,12 @@ const Navbar: React.FC = () => {
                     Admin Dashboard
                   </Link>
                 )}
-                <button className="navbar-mobile-link navbar-mobile-signin" onClick={() => { setIsMobileMenuOpen(false); handleSignOut(); }}>
+                <button className="navbar-mobile-link navbar-mobile-cta" onClick={() => { setIsMobileMenuOpen(false); handleSignOut(); }}>
                   Sign Out
                 </button>
               </>
             ) : (
-              <Link
-                to="/signin"
-                className="navbar-mobile-link navbar-mobile-signin"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
+              <Link to="/signin" className="navbar-mobile-link navbar-mobile-cta" onClick={() => setIsMobileMenuOpen(false)}>
                 Sign In
               </Link>
             )}
@@ -151,138 +141,144 @@ const Navbar: React.FC = () => {
           position: sticky;
           top: 0;
           z-index: 100;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(8px);
-          border-bottom: 1px solid var(--vs-border);
+          background: rgba(255, 255, 255, 0.85);
+          backdrop-filter: saturate(180%) blur(12px);
+          -webkit-backdrop-filter: saturate(180%) blur(12px);
+          border-bottom: 1px solid var(--vs-rule);
         }
-
         .navbar-container {
-          max-width: 1200px;
+          max-width: 1280px;
           margin: 0 auto;
-          padding: 0 var(--vs-space-6);
-          height: 64px;
+          padding: 22px 96px;
           display: flex;
           align-items: center;
           justify-content: space-between;
+          gap: 40px;
         }
-
         .navbar-logo {
-          font-size: 1.25rem;
+          font-family: var(--vs-font-serif);
+          font-feature-settings: "liga", "kern";
           font-weight: 600;
-          color: var(--vs-black);
-          text-decoration: none;
-          letter-spacing: -0.02em;
+          font-size: 26px;
+          letter-spacing: -0.01em;
+          color: var(--vs-ink);
+          line-height: 1;
+          white-space: nowrap;
         }
-
-        .navbar-logo-dot {
-          color: var(--vs-coral);
-        }
+        .navbar-logo-dot { color: var(--vs-coral); }
 
         .navbar-links {
           display: flex;
-          gap: var(--vs-space-8);
+          gap: 32px;
+          align-items: center;
         }
-
         .navbar-link {
-          font-size: 0.9375rem;
+          position: relative;
+          font-family: var(--vs-font-sans);
+          font-size: 14px;
           font-weight: 500;
-          color: var(--vs-text-secondary);
-          text-decoration: none;
-          transition: color var(--vs-transition-fast);
+          color: var(--vs-ink);
+          padding-bottom: 4px;
+          transition: color 200ms ease;
         }
-
+        .navbar-link::after {
+          content: "";
+          position: absolute;
+          left: 0; bottom: 0;
+          width: 0; height: 1px;
+          background: var(--vs-coral);
+          transition: width 220ms ease;
+        }
         .navbar-link:hover,
-        .navbar-link.active {
-          color: var(--vs-text-primary);
-        }
+        .navbar-link.active { color: var(--vs-coral); }
+        .navbar-link:hover::after,
+        .navbar-link.active::after { width: 100%; }
 
         .navbar-actions {
           display: flex;
           align-items: center;
-          gap: var(--vs-space-4);
+          gap: 24px;
         }
+
+        .navbar-affiliation {
+          font-family: var(--vs-font-mono);
+          font-size: 10.5px;
+          font-weight: 400;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+          color: var(--vs-ink-muted);
+          line-height: 1.4;
+          text-align: right;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .navbar-user { display: flex; align-items: center; gap: 14px; }
+        .navbar-user-name {
+          font-family: var(--vs-font-mono);
+          font-size: 10.5px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--vs-ink-muted);
+        }
+        .navbar-signout {
+          font-family: var(--vs-font-mono);
+          font-size: 10.5px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          color: var(--vs-ink);
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 8px 0;
+          transition: color 200ms ease;
+        }
+        .navbar-signout:hover { color: var(--vs-coral); }
 
         .navbar-mobile-btn {
           display: none;
           background: none;
           border: none;
           cursor: pointer;
-          color: var(--vs-text-primary);
-          padding: var(--vs-space-2);
+          color: var(--vs-ink);
+          padding: 6px;
         }
 
         .navbar-mobile-menu {
-          display: none;
           overflow: hidden;
-          border-top: 1px solid var(--vs-border);
+          border-top: 1px solid var(--vs-rule);
+          background: var(--vs-ivory);
         }
-
         .navbar-mobile-link {
           display: block;
-          padding: var(--vs-space-4) var(--vs-space-6);
-          font-size: 1rem;
+          padding: 18px 24px;
+          font-family: var(--vs-font-serif);
+          font-size: 24px;
           font-weight: 500;
-          color: var(--vs-text-primary);
-          text-decoration: none;
-          border-bottom: 1px solid var(--vs-border);
+          letter-spacing: -0.015em;
+          color: var(--vs-ink);
+          border-bottom: 1px solid var(--vs-rule);
         }
-
-        .navbar-mobile-link:hover {
-          background: var(--vs-bg-hover);
-        }
-
-        .navbar-mobile-signin {
+        .navbar-mobile-link.active { color: var(--vs-coral); }
+        .navbar-mobile-cta {
           color: var(--vs-coral);
-        }
-
-        .navbar-user {
-          display: flex;
-          align-items: center;
-          gap: var(--vs-space-3);
-        }
-
-        .navbar-user-name {
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: var(--vs-text-primary);
-        }
-
-        .navbar-signout {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 36px;
-          height: 36px;
-          background: transparent;
-          border: 1px solid var(--vs-border);
-          border-radius: var(--vs-radius-md);
-          color: var(--vs-text-secondary);
+          background: none;
+          border: none;
           cursor: pointer;
-          transition: all var(--vs-transition-fast);
+          text-align: left;
+          width: 100%;
+          font: inherit;
         }
 
-        .navbar-signout:hover {
-          border-color: var(--vs-coral);
-          color: var(--vs-coral);
+        @media (max-width: 1024px) {
+          .navbar-affiliation { display: none; }
         }
-
-        @media (max-width: 768px) {
-          .navbar-links,
-          .navbar-actions {
-            display: none;
-          }
-
-          .navbar-mobile-btn {
-            display: block;
-          }
-
-          .navbar-mobile-menu {
-            display: block;
-          }
-
-          .navbar-container {
-            padding: 0 var(--vs-space-4);
-          }
+        @media (max-width: 900px) {
+          .navbar-container { padding: 18px 24px; }
+          .navbar-links { display: none; }
+          .navbar-actions .btn { display: none; }
+          .navbar-user { display: none; }
+          .navbar-mobile-btn { display: inline-flex; }
         }
       `}</style>
     </nav>

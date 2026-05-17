@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PenLine, ArrowLeft, AlertTriangle, Eye, EyeOff, Check, Info } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import toast from 'react-hot-toast';
 
@@ -10,371 +9,244 @@ const API = `${BACKEND_URL}/api`;
 const SubmitStoryPage = () => {
   const navigate = useNavigate();
   const { user, token } = useAuth();
-  
-  const [formData, setFormData] = useState({
-    title: '',
-    body: '',
-    tags: [],
-    is_anonymous: true,
-    university: '',
-    has_content_warning: false,
-    consent_given: false
+
+  const [form, setForm] = useState({
+    title: '', body: '', tags: [], is_anonymous: true,
+    university: '', has_content_warning: false, consent_given: false,
   });
-  
   const [tags, setTags] = useState([]);
   const [universities, setUniversities] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [charCount, setCharCount] = useState(0);
-  const [showPreview, setShowPreview] = useState(false);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
-      toast.error('Please sign in to submit a story');
+      toast.error('Sign in to share your story');
       window.location.href = `${API}/auth/google`;
       return;
     }
-    fetchFormData();
+    fetch(`${API}/tags`).then(r => r.ok ? r.json() : []).then(setTags).catch(() => {});
+    fetch(`${API}/universities`).then(r => r.ok ? r.json() : []).then(setUniversities).catch(() => {});
   }, [user]);
 
-  const fetchFormData = async () => {
-    try {
-      const [tagsRes, uniRes] = await Promise.all([
-        fetch(`${API}/tags`),
-        fetch(`${API}/universities`)
-      ]);
-      
-      if (tagsRes.ok) {
-        const tagsData = await tagsRes.json();
-        setTags(tagsData);
-      }
-      if (uniRes.ok) {
-        const uniData = await uniRes.json();
-        setUniversities(uniData);
-      }
-    } catch (error) {
-      console.error('Error fetching form data:', error);
-    }
-  };
-
-  const handleChange = (e) => {
+  const onChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
-    if (name === 'title') {
-      setCharCount(value.length);
-    }
-    
-    // Clear error for this field
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
-    }
+    setForm(f => ({ ...f, [name]: type === 'checkbox' ? checked : value }));
+    if (errors[name]) setErrors(e => ({ ...e, [name]: null }));
   };
 
-  const handleTagToggle = (tagName) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.includes(tagName)
-        ? prev.tags.filter(t => t !== tagName)
-        : [...prev.tags, tagName]
+  const toggleTag = (name) => {
+    setForm(f => ({
+      ...f,
+      tags: f.tags.includes(name) ? f.tags.filter(t => t !== name) : [...f.tags, name],
     }));
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    
-    if (!formData.title.trim()) {
-      newErrors.title = 'Title is required';
-    } else if (formData.title.length > 120) {
-      newErrors.title = 'Title must be 120 characters or less';
-    }
-    
-    if (!formData.body.trim()) {
-      newErrors.body = 'Your story is required';
-    } else if (formData.body.trim().length < 100) {
-      newErrors.body = 'Please share a bit more (at least 100 characters)';
-    }
-    
-    if (formData.tags.length === 0) {
-      newErrors.tags = 'Please select at least one topic';
-    }
-    
-    if (!formData.consent_given) {
-      newErrors.consent = 'You must consent to the terms to submit';
-    }
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+  const validate = () => {
+    const e = {};
+    if (!form.title.trim()) e.title = 'Required.';
+    else if (form.title.length > 120) e.title = 'Max 120 characters.';
+    if (!form.body.trim()) e.body = 'Required.';
+    else if (form.body.trim().length < 100) e.body = 'At least 100 characters.';
+    if (form.tags.length === 0) e.tags = 'Pick at least one topic.';
+    if (!form.consent_given) e.consent = 'You must consent.';
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      toast.error('Please fix the errors below');
-      return;
-    }
-    
+  const onSubmit = async (ev) => {
+    ev.preventDefault();
+    if (!validate()) { toast.error('Please fix the issues above'); return; }
     setLoading(true);
     try {
       const res = await fetch(`${API}/stories`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
-
       if (res.ok) {
-        const data = await res.json();
-        toast.success('Story submitted! It will be reviewed before publication.');
+        toast.success('Submitted. We’ll review it before publishing.');
         navigate('/profile');
       } else {
-        const error = await res.json();
-        toast.error(error.detail || 'Failed to submit story');
+        const err = await res.json();
+        toast.error(err.detail || 'Submission failed');
       }
-    } catch (error) {
-      console.error('Error submitting story:', error);
-      toast.error('Failed to submit story');
-    } finally {
-      setLoading(false);
-    }
+    } catch { toast.error('Network error'); }
+    finally { setLoading(false); }
   };
 
-  if (!user) {
-    return (
-      <div className="vs-page vs-submit-page">
-        <div className="vs-container">
-          <div className="vs-auth-required">
-            <PenLine size={48} />
-            <h2>Sign In Required</h2>
-            <p>Please sign in with Google to share your story.</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (!user) return null;
 
   return (
-    <div className="vs-page vs-submit-page">
-      {/* Header */}
-      <div className="vs-submit-header">
+    <div className="vs-page">
+      {/* Hero */}
+      <section className="vs-page-hero">
         <div className="vs-container">
-          <button className="vs-back-btn" onClick={() => navigate('/')}>
-            <ArrowLeft size={20} />
-            Back
-          </button>
-          <div className="vs-submit-header-content">
-            <PenLine size={32} />
-            <div>
-              <h1>Share Your Story</h1>
-              <p>Your experience matters. Share it with our community.</p>
-            </div>
-          </div>
+          <div className="vs-eyebrow">— SHARE YOUR STORY</div>
+          <div className="vs-spacer-sm" />
+          <h1 className="vs-page-title">
+            Tell us what <em className="vs-italic vs-coral">mattered</em><span className="vs-period">.</span>
+          </h1>
+          <p className="vs-lead">
+            Write at your own pace. Anonymously or with your name. We review every story
+            for safety and respect before it's published — usually within a few days.
+          </p>
         </div>
-      </div>
+      </section>
 
-      {/* Form */}
-      <div className="vs-container">
-        <div className="vs-submit-layout">
-          <form className="vs-submit-form" onSubmit={handleSubmit}>
+      <section>
+        <div className="vs-container">
+          <form className="vs-form-shell" onSubmit={onSubmit}>
             {/* Title */}
-            <div className="vs-form-group">
-              <label htmlFor="title" className="vs-form-label">
-                Story Title <span className="vs-required">*</span>
+            <div className="vs-field">
+              <label className="vs-field-label" htmlFor="title">
+                01 — Title <span className="req">*</span>
               </label>
               <input
-                type="text"
                 id="title"
                 name="title"
-                value={formData.title}
-                onChange={handleChange}
-                placeholder="Give your story a meaningful title"
+                type="text"
+                className={`vs-input ${errors.title ? 'vs-input--error' : ''}`}
+                placeholder="A line that catches what this is about"
+                value={form.title}
+                onChange={onChange}
                 maxLength={120}
-                className={`vs-input ${errors.title ? 'vs-input-error' : ''}`}
               />
-              <div className="vs-input-footer">
-                <span className={`vs-char-count ${charCount > 100 ? 'warning' : ''}`}>
-                  {charCount}/120
-                </span>
-                {errors.title && <span className="vs-error">{errors.title}</span>}
+              <div className="vs-field-foot">
+                <span>{form.title.length}/120</span>
+                {errors.title && <span className="err">— {errors.title}</span>}
               </div>
             </div>
 
-            {/* Story Body */}
-            <div className="vs-form-group">
-              <label htmlFor="body" className="vs-form-label">
-                Your Story <span className="vs-required">*</span>
+            {/* Body */}
+            <div className="vs-field">
+              <label className="vs-field-label" htmlFor="body">
+                02 — Your story <span className="req">*</span>
               </label>
               <textarea
                 id="body"
                 name="body"
-                value={formData.body}
-                onChange={handleChange}
-                placeholder="Share your health experience... What happened? How did it affect you? What did you learn?"
-                rows={12}
-                className={`vs-textarea ${errors.body ? 'vs-input-error' : ''}`}
+                className={`vs-textarea ${errors.body ? 'vs-textarea--error' : ''}`}
+                placeholder="Start anywhere. The diagnosis. The waiting room. The first morning after."
+                value={form.body}
+                onChange={onChange}
               />
-              <div className="vs-input-footer">
-                <span className="vs-helper-text">
-                  Tip: Be as open as you're comfortable with. Your story can help others feel less alone.
-                </span>
-                {errors.body && <span className="vs-error">{errors.body}</span>}
+              <div className="vs-field-foot">
+                <span className="vs-field-help">Most stories run 400–1,500 words. Take your time.</span>
+                {errors.body && <span className="err">— {errors.body}</span>}
               </div>
             </div>
 
-            {/* Topic Tags */}
-            <div className="vs-form-group">
-              <label className="vs-form-label">
-                Health Topics <span className="vs-required">*</span>
-              </label>
-              <p className="vs-form-description">Select all that apply to your story</p>
-              <div className="vs-tags-grid">
-                {tags.map(tag => (
+            {/* Tags */}
+            <div className="vs-field">
+              <label className="vs-field-label">03 — Topics <span className="req">*</span></label>
+              <p className="vs-field-help" style={{ margin: 0 }}>Select all that apply.</p>
+              <div className="vs-tag-selector" style={{ marginTop: 8 }}>
+                {tags.map(t => (
                   <button
-                    key={tag.id}
                     type="button"
-                    className={`vs-tag-select ${formData.tags.includes(tag.name) ? 'selected' : ''}`}
-                    onClick={() => handleTagToggle(tag.name)}
+                    key={t.id}
+                    className={`vs-chip ${form.tags.includes(t.name) ? 'vs-chip--active' : ''}`}
+                    onClick={() => toggleTag(t.name)}
                   >
-                    {formData.tags.includes(tag.name) && <Check size={16} />}
-                    {tag.name}
+                    {form.tags.includes(t.name) ? '✓ ' : ''}{t.name}
                   </button>
                 ))}
               </div>
-              {errors.tags && <span className="vs-error">{errors.tags}</span>}
+              {errors.tags && <div className="vs-field-foot"><span className="err">— {errors.tags}</span></div>}
             </div>
 
-            {/* Author Display */}
-            <div className="vs-form-group">
-              <label className="vs-form-label">Author Display</label>
-              <div className="vs-toggle-group">
+            {/* Author display */}
+            <div className="vs-field">
+              <label className="vs-field-label">04 — How should we credit you?</label>
+              <div className="vs-toggle-row">
                 <button
                   type="button"
-                  className={`vs-toggle-btn ${formData.is_anonymous ? 'active' : ''}`}
-                  onClick={() => setFormData(prev => ({ ...prev, is_anonymous: true }))}
+                  className={`vs-toggle-btn ${form.is_anonymous ? 'is-active' : ''}`}
+                  onClick={() => setForm(f => ({ ...f, is_anonymous: true }))}
                 >
-                  <EyeOff size={18} />
-                  Post Anonymously
+                  Anonymous
                 </button>
                 <button
                   type="button"
-                  className={`vs-toggle-btn ${!formData.is_anonymous ? 'active' : ''}`}
-                  onClick={() => setFormData(prev => ({ ...prev, is_anonymous: false }))}
+                  className={`vs-toggle-btn ${!form.is_anonymous ? 'is-active' : ''}`}
+                  onClick={() => setForm(f => ({ ...f, is_anonymous: false }))}
                 >
-                  <Eye size={18} />
-                  Use My Name ({user.name})
+                  My name ({user.name?.split(' ')[0]})
                 </button>
               </div>
-              <p className="vs-form-description">
-                <Info size={14} /> Your identity will only be visible to moderators for review purposes.
+              <p className="vs-field-help" style={{ marginTop: 12 }}>
+                Editors will always know who wrote each story — readers only see what you choose.
               </p>
             </div>
 
-            {/* University (Optional) */}
-            <div className="vs-form-group">
-              <label htmlFor="university" className="vs-form-label">
-                University Affiliation <span className="vs-optional">(Optional)</span>
+            {/* University */}
+            <div className="vs-field">
+              <label className="vs-field-label" htmlFor="university">
+                05 — Affiliation <span className="opt">(optional)</span>
               </label>
               <select
                 id="university"
                 name="university"
-                value={formData.university}
-                onChange={handleChange}
                 className="vs-select"
+                value={form.university}
+                onChange={onChange}
               >
-                <option value="">Select your university (optional)</option>
-                {universities.map(uni => (
-                  <option key={uni} value={uni}>{uni}</option>
-                ))}
+                <option value="">None / Prefer not to say</option>
+                {universities.map(u => <option key={u} value={u}>{u}</option>)}
               </select>
             </div>
 
-            {/* Content Warning */}
-            <div className="vs-form-group">
-              <label className="vs-checkbox-label">
+            {/* Content warning */}
+            <div className="vs-field">
+              <label className="vs-field-label">06 — Sensitive content</label>
+              <label className="vs-check">
                 <input
                   type="checkbox"
                   name="has_content_warning"
-                  checked={formData.has_content_warning}
-                  onChange={handleChange}
+                  checked={form.has_content_warning}
+                  onChange={onChange}
                 />
-                <AlertTriangle size={18} />
-                <span>This story contains potentially distressing content</span>
+                <span>
+                  This story includes trauma, loss, or graphic detail. Add a content warning.
+                </span>
               </label>
-              <p className="vs-form-description">
-                Check this if your story includes topics like trauma, loss, or graphic medical details.
-              </p>
             </div>
 
             {/* Consent */}
-            <div className="vs-form-group vs-consent-group">
-              <label className={`vs-checkbox-label ${errors.consent ? 'vs-checkbox-error' : ''}`}>
+            <div className="vs-field">
+              <label className="vs-field-label">07 — Consent <span className="req">*</span></label>
+              <label className="vs-check">
                 <input
                   type="checkbox"
                   name="consent_given"
-                  checked={formData.consent_given}
-                  onChange={handleChange}
+                  checked={form.consent_given}
+                  onChange={onChange}
                 />
                 <span>
-                  I consent to this story being published on Vital Signs and understand it will be 
-                  reviewed before publication. <span className="vs-required">*</span>
+                  I consent to this story being reviewed and published on Vital Signs.
                 </span>
               </label>
-              {errors.consent && <span className="vs-error">{errors.consent}</span>}
+              {errors.consent && <div className="vs-field-foot"><span className="err">— {errors.consent}</span></div>}
             </div>
 
-            {/* Submit Button */}
-            <div className="vs-form-actions">
-              <button
-                type="button"
-                className="vs-btn-outline"
-                onClick={() => setShowPreview(!showPreview)}
-              >
-                {showPreview ? 'Hide Preview' : 'Preview Story'}
+            <div className="vs-btn-row" style={{ marginTop: 32 }}>
+              <button type="submit" className="vs-btn vs-btn--primary vs-btn--large" disabled={loading}>
+                <span className="vs-btn-dot" />
+                {loading ? 'Submitting…' : 'Submit for review'}
               </button>
-              <button
-                type="submit"
-                className="vs-btn-primary vs-btn-large"
-                disabled={loading}
-              >
-                {loading ? 'Submitting...' : 'Submit Story'}
+              <button type="button" className="vs-btn vs-btn--secondary" onClick={() => navigate('/')}>
+                Save & exit
               </button>
             </div>
+
+            <p className="vs-field-help" style={{ marginTop: 24, maxWidth: '60ch' }}>
+              By submitting, you understand your story will be read by our editorial team
+              before appearing on the site. We may suggest small edits for clarity — never tone.
+            </p>
           </form>
-
-          {/* Preview Panel */}
-          {showPreview && (
-            <div className="vs-preview-panel">
-              <h3>Preview</h3>
-              <div className="vs-preview-content">
-                <div className="vs-preview-tags">
-                  {formData.tags.map((tag, idx) => (
-                    <span key={idx} className="vs-tag-pill">{tag}</span>
-                  ))}
-                </div>
-                <h4>{formData.title || 'Your Title Here'}</h4>
-                <p className="vs-preview-author">
-                  By {formData.is_anonymous ? 'Anonymous' : user.name}
-                  {formData.university && ` • ${formData.university}`}
-                </p>
-                {formData.has_content_warning && (
-                  <div className="vs-preview-warning">
-                    <AlertTriangle size={16} /> Content Warning
-                  </div>
-                )}
-                <div className="vs-preview-body">
-                  {formData.body || 'Your story will appear here...'}
-                </div>
-              </div>
-            </div>
-          )}
         </div>
-      </div>
+      </section>
     </div>
   );
 };
